@@ -4,6 +4,8 @@ import com.code_inspector.api.AddViolationToIgnoreMutation;
 import com.code_inspector.api.type.LanguageEnumeration;
 import com.code_inspector.plugins.intellij.cache.AnalysisDataCache;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
+import com.google.common.collect.ImmutableList;
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
@@ -12,6 +14,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.FileContentUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,22 +35,24 @@ public class CodeInspectionAnnotationFixIgnore implements IntentionAction {
     private final LanguageEnumeration language;
     private final String tool;
     private final Optional<String> filename;
+    private final PsiFile psiFile;
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
 
-    public CodeInspectionAnnotationFixIgnore(Long _projectId, Optional<String> _filename, String _rule, LanguageEnumeration _language, String _tool) {
+    public CodeInspectionAnnotationFixIgnore(PsiFile _psiFile, Long _projectId, Optional<String> _filename, String _rule, LanguageEnumeration _language, String _tool) {
         this.projectId = _projectId;
         this.rule = _rule;
         this.language = _language;
         this.tool = _tool;
         this.filename = _filename;
+        this.psiFile = _psiFile;
     }
 
     @Override
     public @IntentionName @NotNull String getText() {
-        if(this.filename.isEmpty()) {
+        if(!this.filename.isPresent()) {
             return ANNOTATION_FIX_IGNORE_PROJECT;
         }
         return ANNOTATION_FIX_IGNORE_FILE;
@@ -84,6 +89,9 @@ public class CodeInspectionAnnotationFixIgnore implements IntentionAction {
 
         // invalidate the cache so that at the next fetch, the data is being refetched
         AnalysisDataCache.getInstance().invalidateCache();
+
+        // refresh this file so that the annotation disappear.
+        FileContentUtil.reparseFiles(psiFile.getProject(), ImmutableList.of(psiFile.getVirtualFile()), true);
     }
 
     @Override
