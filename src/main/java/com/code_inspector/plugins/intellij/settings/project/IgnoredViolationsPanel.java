@@ -3,9 +3,11 @@ package com.code_inspector.plugins.intellij.settings.project;
 import com.code_inspector.api.GetProjectsQuery;
 import com.code_inspector.plugins.intellij.cache.AnalysisDataCache;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.FileContentUtil;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -55,6 +57,9 @@ public class IgnoredViolationsPanel extends JPanel {
 
             // make sure we refresh our cache so that violations are coming back.
             AnalysisDataCache.getInstance().invalidateCache();
+
+            // re-parse files to surface issues that are now no longer being ignored.
+            FileContentUtil.reparseOpenedFiles();
         });
 
         JBScrollPane scrollPane = new JBScrollPane(table);

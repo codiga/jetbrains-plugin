@@ -177,10 +177,10 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
                 annotationBuilder = annotationBuilder
                     .withFix(
                         new CodeInspectionAnnotationFixIgnore(
-                            projectId, Optional.of(annotation.getFilename()), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()))
+                            psiFile, projectId, Optional.of(annotation.getFilename()), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()))
                     .withFix(
                         new CodeInspectionAnnotationFixIgnore(
-                            projectId, Optional.empty(), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()));
+                            psiFile, projectId, Optional.empty(), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()));
             }
 
             /*
