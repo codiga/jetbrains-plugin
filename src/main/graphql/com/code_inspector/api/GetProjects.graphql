@@ -1,0 +1,22 @@
+query GetProjects{
+    projects(howmany: 100, skip: 0) {
+        id
+        name
+        owner {
+            username
+        }
+        group {
+            id
+            name
+        }
+        violationsToIgnore {
+            filename
+            description
+            prefix
+            rule
+            tool
+            description
+            language
+        }
+    }
+}

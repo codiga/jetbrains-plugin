@@ -1,0 +1,10 @@
+mutation AddViolationToIgnore(
+    $projectId: Long!, $rule: String!, $tool: String!,
+    $language: LanguageEnumeration!, $filename: String,
+    $prefix: String, $description: String) {
+
+      addViolationToIgnore(
+          projectId: $projectId, rule: $rule, tool: $tool,
+          language: $language, filename: $filename,
+          description: $description, prefix: $prefix) { rule }
+}

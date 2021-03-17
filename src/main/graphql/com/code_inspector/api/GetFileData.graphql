@@ -1,0 +1,43 @@
+query GetFileData($projectId: Long!, $revision: String!, $path: String!){
+    project(id:$projectId) {
+        id
+        name
+        analyses(status: [Done], revision: [$revision], howmany:1, skip:0){
+            id
+            violations(filename: $path, howmany:100, skip:0){
+                line
+                category
+                severity
+                description
+                filename
+                lineCount
+                language
+                tool
+                rule
+                ruleUrl
+            }
+            longFunctions(howmany:100, skip:0, filename: $path){
+                filename
+                functionName
+                complexity
+                length
+                lineStart
+                lineEnd
+            }
+            complexFunctions(howmany:100, skip:0, filename: $path){
+                filename
+                functionName
+                complexity
+                length
+                lineStart
+                lineEnd
+            }
+            duplicates(filename: $path, skip:0, howmany:100){
+                occurrences(howmany:100, skip:0){
+                    line
+                    filename
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,165 @@
+diff --git a/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java b/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java
+index 8819e26..2337eae 100644
+--- a/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java
++++ b/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java
+@@ -1,11 +1,10 @@
+ package com.code_inspector.plugins.intellij.git;
+ 
++import com.code_inspector.plugins.intellij.model.FileLinePair;
++import com.google.common.annotations.VisibleForTesting;
+ import com.google.common.collect.ImmutableList;
+ import com.intellij.openapi.diagnostic.Logger;
+-import com.intellij.openapi.diff.impl.patch.PatchHunk;
+-import com.intellij.openapi.diff.impl.patch.PatchReader;
+-import com.intellij.openapi.diff.impl.patch.PatchSyntaxException;
+-import com.intellij.openapi.diff.impl.patch.TextFilePatch;
++import com.intellij.openapi.diff.impl.patch.*;
+ import com.intellij.openapi.vcs.FilePath;
+ import com.intellij.openapi.vcs.FileStatus;
+ import com.intellij.openapi.vcs.VcsException;
+@@ -22,9 +21,7 @@ import git4idea.commands.GitLineHandler;
+ import git4idea.repo.GitRepository;
+ import git4idea.repo.GitRepositoryManager;
+ 
+-import java.util.Collection;
+-import java.util.List;
+-import java.util.Optional;
++import java.util.*;
+ 
+ import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
+ 
+@@ -148,7 +145,19 @@ public final class CodeInspectorGitUtils {
+         }
+ 
+         String patchContent = String.join("\n", result.getOutput());
++
+         LOGGER.debug(String.format("[getPatchesForWorkingDirectoryForFile]  patch content %s", patchContent));
++
++        return getTextFilePatchesFromDiff(patchContent);
++    }
++
++    /**
++     * Get all the TextFilePatch for a given diff
++     * @param patchContent
++     * @return
++     */
++    @VisibleForTesting
++    public static List<TextFilePatch> getTextFilePatchesFromDiff(final String patchContent) {
+         PatchReader patchReader = new PatchReader(patchContent);
+         try{
+             return patchReader.readTextPatches();
+@@ -158,4 +167,34 @@ public final class CodeInspectorGitUtils {
+         }
+         return ImmutableList.of();
+     }
++
++
++    /**
++     * For all patches, let's get the new position of all the context file. We do not index all the add or delete
++     * for now as this is not what we want to index and Code Inspector does not show anything on modified code
++     * from the current directory.
++     * @param textFilePatches - the list of patch files we have
++     * @return a map that indicate the initial position of a file/line and the new position, using only context info from patches.
++     */
++    public static Map<FileLinePair, FileLinePair> indexPatchHunks(List<TextFilePatch> textFilePatches) {
++        Map<FileLinePair, FileLinePair> result = new HashMap<>();
++        for (TextFilePatch tfp: textFilePatches) {
++            for (PatchHunk ph: tfp.getHunks()) {
++                int beforeStartLine = ph.getStartLineBefore();
++                int afterStartLine =  ph.getStartLineAfter();
++                for (PatchLine pl: ph.getLines()) {
++                    FileLinePair key = new FileLinePair(tfp.getBeforeName(), beforeStartLine);
++                    FileLinePair value = new FileLinePair(tfp.getAfterName(), afterStartLine);
++                    if (pl.getType() == PatchLine.Type.CONTEXT) {
++
++                        result.put(key, value);
++                    }
++                    beforeStartLine = beforeStartLine + 1;
++                    afterStartLine = afterStartLine + 1;
++
++                }
++            }
++        }
++        return result;
++    }
+ }
+diff --git a/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java b/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java
+index c3bfe1e..1d9d003 100644
+--- a/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java
++++ b/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java
+@@ -4,6 +4,7 @@ import com.code_inspector.api.GetFileDataQuery;
+ import com.code_inspector.plugins.intellij.annotators.CodeInspectionAnnotation;
+ import com.code_inspector.plugins.intellij.annotators.CodeInspectionAnnotationKind;
+ import com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils;
++import com.code_inspector.plugins.intellij.model.FileLinePair;
+ import com.code_inspector.plugins.intellij.model.FileOffset;
+ import com.code_inspector.plugins.intellij.model.LineOffset;
+ import com.intellij.openapi.diagnostic.Logger;
+@@ -18,14 +19,19 @@ import git4idea.commands.GitCommandResult;
+ import git4idea.commands.GitLineHandler;
+ 
+ 
++import java.io.IOException;
+ import java.math.BigDecimal;
++import java.nio.charset.StandardCharsets;
++import java.util.Arrays;
+ import java.util.List;
++import java.util.Map;
+ import java.util.Optional;
+ import java.util.stream.Collectors;
+ 
+ import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
+ import static com.code_inspector.plugins.intellij.Constants.NO_ANNOTATION;
+ import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.getPatchesForWorkingDirectoryForFile;
++import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.indexPatchHunks;
+ 
+ /**
+  * Utility class to convert data from the GraphQL API into data we can use for annotating the
+@@ -101,26 +107,30 @@ public class CodeInspectorApiUtils {
+ 
+         LOGGER.debug(String.format("received %s annotations", analysis.violations().size()));
+ 
+-        FileOffset fileOffset = new FileOffset(analysis.fileContent());
++        try{
++            final String fileContent = new String(psiFile.getVirtualFile().contentsToByteArray(), StandardCharsets.UTF_8);
++            final FileOffset fileOffset = new FileOffset(Arrays.asList(fileContent.split("\n")));
++
++
++            Map<FileLinePair, FileLinePair> changesFromWorkingDirectory = indexPatchHunks(getPatchesForWorkingDirectoryForFile(psiFile));
+ 
+-        for (TextFilePatch tfp: getPatchesForWorkingDirectoryForFile(psiFile)) {
+-            LOGGER.debug(String.format("patch before %s, after %s", tfp.getBeforeFileName(), tfp.getAfterFileName()));
+-            for (PatchHunk ph: tfp.getHunks()){
+-                LOGGER.debug(String.format("hunk before start line %s, end line %s", ph.getStartLineBefore(), ph.getEndLineBefore()));
+-                LOGGER.debug(String.format("hunk after  start line %s, end line %s", ph.getStartLineAfter(), ph.getEndLineAfter()));
+-            }
+-        }
+ 
+-        // TODO - map duplicates, long functions and complex functions
++            // TODO - map duplicates, long functions and complex functions
+ 
+-        Long analysisId = ((java.math.BigDecimal)analysis.id()).toBigInteger().longValue();
+-        Long projectId = ((java.math.BigDecimal)query.id()).toBigInteger().longValue();
++            Long analysisId = ((java.math.BigDecimal)analysis.id()).toBigInteger().longValue();
++            Long projectId = ((java.math.BigDecimal)query.id()).toBigInteger().longValue();
++
++            return analysis.violations()
++                .stream()
++                .map(v -> mapViolation(projectId, analysisId, v, fileOffset))
++                .filter( v -> v.isPresent())
++                .map(v -> v.get())
++                .collect(Collectors.toList());
++        } catch (IOException ioe){
++            ioe.printStackTrace();
++            LOGGER.debug("cannot read file");
++            return NO_ANNOTATION;
++        }
+ 
+-        return analysis.violations()
+-            .stream()
+-            .map(v -> mapViolation(projectId, analysisId, v, fileOffset))
+-            .filter( v -> v.isPresent())
+-            .map(v -> v.get())
+-            .collect(Collectors.toList());
+     }
+ }
