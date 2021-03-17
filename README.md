@@ -1,3 +1,6 @@
+[![Code Quality Score](https://www.code-inspector.com/project/20239/score/svg)](https://frontend.code-inspector.com/public/project/20239/intellij-plugin/dashboard)
+[![Code Status](https://www.code-inspector.com/project/20239/status/svg)](https://frontend.code-inspector.com/public/project/20239/intellij-plugin/dashboard)
+
 # Code Inspector Plugin for IntelliJ
 
 This is the source code for the IntelliJ plugin for Code Inspector.
