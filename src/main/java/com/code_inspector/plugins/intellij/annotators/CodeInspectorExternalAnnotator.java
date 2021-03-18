@@ -140,6 +140,53 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     }
 
     /**
+     * Generate an annotation for a violation
+     * @param psiFile - the file to annotate
+     * @param annotation - the annotation we need
+     * @param holder - the holder of the annotation
+     */
+    private void generateAnnotationForViolation(
+        @NotNull final PsiFile psiFile,
+        @NotNull final CodeInspectionAnnotation annotation,
+        @NotNull AnnotationHolder holder) {
+        final Long projectId = annotation.getProjectId();
+
+        final String message = String.format("%s (%s)", annotation.getMessage(), ANNOTATION_PREFIX);
+
+        AnnotationBuilder annotationBuilder = holder
+            .newAnnotation(getHighlightSeverityForViolation(annotation), message)
+            .highlightType(getProblemHighlightTypeForViolation(annotation))
+            .range(annotation.range());
+
+        /*
+         * We create two fixes to ignore the violation (if possible): one to ignore the violation
+         * at the file level (with Optional.of(filename)) and one without the file (with Optional.empty()).
+         */
+        if (annotation.getRule().isPresent() && annotation.getTool().isPresent() && annotation.getDescription().isPresent() && annotation.getLanguage().isPresent()) {
+            LOGGER.debug("Adding fix for annotation");
+            annotationBuilder = annotationBuilder
+                .withFix(
+                    new CodeInspectionAnnotationFixIgnore(
+                        psiFile, projectId, Optional.of(annotation.getFilename()), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()))
+                .withFix(
+                    new CodeInspectionAnnotationFixIgnore(
+                        psiFile, projectId, Optional.empty(), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()));
+        }
+
+        /*
+         * If there is a URL associated with the rule, add an action to send the user to the description
+         * of the rule.
+         */
+        if (annotation.getRuleUrl().isPresent()) {
+            annotationBuilder = annotationBuilder.withFix(new CodeInspectionAnnotationFixLearnMore(annotation.getRuleUrl().get()));
+        }
+
+        annotationBuilder = annotationBuilder.withFix(new CodeInspectionAnnotationFixOpenBrowser(projectId, annotation.getAnalysisId(), annotation.getFilename()));
+
+        annotationBuilder.create();
+    }
+
+    /**
      * Create all the UI elements to create an annotation.
      * @param psiFile - the file to annotate
      * @param annotations - the list of annotations previously reported by doAnnotate
@@ -161,39 +208,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
         LOGGER.debug(String.format("Received %s annotations", annotations.size()));
         for (CodeInspectionAnnotation annotation : annotations) {
-            final String message = String.format("%s (%s)", annotation.getMessage(), ANNOTATION_PREFIX);
-
-            AnnotationBuilder annotationBuilder = holder
-                .newAnnotation(getHighlightSeverityForViolation(annotation), message)
-                .highlightType(getProblemHighlightTypeForViolation(annotation))
-                .range(annotation.range());
-
-            /*
-             * We create two fixes to ignore the violation (if possible): one to ignore the violation
-             * at the file level (with Optional.of(filename)) and one without the file (with Optional.empty()).
-             */
-            if (annotation.getRule().isPresent() && annotation.getTool().isPresent() && annotation.getDescription().isPresent() && annotation.getLanguage().isPresent()) {
-                LOGGER.debug("Adding fix for annotation");
-                annotationBuilder = annotationBuilder
-                    .withFix(
-                        new CodeInspectionAnnotationFixIgnore(
-                            psiFile, projectId, Optional.of(annotation.getFilename()), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()))
-                    .withFix(
-                        new CodeInspectionAnnotationFixIgnore(
-                            psiFile, projectId, Optional.empty(), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()));
-            }
-
-            /*
-             * If there is a URL associated with the rule, add an action to send the user to the description
-             * of the rule.
-             */
-            if (annotation.getRuleUrl().isPresent()) {
-                annotationBuilder = annotationBuilder.withFix(new CodeInspectionAnnotationFixLearnMore(annotation.getRuleUrl().get()));
-            }
-
-            annotationBuilder = annotationBuilder.withFix(new CodeInspectionAnnotationFixOpenBrowser(projectId, annotation.getAnalysisId(), annotation.getFilename()));
-
-            annotationBuilder.create();
+            generateAnnotationForViolation(psiFile, annotation, holder);
         }
     }
 }

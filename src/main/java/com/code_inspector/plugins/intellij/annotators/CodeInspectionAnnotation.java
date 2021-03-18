@@ -26,19 +26,19 @@ public class CodeInspectionAnnotation {
     private final @NotNull Optional<String> category;
     private final @NotNull TextRange range;
 
-    @NotNull CodeInspectionAnnotationKind getAnnotationKind() { return annotationKind; };
-    @NotNull Long getProjectId() { return projectId; }
-    @NotNull Long getAnalysisId() { return analysisId; }
-    @NotNull String getMessage() { return message; }
-    @NotNull Optional<String> getRule() { return rule; }
-    @NotNull Optional<String> getRuleUrl() { return ruleUrl; }
-    @NotNull String getFilename() { return filename; }
-    @NotNull Optional<String> getTool() { return tool; }
-    @NotNull Optional<String> getDescription() { return description; }
-    @NotNull Optional<LanguageEnumeration> getLanguage() { return language; }
-    @NotNull Optional<Long> getSeverity() { return severity; }
-    @NotNull Optional<String> getCategory() { return category; }
-    @NotNull TextRange range() { return range; }
+    @NotNull public CodeInspectionAnnotationKind getAnnotationKind() { return annotationKind; };
+    @NotNull public Long getProjectId() { return projectId; }
+    @NotNull public Long getAnalysisId() { return analysisId; }
+    @NotNull public String getMessage() { return message; }
+    @NotNull public Optional<String> getRule() { return rule; }
+    @NotNull public Optional<String> getRuleUrl() { return ruleUrl; }
+    @NotNull public String getFilename() { return filename; }
+    @NotNull public Optional<String> getTool() { return tool; }
+    @NotNull public Optional<String> getDescription() { return description; }
+    @NotNull public Optional<LanguageEnumeration> getLanguage() { return language; }
+    @NotNull public Optional<Long> getSeverity() { return severity; }
+    @NotNull public Optional<String> getCategory() { return category; }
+    @NotNull public TextRange range() { return range; }
 
     public CodeInspectionAnnotation(
         final @NotNull Long _projectId,
