@@ -7,6 +7,7 @@ import com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils;
 import com.code_inspector.plugins.intellij.model.FileLinePair;
 import com.code_inspector.plugins.intellij.model.FileOffset;
 import com.code_inspector.plugins.intellij.model.LineOffset;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.diff.impl.patch.*;
 import com.intellij.openapi.util.TextRange;
@@ -17,6 +18,7 @@ import git4idea.commands.Git;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitLineHandler;
+import org.jetbrains.annotations.NotNull;
 
 
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 import static com.code_inspector.plugins.intellij.Constants.NO_ANNOTATION;
@@ -70,7 +73,7 @@ public class CodeInspectorApiUtils {
 
         Optional<LineOffset> lineOffset = fileOffset.getLineOffsetAtLine(violationLine);
 
-        if (lineOffset.isEmpty()){
+        if (!lineOffset.isPresent()){
             LOGGER.debug("line offset not found");
             return Optional.empty();
         }
@@ -94,6 +97,114 @@ public class CodeInspectorApiUtils {
     }
 
     /**
+     * Map a complex function into a CodeInspectionAnnotation to be surfaced in IntelliJ
+     * @param projectId - the project identifier on Code Inspector
+     * @param analysisId - the analysis identifier on Code Inspector
+     * @param complexFunction - the complex function
+     * @param fileOffset - the offset of the violation in the file (in IntelliJ term).
+     * @return
+     */
+    @VisibleForTesting
+    public static final Optional<CodeInspectionAnnotation> mapComplexFunction(
+        @NotNull final Long projectId,
+        @NotNull final Long analysisId,
+        @NotNull final GetFileDataQuery.ComplexFunction complexFunction,
+        @NotNull final FileOffset fileOffset,
+        @NotNull final Map<FileLinePair, FileLinePair> changesFromWorkingDirectory) {
+        LOGGER.debug(String.format("mapping complex function %s", complexFunction));
+        Integer startLine = ((BigDecimal)complexFunction.lineStart()).toBigInteger().intValue();
+        Integer complexity = ((BigDecimal)complexFunction.complexity()).toBigInteger().intValue();
+
+        /**
+         * Search if there was a change from Git and if then, take the change where it was.
+         */
+        FileLinePair key = new FileLinePair(complexFunction.filename(), startLine);
+        if (changesFromWorkingDirectory.containsKey(key)) {
+            FileLinePair value = changesFromWorkingDirectory.get(key);
+            if (value.getFilename().equals(complexFunction.filename())) {
+                startLine = value.getLineNumber();
+            }
+        }
+
+        Optional<LineOffset> lineOffset = fileOffset.getLineOffsetAtLine(startLine);
+
+        if (!lineOffset.isPresent()){
+            LOGGER.debug("line offset not found");
+            return Optional.empty();
+        }
+
+        String description = String.format(
+            "Function %s is too complex with a cyclomatic complexity of %s. Consider reducing the complexity of the function" +
+                "by refactoring it or simplifying its logic.",
+            complexFunction.functionName(),
+            complexity);
+
+        TextRange range = new TextRange(lineOffset.get().codeStartOffset, lineOffset.get().endOffset);
+        return Optional.of(
+            new CodeInspectionAnnotation(
+                projectId,
+                analysisId,
+                CodeInspectionAnnotationKind.ComplexFunction,
+                description,
+                complexFunction.filename(),
+                range));
+    }
+
+    /**
+     * Map a long function from the GraphQL API into a CodeInspectionAnnotation
+     * @param projectId - the project identifier on Code Inspector
+     * @param analysisId - the analysis identifier on Code Inspector
+     * @param longFunction - long function complex function
+     * @param fileOffset - the offset of the violation in the file (in IntelliJ term).
+     * @return
+     */
+    @VisibleForTesting
+    public static final Optional<CodeInspectionAnnotation> mapLongFunction(
+        @NotNull final Long projectId,
+        @NotNull final Long analysisId,
+        @NotNull final GetFileDataQuery.LongFunction longFunction,
+        @NotNull final FileOffset fileOffset,
+        @NotNull final Map<FileLinePair, FileLinePair> changesFromWorkingDirectory) {
+        LOGGER.debug(String.format("mapping long function %s", longFunction));
+        Integer startLine = ((BigDecimal)longFunction.lineStart()).toBigInteger().intValue();
+        Integer length = ((BigDecimal)longFunction.length()).toBigInteger().intValue();
+
+        /**
+         * Search if there was a change from Git and if then, take the change where it was.
+         */
+        FileLinePair key = new FileLinePair(longFunction.filename(), startLine);
+        if (changesFromWorkingDirectory.containsKey(key)) {
+            FileLinePair value = changesFromWorkingDirectory.get(key);
+            if (value.getFilename().equals(longFunction.filename())) {
+                startLine = value.getLineNumber();
+            }
+        }
+
+        Optional<LineOffset> lineOffset = fileOffset.getLineOffsetAtLine(startLine);
+
+        if (!lineOffset.isPresent()){
+            LOGGER.debug("line offset not found");
+            return Optional.empty();
+        }
+
+        String description = String.format(
+            "Function %s is too long with a length of %s lines. Consider refactoring the function into sub-functions.",
+            longFunction.functionName(),
+            length);
+
+        TextRange range = new TextRange(lineOffset.get().codeStartOffset, lineOffset.get().endOffset);
+        return Optional.of(
+            new CodeInspectionAnnotation(
+                projectId,
+                analysisId,
+                CodeInspectionAnnotationKind.LongFunction,
+                description,
+                longFunction.filename(),
+                range));
+    }
+
+
+    /**
      * Get all the annotations to surface in IntelliJ based on the results from the GraphQL API.
      * @param query - the query results from the GraphQL API.
      * @param psiFile - the file being edited in IntelliJ
@@ -101,13 +212,13 @@ public class CodeInspectorApiUtils {
      */
     public static List<CodeInspectionAnnotation> getAnnotationsFromQueryResult(GetFileDataQuery.Project query, PsiFile psiFile) {
         Optional<GetFileDataQuery.Analysis> analysisOptional = query.analyses().stream().findFirst();
-        if(analysisOptional.isEmpty()) {
+        if(!analysisOptional.isPresent()) {
             LOGGER.info("no analysis present");
             return NO_ANNOTATION;
         }
         Optional<VirtualFile> repositoryRoot = CodeInspectorGitUtils.getRepositoryRoot(psiFile);
 
-        if (repositoryRoot.isEmpty()) {
+        if (!repositoryRoot.isPresent()) {
             LOGGER.debug("no root found");
             return NO_ANNOTATION;
         }
@@ -125,17 +236,32 @@ public class CodeInspectorApiUtils {
             Map<FileLinePair, FileLinePair> changesFromWorkingDirectory = indexPatchHunks(getPatchesForWorkingDirectoryForFile(psiFile));
 
 
-            // TODO - map duplicates, long functions and complex functions
+            // TODO - map duplicates
 
             Long analysisId = ((java.math.BigDecimal)analysis.id()).toBigInteger().longValue();
             Long projectId = ((java.math.BigDecimal)query.id()).toBigInteger().longValue();
 
-            return analysis.violations()
+            List<Optional<CodeInspectionAnnotation>> violationsAnnotations = analysis.violations()
                 .stream()
                 .map(v -> mapViolation(projectId, analysisId, v, fileOffset, changesFromWorkingDirectory))
-                .filter( v -> v.isPresent())
-                .map(v -> v.get())
                 .collect(Collectors.toList());
+
+            List<Optional<CodeInspectionAnnotation>> complexFunctionsAnnotations = analysis.complexFunctions()
+                .stream()
+                .map(v -> mapComplexFunction(projectId, analysisId, v, fileOffset, changesFromWorkingDirectory))
+                .collect(Collectors.toList());
+
+            List<Optional<CodeInspectionAnnotation>> longFunctionsAnnotations = analysis.longFunctions()
+                .stream()
+                .map(v -> mapLongFunction(projectId, analysisId, v, fileOffset, changesFromWorkingDirectory))
+                .collect(Collectors.toList());
+
+            Stream<Optional<CodeInspectionAnnotation>> allAnnotations =
+                Stream.concat(Stream.concat(violationsAnnotations.stream(), complexFunctionsAnnotations.stream()), longFunctionsAnnotations.stream());
+            return allAnnotations
+                    .filter(v -> v.isPresent())
+                    .map(v -> v.get())
+                    .collect(Collectors.toList());
         } catch (IOException ioe){
             ioe.printStackTrace();
             LOGGER.debug("cannot read file");
