@@ -34,8 +34,8 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         GetFileDataQuery.LongFunction longFunction = mock(GetFileDataQuery.LongFunction.class);
         FileOffset fileOffset = mock(FileOffset.class);
         when(fileOffset.getLineOffsetAtLine(anyInt())).thenReturn(Optional.empty());
-        when(longFunction.lineStart()).thenReturn(new BigDecimal(1.0));
-        when(longFunction.length()).thenReturn(new BigDecimal(40));
+        when(longFunction.lineStart()).thenReturn(new BigDecimal("1.0"));
+        when(longFunction.length()).thenReturn(new BigDecimal("40"));
 
         Optional<CodeInspectionAnnotation> annotation = mapLongFunction(1L, 42L, longFunction, fileOffset, ImmutableMap.of());
         assertTrue(!annotation.isPresent());
@@ -50,8 +50,8 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         LineOffset lineOffset = new LineOffset(42, 51, 45);
 
         when(fileOffset.getLineOffsetAtLine(anyInt())).thenReturn(Optional.of(lineOffset));
-        when(longFunction.lineStart()).thenReturn(new BigDecimal(1.0));
-        when(longFunction.length()).thenReturn(new BigDecimal(40));
+        when(longFunction.lineStart()).thenReturn(new BigDecimal("1.0"));
+        when(longFunction.length()).thenReturn(new BigDecimal("40"));
         when(longFunction.filename()).thenReturn("foobar.txt");
         when(longFunction.functionName()).thenReturn("superfunction");
 
@@ -77,8 +77,8 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         GetFileDataQuery.ComplexFunction complexFunction = mock(GetFileDataQuery.ComplexFunction.class);
         FileOffset fileOffset = mock(FileOffset.class);
         when(fileOffset.getLineOffsetAtLine(anyInt())).thenReturn(Optional.empty());
-        when(complexFunction.lineStart()).thenReturn(new BigDecimal(1.0));
-        when(complexFunction.complexity()).thenReturn(new BigDecimal(51));
+        when(complexFunction.lineStart()).thenReturn(new BigDecimal("1.0"));
+        when(complexFunction.complexity()).thenReturn(new BigDecimal("51"));
 
         Optional<CodeInspectionAnnotation> annotation = mapComplexFunction(1L, 42L, complexFunction, fileOffset, ImmutableMap.of());
         assertTrue(!annotation.isPresent());
@@ -94,8 +94,8 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         LineOffset lineOffset = new LineOffset(42, 51, 45);
 
         when(fileOffset.getLineOffsetAtLine(anyInt())).thenReturn(Optional.of(lineOffset));
-        when(complexFunction.lineStart()).thenReturn(new BigDecimal(1.0));
-        when(complexFunction.complexity()).thenReturn(new BigDecimal(51));
+        when(complexFunction.lineStart()).thenReturn(new BigDecimal("1.0"));
+        when(complexFunction.complexity()).thenReturn(new BigDecimal("51"));
         when(complexFunction.filename()).thenReturn("foobar.txt");
         when(complexFunction.functionName()).thenReturn("superfunction");
 

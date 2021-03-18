@@ -141,13 +141,8 @@ public class CodeInspectorApiUtils {
 
         TextRange range = new TextRange(lineOffset.get().codeStartOffset, lineOffset.get().endOffset);
         return Optional.of(
-            new CodeInspectionAnnotation(
-                projectId,
-                analysisId,
-                CodeInspectionAnnotationKind.ComplexFunction,
-                description,
-                complexFunction.filename(),
-                range));
+            new CodeInspectionAnnotation(projectId, analysisId, CodeInspectionAnnotationKind.ComplexFunction,
+                description, complexFunction.filename(), range));
     }
 
     /**
@@ -195,12 +190,8 @@ public class CodeInspectorApiUtils {
         TextRange range = new TextRange(lineOffset.get().codeStartOffset, lineOffset.get().endOffset);
         return Optional.of(
             new CodeInspectionAnnotation(
-                projectId,
-                analysisId,
-                CodeInspectionAnnotationKind.LongFunction,
-                description,
-                longFunction.filename(),
-                range));
+                projectId, analysisId, CodeInspectionAnnotationKind.LongFunction,
+                description, longFunction.filename(), range));
     }
 
 
