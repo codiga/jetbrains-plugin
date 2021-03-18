@@ -5,6 +5,9 @@
 
 This is the source code for the IntelliJ plugin for Code Inspector.
 
+It is available on the [IntelliJ marketplace](https://plugins.jetbrains.com/plugin/16341-code-inspector) 
+and you can install it directly within any IntelliJ product (IntelliJ, PHPStorm, PYCharm, etc).
+
 You can watch a [short description of the plugin](https://www.youtube.com/watch?v=ecGhMpynHXQ).
 
 
