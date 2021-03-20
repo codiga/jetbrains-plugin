@@ -189,9 +189,6 @@ public final class CodeInspectorGitUtils {
                     FileLinePair key = new FileLinePair(tfp.getBeforeName(), beforeStartLine);
                     FileLinePair value = new FileLinePair(tfp.getAfterName(), afterStartLine);
                     if (pl.getType() == PatchLine.Type.CONTEXT) {
-                        System.out.println(String.format("getting context, transforming %s into %s", key, value));
-                        System.out.println("mapping " + key);
-                        System.out.println("to " + value);
                         result.put(key, value);
                         beforeStartLine = beforeStartLine + 1;
                         afterStartLine = afterStartLine + 1;
