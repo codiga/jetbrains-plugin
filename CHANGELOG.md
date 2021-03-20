@@ -3,6 +3,7 @@
 # Code Inspector IntelliJ PlugIn Changelog
 
 ## [Unreleased]
+## [1.0.1]
 ### Added
 
 - Add long and complex functions detection
