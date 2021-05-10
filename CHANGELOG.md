@@ -5,7 +5,11 @@
 ## [Unreleased]
 ### Added
 
+## [1.0.2]
+### Added
+
 - Add long and complex functions detection
+- Support new builds 
 
 
 ## [1.0.0] - 2021-03-17
