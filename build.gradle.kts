@@ -28,7 +28,7 @@ dependencies {
     implementation("com.apollographql.apollo:apollo-runtime:2.5.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testCompile("org.mockito:mockito-core:3.8.0")
+    testCompile("org.mockito:mockito-core:3.10.0")
 }
 
 // Configure gradle-intellij-plugin plugin.
