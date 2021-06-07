@@ -7,9 +7,9 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.4.31"
+    id("org.jetbrains.kotlin.jvm") version "1.5.10"
     // GraphQL
-    id("com.apollographql.apollo") version "2.5.4"
+    id("com.apollographql.apollo") version "2.5.8"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     id("org.jetbrains.intellij") version "0.7.2"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
@@ -25,7 +25,7 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation("com.apollographql.apollo:apollo-runtime:2.5.4")
+    implementation("com.apollographql.apollo:apollo-runtime:2.5.8")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testCompile("org.mockito:mockito-core:3.11.0")
