@@ -31,6 +31,11 @@ public class LanguageUtils {
 
     public static LanguageEnumeration getLanguageFromFilename(final String filename) {
         final String extension = FilenameUtils.getExtension(filename);
+
+        if (filename.toLowerCase().startsWith("docker")) {
+            return LanguageEnumeration.DOCKER;
+        }
+
         return EXTENSION_TO_LANGUAGE.getOrDefault(extension, LanguageEnumeration.UNKNOWN);
     }
 }

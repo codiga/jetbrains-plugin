@@ -64,7 +64,7 @@ public final class AnalysisDataCache {
 
         LOGGER.debug(String.format("Language file %s: %s", filename, language));
 
-        if (!cacheProjectAnalysis.containsKey(cacheKey)) {
+        if (!cacheFileAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));
             Optional<GetFileAnalysisQuery.GetFileAnalysis> query = codeInspectorApi.getFileAnalysis(filename, code, language, projectIdOptional);
             cacheFileAnalysis.put(cacheKey, query);

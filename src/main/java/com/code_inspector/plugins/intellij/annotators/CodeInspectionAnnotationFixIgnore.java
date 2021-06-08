@@ -81,7 +81,10 @@ public class CodeInspectionAnnotationFixIgnore implements IntentionAction {
         LOGGER.debug("CodeInspectionIgnoreAnnotation - calling invoke()");
         
         // Call the GraphQL API.
-        Optional<AddViolationToIgnoreMutation.AddViolationToIgnore> res = codeInspectorApi.addViolationToIgnore(this.projectId, this.rule, this.tool, this.language, this.filename, Optional.empty(), "description");
+        Optional<AddViolationToIgnoreMutation.AddViolationToIgnore> res =
+            codeInspectorApi.addViolationToIgnore(
+                this.projectId, this.rule, this.tool,
+                this.language, this.filename, Optional.empty(), "description");
         if(res.isPresent()) {
             LOGGER.debug(res.get().toString());
         } else {

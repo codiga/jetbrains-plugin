@@ -60,13 +60,21 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
     @Nullable
     private List<CodeInspectionAnnotation> getAnnotationFromFileAnalysis(PsiFile psiFile, Long projectId) {
-        final String fullPath = psiFile.getVirtualFile().getPath();
-        final String projectPath = psiFile.getProject().getBasePath();
         final String filename = psiFile.getName();
 
-        LOGGER.debug(String.format("calling doAnnotate on file %s, type %s", filename, psiFile.getLanguage().toString()));
+        LOGGER.debug(String.format("calling doAnnotate on file %s, type %s", filename, psiFile.getLanguage()));
 
-        Optional<GetFileAnalysisQuery.GetFileAnalysis> queryResult = AnalysisDataCache.getInstance().getViolationsFromFileAnalysis(projectId, filename, psiFile.getText());
+        final long startAnalysisTimeMillis = System.currentTimeMillis();
+
+        Optional<GetFileAnalysisQuery.GetFileAnalysis> queryResult = AnalysisDataCache
+            .getInstance()
+            .getViolationsFromFileAnalysis(projectId, filename, psiFile.getText());
+
+        final long endAnalysisTimeMillis = System.currentTimeMillis();
+
+        LOGGER.debug(String.format("Analysis time for file %s: %s ms",
+            filename,
+            endAnalysisTimeMillis - startAnalysisTimeMillis));
 
         if (queryResult.isPresent()){
             List<CodeInspectionAnnotation> res = getAnnotationsFromFileAnalysisQueryResult(queryResult.get(), psiFile);
@@ -81,7 +89,10 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
     @Nullable
     private List<CodeInspectionAnnotation> getAnnotationFromProjectAnalysis(PsiFile psiFile, Long projectId) {
-        LOGGER.debug(String.format("calling getAnnotationFromExistingAnalysis on file %s, type %s", psiFile.getVirtualFile().getPath(), psiFile.getLanguage().toString()));
+        LOGGER.debug(String.format(
+            "calling getAnnotationFromExistingAnalysis on file %s, type %s",
+            psiFile.getVirtualFile().getPath(),
+            psiFile.getLanguage()));
 
         Optional<String> revision = CodeInspectorGitUtils.getGitRevision(psiFile);
 
@@ -97,7 +108,9 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
             return NO_ANNOTATION;
         }
 
-        Optional<GetFileDataQuery.Project> query = AnalysisDataCache.getInstance().getViolationsFromProjectAnalysis(projectId, revision.get(), filePath.get());
+        Optional<GetFileDataQuery.Project> query = AnalysisDataCache
+            .getInstance()
+            .getViolationsFromProjectAnalysis(projectId, revision.get(), filePath.get());
 
         if (!query.isPresent()) {
             LOGGER.info("no data from query");
@@ -127,11 +140,12 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
         ProgressManager.checkCanceled();
 
-        /**
+        /*
          * If the project is analyzed by Code Inspector and the file not modified, get that data from
          * the existing Code Inspector Analysis from our backend.
          */
-        if(fileStatus == FileStatus.NOT_CHANGED && PROJECT_SETTINGS.isEnabled && !settings.projectId.equals(INVALID_PROJECT_ID)) {
+        if(fileStatus == FileStatus.NOT_CHANGED &&
+            PROJECT_SETTINGS.isEnabled && !settings.projectId.equals(INVALID_PROJECT_ID)) {
             LOGGER.debug("Get data from project analysis");
             return getAnnotationFromProjectAnalysis(psiFile, settings.projectId);
         } else {
@@ -153,7 +167,6 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
                 case 2:
                     return HighlightSeverity.WARNING;
                 case 3:
-                    return HighlightSeverity.WEAK_WARNING;
                 default:
                     return HighlightSeverity.WEAK_WARNING;
             }
@@ -196,7 +209,8 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
         final TextRange textRange = psiFile.getTextRange();
 
-        if (!textRange.contains(annotation.range().getEndOffset()) || !textRange.contains(annotation.range().getStartOffset())){
+        if (!textRange.contains(annotation.range().getEndOffset()) ||
+            !textRange.contains(annotation.range().getStartOffset())) {
             LOGGER.debug("range outside of the scope");
             return;
         }
@@ -217,10 +231,12 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
             annotationBuilder = annotationBuilder
                 .withFix(
                     new CodeInspectionAnnotationFixIgnore(
-                        psiFile, projectId.get(), Optional.of(annotation.getFilename()), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()))
+                        psiFile, projectId.get(), Optional.of(annotation.getFilename()), annotation.getRule().get(),
+                        annotation.getLanguage().get(), annotation.getTool().get()))
                 .withFix(
                     new CodeInspectionAnnotationFixIgnore(
-                        psiFile, projectId.get(), Optional.empty(), annotation.getRule().get(), annotation.getLanguage().get(), annotation.getTool().get()));
+                        psiFile, projectId.get(), Optional.empty(), annotation.getRule().get(),
+                        annotation.getLanguage().get(), annotation.getTool().get()));
         }
 
         /*
@@ -228,11 +244,16 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
          * of the rule.
          */
         if (annotation.getRuleUrl().isPresent()) {
-            annotationBuilder = annotationBuilder.withFix(new CodeInspectionAnnotationFixLearnMore(annotation.getRuleUrl().get()));
+            annotationBuilder = annotationBuilder.withFix(
+                new CodeInspectionAnnotationFixLearnMore(annotation.getRuleUrl().get()));
         }
 
         if (projectId.isPresent() && annotation.getAnalysisId().isPresent()) {
-            annotationBuilder = annotationBuilder.withFix(new CodeInspectionAnnotationFixOpenBrowser(projectId.get(), annotation.getAnalysisId().get(), annotation.getFilename()));
+            annotationBuilder = annotationBuilder.withFix(
+                new CodeInspectionAnnotationFixOpenBrowser(
+                    projectId.get(),
+                    annotation.getAnalysisId().get(),
+                    annotation.getFilename()));
 
         }
 
@@ -255,8 +276,6 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
         if (annotations == null || annotations.isEmpty()) {
             return;
         }
-
-        ProjectSettingsState settings = ProjectSettingsState.getInstance(psiFile.getProject());
 
         LOGGER.debug(String.format("Received %s annotations", annotations.size()));
         for (CodeInspectionAnnotation annotation : annotations) {
