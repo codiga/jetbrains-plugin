@@ -331,8 +331,11 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
         long currentTimestamp = System.currentTimeMillis();
         long deadline = currentTimestamp + REAL_TIME_FEEDBACK_TIMEOUT_MILLIS;
 
-        LOGGER.debug(String.format("current timestamp: %s", currentTimestamp));
-        LOGGER.debug(String.format("deadline         : %s", deadline));
+        try {
+            Thread.sleep(FILE_ANALYSIS_INITIAL_SLEEP_MILLIS);
+        } catch (InterruptedException e) {
+            LOGGER.debug("interupted during initial sleep");
+        }
 
         while (currentTimestamp < deadline) {
             /**
