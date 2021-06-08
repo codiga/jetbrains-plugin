@@ -61,14 +61,19 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     @Nullable
     private List<CodeInspectionAnnotation> getAnnotationFromFileAnalysis(PsiFile psiFile, Long projectId) {
         final String filename = psiFile.getName();
+        final String code = psiFile.getText();
 
         LOGGER.debug(String.format("calling doAnnotate on file %s, type %s", filename, psiFile.getLanguage()));
+
+        if (code.isEmpty()) {
+            return ImmutableList.of();
+        }
 
         final long startAnalysisTimeMillis = System.currentTimeMillis();
 
         Optional<GetFileAnalysisQuery.GetFileAnalysis> queryResult = AnalysisDataCache
             .getInstance()
-            .getViolationsFromFileAnalysis(projectId, filename, psiFile.getText());
+            .getViolationsFromFileAnalysis(projectId, filename, code);
 
         final long endAnalysisTimeMillis = System.currentTimeMillis();
 
