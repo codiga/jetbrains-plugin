@@ -35,6 +35,9 @@ by Code Inspector and also by one of the Code Inspector engineer.
 We follow the [Google Java Code Style](https://google.github.io/styleguide/javaguide.html).
 We sometimes derive from it and that's okay.
 
+## Updating the GraphQL Schema
+
+See instructions [here](https://www.apollographql.com/docs/android/essentials/get-started-java/)
 
 ## Relevant documentation
 

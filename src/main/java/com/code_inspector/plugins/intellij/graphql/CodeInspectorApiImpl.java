@@ -9,6 +9,7 @@ import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.request.RequestHeaders;
 import com.code_inspector.api.*;
+import com.code_inspector.api.type.AnalysisResultStatus;
 import com.code_inspector.api.type.LanguageEnumeration;
 import com.code_inspector.plugins.intellij.settings.application.AppSettingsState;
 import com.google.common.collect.ImmutableList;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Optional;
 
-import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
+import static com.code_inspector.plugins.intellij.Constants.*;
 import static com.code_inspector.plugins.intellij.graphql.Constants.*;
 
 /**
@@ -269,5 +270,134 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
             });
 
         return apiRequest.getData();
+    }
+
+    /**
+     * Initiate the real-time feedback query using the [[getFileAnalysis]] method.
+     * @param filename - the filename to analyze
+     * @param code - the code we want to analyze
+     * @param language - the language (using the GraphQL enumeration)
+     * @param projectId - the optional project identifier.
+     * @return the list of violations.
+     */
+    @Override
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) {
+        ApiRequest<Object> apiRequestSendFileForAnalysis = new ApiRequest<Object>();
+
+        final Input<Object> inputProjectId = Input.absent();
+
+        /**
+         * Send the analysis query
+         */
+        ApolloMutationCall<CreateFileAnalysisMutation.Data> mutationCall =
+            apolloClient.mutate(new CreateFileAnalysisMutation(inputProjectId, filename, code, language))
+            .toBuilder()
+            .requestHeaders(getHeaders())
+            .build();
+        mutationCall.enqueue(
+            new ApolloCall.Callback<CreateFileAnalysisMutation.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<CreateFileAnalysisMutation.Data> response) {
+                    if (response.getData() == null) {
+                        LOGGER.info(String.format("CreateFileAnalysisMutation response %s", response));
+
+                        apiRequestSendFileForAnalysis.setError();
+                    } else {
+                        LOGGER.info(String.format("CreateFileAnalysisMutation response data: %s ", response.getData()));
+                        LOGGER.info(String.format("CreateFileAnalysisMutation response data: %s ", response.getData().createFileAnalysis()));
+                        apiRequestSendFileForAnalysis.setData(response.getData().createFileAnalysis());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    LOGGER.debug("api call to ignore failure fails");
+                    LOGGER.debug(e.getMessage());
+                    e.printStackTrace();
+                    apiRequestSendFileForAnalysis.setError();
+                }
+            });
+
+
+        Optional<Object> fileAnalysisId = apiRequestSendFileForAnalysis.getData();
+        if (!fileAnalysisId.isPresent()) {
+            LOGGER.debug("no data found from the createFileAnalysis call");
+            LOGGER.debug(fileAnalysisId.toString());
+        }
+
+        LOGGER.debug(String.format("Got data from createFileAnalysis call %s", fileAnalysisId.get()));
+
+
+        long currentTimestamp = System.currentTimeMillis();
+        long deadline = currentTimestamp + REAL_TIME_FEEDBACK_TIMEOUT_MILLIS;
+
+        LOGGER.debug(String.format("current timestamp: %s", currentTimestamp));
+        LOGGER.debug(String.format("deadline         : %s", deadline));
+
+        while (currentTimestamp < deadline) {
+            /**
+             * Regularly poll until we get the results
+             */
+            ApiRequest<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysisData = new ApiRequest<GetFileAnalysisQuery.GetFileAnalysis>();
+
+
+            LOGGER.info(String.format("Doing GetFileAnalysisQuery for file %s", filename));
+            ApolloQueryCall<GetFileAnalysisQuery.Data> queryCall =
+                apolloClient.query(new GetFileAnalysisQuery(fileAnalysisId.get()))
+                    .toBuilder()
+                    .requestHeaders(getHeaders())
+                    .build();
+            queryCall.enqueue(
+                new ApolloCall.Callback<GetFileAnalysisQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<GetFileAnalysisQuery.Data> response) {
+                        if (response.getData() == null) {
+                            LOGGER.info(String.format("GetFileAnalysisQuery response %s", response));
+                            getFileAnalysisData.setError();
+                        } else {
+                            getFileAnalysisData.setData(response.getData().getFileAnalysis());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        LOGGER.debug("GetFileAnalysisQuery - api call to ignore failure fails");
+                        LOGGER.debug(e.getMessage());
+                        e.printStackTrace();
+                        getFileAnalysisData.setError();
+                    }
+                });
+
+            /**
+             * If no data, just return since there is definitely something wrong.
+             */
+            LOGGER.debug(String.format("Waiting for data from GetFileAnalysisQuery for file %s", filename));
+            Optional<GetFileAnalysisQuery.GetFileAnalysis> returnedData = getFileAnalysisData.getData();
+            if (!returnedData.isPresent()) {
+                LOGGER.debug("error getting data from the analysis");
+                LOGGER.debug(returnedData.get().toString());
+                return Optional.empty();
+            }
+            else {
+                /**
+                 * Loop until we get something.
+                 */
+                switch (returnedData.get().status()) {
+                    case DONE:
+                        return returnedData;
+                    case ERROR:
+                        LOGGER.debug("error when getting the request");
+                        return Optional.empty();
+                }
+            }
+
+            try {
+                Thread.sleep(SLEEP_BETWEEN_FILE_ANALYSIS_MILLIS);
+            } catch (InterruptedException e) {
+                LOGGER.debug("cannot sleep");
+            }
+            currentTimestamp = System.currentTimeMillis();
+        }
+        return Optional.empty();
     }
 }

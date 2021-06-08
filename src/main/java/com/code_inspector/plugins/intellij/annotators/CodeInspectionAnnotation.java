@@ -13,8 +13,8 @@ import java.util.Optional;
 public class CodeInspectionAnnotation {
 
     private final @NotNull CodeInspectionAnnotationKind annotationKind;
-    private final @NotNull Long projectId;
-    private final @NotNull Long analysisId;
+    private final @NotNull Optional<Long> projectId;
+    private final @NotNull Optional<Long> analysisId;
     private final @NotNull String message;
     private final @NotNull Optional<String> rule;
     private final @NotNull Optional<String> ruleUrl;
@@ -27,8 +27,8 @@ public class CodeInspectionAnnotation {
     private final @NotNull TextRange range;
 
     @NotNull public CodeInspectionAnnotationKind getAnnotationKind() { return annotationKind; };
-    @NotNull public Long getProjectId() { return projectId; }
-    @NotNull public Long getAnalysisId() { return analysisId; }
+    @NotNull public Optional<Long> getProjectId() { return projectId; }
+    @NotNull public Optional<Long> getAnalysisId() { return analysisId; }
     @NotNull public String getMessage() { return message; }
     @NotNull public Optional<String> getRule() { return rule; }
     @NotNull public Optional<String> getRuleUrl() { return ruleUrl; }
@@ -41,8 +41,8 @@ public class CodeInspectionAnnotation {
     @NotNull public TextRange range() { return range; }
 
     public CodeInspectionAnnotation(
-        final @NotNull Long _projectId,
-        final @NotNull Long _analysisId,
+        final @NotNull Optional<Long> _projectId,
+        final @NotNull Optional<Long> _analysisId,
         final @NotNull CodeInspectionAnnotationKind _annotationKind,
         final @NotNull String msg,
         final @NotNull String filename,
@@ -70,8 +70,8 @@ public class CodeInspectionAnnotation {
     }
 
     public CodeInspectionAnnotation(
-        final @NotNull Long _projectId,
-        final @NotNull Long _analysisId,
+        final @NotNull Optional<Long> _projectId,
+        final @NotNull Optional<Long> _analysisId,
         final @NotNull CodeInspectionAnnotationKind _annotationKind,
         final @NotNull String msg,
         final @NotNull String _filename,
@@ -90,4 +90,5 @@ public class CodeInspectionAnnotation {
         this.rule = Optional.empty();
         this.tool = Optional.empty();
     }
+
 }

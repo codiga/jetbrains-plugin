@@ -99,4 +99,14 @@ public interface CodeInspectorApi {
      * @return - a string (which is not really relevant)
      */
     public Optional<String> removeViolationToIgnore(Long projectId, String rule, String tool, LanguageEnumeration language, Optional<String> filename, Optional<String> prefix);
+
+    /**
+     * Analyze a file using the real-time feedback and return the result of the query
+     * @param filename - the filename to analyze
+     * @param code - the code we want to analyze
+     * @param language - the language (using the GraphQL enumeration)
+     * @param projectId - the optional project identifier.
+     * @return - the list of potential issues.
+     */
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId);
 }
