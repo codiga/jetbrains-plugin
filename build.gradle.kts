@@ -26,7 +26,7 @@ repositories {
 }
 dependencies {
     implementation("com.apollographql.apollo:apollo-runtime:2.5.8")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testCompile("org.mockito:mockito-core:3.11.0")
 }
