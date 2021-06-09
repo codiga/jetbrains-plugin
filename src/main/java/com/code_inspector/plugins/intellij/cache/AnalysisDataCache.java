@@ -4,6 +4,7 @@ import com.code_inspector.api.GetFileAnalysisQuery;
 import com.code_inspector.api.GetFileDataQuery;
 import com.code_inspector.api.type.LanguageEnumeration;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -41,6 +42,17 @@ public final class AnalysisDataCache {
         return _INSTANCE;
     }
 
+
+    @VisibleForTesting
+    public ConcurrentHashMap<CacheKey, Optional<GetFileDataQuery.Project>> getCacheProjectAnalysis() {
+        return this.cacheProjectAnalysis;
+    }
+
+    @VisibleForTesting
+    public ConcurrentHashMap<CacheKey, Optional<GetFileAnalysisQuery.GetFileAnalysis>> getCacheFileAnalysis() {
+        return this.cacheFileAnalysis;
+    }
+
     private String getMD5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -51,10 +63,21 @@ public final class AnalysisDataCache {
         }
     }
 
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getViolationsFromFileAnalysis(Long projectId, String filename, String code) {
-        String digest = getMD5(code);;
+    /**
+     * Get the violation when inspecting a single file.
+     * Look up in the cache and if not present, fetch the result from the API and show them.
+     *
+     * If the filename does not match with supported language by Code Inspector, it just returns
+     * nothing as the API will not return anything for this file.
+     *
+     * @param projectId - the identifier of the project
+     * @param filename - the filename
+     * @param code - the code to analyze
+     * @return
+     */
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getViolationsFromFileAnalysis(Optional<Long> projectId, String filename, String code) {
+        String digest = getMD5(code);
         CacheKey cacheKey = new CacheKey(projectId, null, filename, digest);
-        Optional<Long> projectIdOptional = Optional.ofNullable(projectId);
         LanguageEnumeration language = getLanguageFromFilename(filename);
 
         if (language == LanguageEnumeration.UNKNOWN) {
@@ -66,7 +89,7 @@ public final class AnalysisDataCache {
 
         if (!cacheFileAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));
-            Optional<GetFileAnalysisQuery.GetFileAnalysis> query = codeInspectorApi.getFileAnalysis(filename, code, language, projectIdOptional);
+            Optional<GetFileAnalysisQuery.GetFileAnalysis> query = codeInspectorApi.getFileAnalysis(filename, code, language, projectId);
             cacheFileAnalysis.put(cacheKey, query);
         } else {
             LOGGER.debug(String.format("[AnalysisDataCache] cache hit on key %s", cacheKey));
@@ -76,8 +99,17 @@ public final class AnalysisDataCache {
     }
 
 
+    /**
+     * Get violations from an existing project analysis on Code Inspector. It means
+     * that this project has been analyzed on Code Inspector before and we fetch the results from the analysis.
+     *
+     * @param projectId - the identifier of the project
+     * @param revision - the revision of the project
+     * @param path - the path of the file to analyze
+     * @return
+     */
     public Optional<GetFileDataQuery.Project> getViolationsFromProjectAnalysis(Long projectId, String revision, String path) {
-        CacheKey cacheKey = new CacheKey(projectId, revision, path, null);
+        CacheKey cacheKey = new CacheKey(Optional.of(projectId), revision, path, null);
         if (!cacheProjectAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));
             Optional<GetFileDataQuery.Project> query = codeInspectorApi.getDataForFile(projectId, revision, path);
@@ -90,5 +122,6 @@ public final class AnalysisDataCache {
     public void invalidateCache() {
         LOGGER.debug("invalidating cache");
         this.cacheProjectAnalysis.clear();
+        this.cacheFileAnalysis.clear();
     }
 }

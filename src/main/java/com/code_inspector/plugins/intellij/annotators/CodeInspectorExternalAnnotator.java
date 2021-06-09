@@ -59,7 +59,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
 
     @Nullable
-    private List<CodeInspectionAnnotation> getAnnotationFromFileAnalysis(PsiFile psiFile, Long projectId) {
+    private List<CodeInspectionAnnotation> getAnnotationFromFileAnalysis(PsiFile psiFile, Optional<Long> projectId) {
         final String filename = psiFile.getName();
         final String code = psiFile.getText();
 
@@ -154,8 +154,12 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
             LOGGER.debug("Get data from project analysis");
             return getAnnotationFromProjectAnalysis(psiFile, settings.projectId);
         } else {
+            Optional<Long> projectId = Optional.empty();
+            if(settings.projectId.equals(INVALID_PROJECT_ID)) {
+                projectId = Optional.of(settings.projectId);
+            }
             LOGGER.debug("Get data from file analysis");
-            return getAnnotationFromFileAnalysis(psiFile, settings.projectId);
+            return getAnnotationFromFileAnalysis(psiFile, projectId);
         }
     }
 

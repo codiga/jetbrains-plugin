@@ -36,7 +36,7 @@ public class FileOffset {
 
     public Optional<LineOffset> getLineOffsetAtLine(int line) {
         int arrayIndex = line - 1;
-        if (arrayIndex > lineOffsets.size() || arrayIndex < 0) {
+        if (arrayIndex >= lineOffsets.size() || arrayIndex < 0) {
             return Optional.empty();
         }
         return Optional.of(lineOffsets.get(arrayIndex));

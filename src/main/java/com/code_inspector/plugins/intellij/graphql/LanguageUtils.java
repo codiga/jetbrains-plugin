@@ -20,13 +20,19 @@ public class LanguageUtils {
         .put("py3", LanguageEnumeration.PYTHON)
         .put("rb", LanguageEnumeration.RUBY)
         .put("go", LanguageEnumeration.GO)
+        .put("json", LanguageEnumeration.JSON)
         .put("java", LanguageEnumeration.JAVA)
+        .put("rs", LanguageEnumeration.RUST)
         .put("kt", LanguageEnumeration.KOTLIN)
+        .put("scala", LanguageEnumeration.SCALA)
         .put("sh", LanguageEnumeration.SHELL)
         .put("bash", LanguageEnumeration.SHELL)
         .put("tf", LanguageEnumeration.TERRAFORM)
         .put("ts", LanguageEnumeration.TYPESCRIPT)
         .put("js", LanguageEnumeration.JAVASCRIPT)
+        .put("jsx", LanguageEnumeration.JAVASCRIPT)
+        .put("yml", LanguageEnumeration.YAML)
+        .put("yaml", LanguageEnumeration.YAML)
         .build();
 
     public static LanguageEnumeration getLanguageFromFilename(final String filename) {

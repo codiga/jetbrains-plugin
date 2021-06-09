@@ -103,7 +103,16 @@
                 language="yaml"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
+                language="JSX Harmony"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
+                language="ECMAScript 6"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
                 language="JavaScript"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
+                language="TypeScript"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
                 language="ruby"
@@ -119,6 +128,9 @@
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
                 language="Python"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
+                language="Shell Script"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
                 language="JAVA"

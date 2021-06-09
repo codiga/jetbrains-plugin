@@ -1,6 +1,7 @@
 package com.code_inspector.plugins.intellij.cache;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This is the key used to cache data in a HashMap. It used the unique combination
@@ -8,12 +9,12 @@ import java.util.Objects;
  * and only be used in AnalysisDataCache.
  */
 public class CacheKey {
-    private final Long projectId;
+    private final Optional<Long> projectId;
     private final String revision;
     private final String filename;
     private final String digest;
 
-    public CacheKey(Long projectId, String revision, String filename, String digest) {
+    public CacheKey(Optional<Long> projectId, String revision, String filename, String digest) {
         this.projectId = projectId;
         this.revision = revision;
         this.filename = filename;
