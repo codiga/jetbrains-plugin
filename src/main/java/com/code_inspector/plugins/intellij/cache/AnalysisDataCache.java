@@ -9,7 +9,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
-import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
@@ -54,11 +53,24 @@ public final class AnalysisDataCache {
         return this.cacheFileAnalysis;
     }
 
-    private String getMD5(String input) {
+    /**
+     * Generate a unique hash for a file
+     * @param input - the content of the file
+     * @return
+     */
+    private String getFileHash(String input) {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] raw = md.digest(input.getBytes());
-            return DatatypeConverter.printHexBinary(raw);
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            md.reset();
+            byte[] buffer = input.getBytes();
+            md.update(buffer);
+            byte[] digest = md.digest();
+
+            String hexStr = "";
+            for (int i = 0; i < digest.length; i++) {
+                hexStr +=  Integer.toString( ( digest[i] & 0xff ) + 0x100, 16).substring( 1 );
+            }
+            return hexStr;
         } catch (NoSuchAlgorithmException e){
             return null;
         }
@@ -77,7 +89,7 @@ public final class AnalysisDataCache {
      * @return
      */
     public Optional<GetFileAnalysisQuery.GetFileAnalysis> getViolationsFromFileAnalysis(Optional<Long> projectId, String filename, String code) throws GraphQlQueryException {
-        String digest = getMD5(code);
+        String digest = getFileHash(code);
         CacheKey cacheKey = new CacheKey(projectId, null, filename, digest);
         LanguageEnumeration language = getLanguageFromFilename(filename);
 
