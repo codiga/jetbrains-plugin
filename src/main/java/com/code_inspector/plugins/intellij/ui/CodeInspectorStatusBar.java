@@ -25,9 +25,6 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
 
         private static final float fontToScale = JBUIScale.scale(12f);
 
-        private static Icon scaleIcon(Icon sourceIcon) {
-            return IconUtil.scaleByFont(sourceIcon, null, fontToScale - 2);
-        }
         private static final Icon errorGray = scaleIcon(AllIcons.Nodes.WarningIntroduction);
         private static final Icon errorColor = scaleIcon(AllIcons.General.Error);
         private static final Icon warningGray = scaleIcon(AllIcons.General.ShowWarning);
@@ -40,6 +37,10 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
         private StatusBar myStatusBar;
         private Icon myCurrentIcon = EMPTY_EWI_ICON;
         private String myToolTipText = "CodeInspector";
+
+        private static Icon scaleIcon(Icon sourceIcon) {
+            return IconUtil.scaleByFont(sourceIcon, null, fontToScale - 2);
+        }
 
         public CodeInspectorStatusBarWidget(@NotNull Project project) {
             this.project = project;
@@ -69,7 +70,9 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
         }
 
         @Override
-        public void dispose() {}
+        public void dispose() {
+            // no need to change anything here
+        }
 
 
 
@@ -82,10 +85,7 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
         @Nullable
         @Override
         public Consumer<MouseEvent> getClickConsumer() {
-            return mouseEvent -> {
-                ToolWindow myToolWindow = ToolWindowManager.getInstance(project).getToolWindow("DeepCode");
-                myToolWindow.show(null);
-            };
+            return null;
         }
 
         @Override

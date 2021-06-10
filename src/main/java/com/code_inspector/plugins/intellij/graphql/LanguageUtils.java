@@ -8,6 +8,10 @@ import java.util.Map;
 
 public class LanguageUtils {
 
+    private LanguageUtils() {
+        // do not instantiate
+    }
+
     private static Map<String, LanguageEnumeration> EXTENSION_TO_LANGUAGE = ImmutableMap.<String, LanguageEnumeration>builder()
         .put("c", LanguageEnumeration.C)
         .put("cls", LanguageEnumeration.APEX)

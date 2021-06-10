@@ -72,6 +72,7 @@ public final class AnalysisDataCache {
             }
             return hexStr;
         } catch (NoSuchAlgorithmException e){
+            LOGGER.debug("impossible to get algorithm");
             return null;
         }
     }
