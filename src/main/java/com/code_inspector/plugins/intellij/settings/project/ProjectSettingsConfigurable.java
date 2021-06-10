@@ -43,16 +43,11 @@ public class ProjectSettingsConfigurable implements Configurable {
         ProjectSettingsState settings = ProjectSettingsState.getInstance(project);
         LOGGER.debug(settings.isEnabled.toString());
         LOGGER.debug(this.mySettingsComponent.isEnabled().toString());
-        if (!this.mySettingsComponent.getSelectedProjectId().equals(settings.projectId)) {
-            return true;
-        }
-        if (!this.mySettingsComponent.isProjectAssociated().equals(settings.isProjectAssociated)) {
-            return true;
-        }
-        if (!this.mySettingsComponent.isEnabled().equals(settings.isEnabled)) {
-            return true;
-        }
-        return false;
+        return (
+            !this.mySettingsComponent.getSelectedProjectId().equals(settings.projectId) ||
+            !this.mySettingsComponent.isProjectAssociated().equals(settings.isProjectAssociated) ||
+            !this.mySettingsComponent.isEnabled().equals(settings.isEnabled)
+        );
     }
 
     @Override

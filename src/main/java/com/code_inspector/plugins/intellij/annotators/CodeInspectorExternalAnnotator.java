@@ -17,7 +17,9 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vcs.FileStatus;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
+import com.intellij.vcsUtil.VcsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +30,7 @@ import static com.code_inspector.plugins.intellij.Constants.INVALID_PROJECT_ID;
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 import static com.code_inspector.plugins.intellij.Constants.NO_ANNOTATION;
 import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.getFileStatus;
+import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.getPatchesForWorkingDirectoryForFile;
 import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromFileAnalysisQueryResult;
 import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromProjectQueryResult;
 import static com.code_inspector.plugins.intellij.ui.NotificationUtils.*;
@@ -135,7 +138,6 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
             query = Optional.empty();
         }
 
-
         if (!query.isPresent()) {
             LOGGER.info("no data from query");
             return NO_ANNOTATION;
@@ -156,9 +158,13 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     @Nullable
     @Override
     public List<CodeInspectionAnnotation> doAnnotate(PsiFile psiFile) {
-        final FileStatus fileStatus = getFileStatus(psiFile);
+        Optional<VirtualFile> repositoryRoot = CodeInspectorGitUtils.getRepositoryRoot(psiFile);
+        boolean isFileUnderGit = repositoryRoot.isPresent();
+        boolean isFileModifiedInGit = isFileUnderGit && !getPatchesForWorkingDirectoryForFile(psiFile).isEmpty();
 
-        LOGGER.info(String.format("calling doAnnotate on file: %s, status: %s", psiFile.getName(), fileStatus));
+        LOGGER.info(String.format("calling doAnnotate on file: %s, is in git: %s, is modified in git: %s",
+            psiFile.getName(), isFileUnderGit, isFileModifiedInGit));
+
         final ProjectSettingsState PROJECT_SETTINGS = ProjectSettingsState.getInstance(psiFile.getProject());
 
         final ProjectSettingsState settings = ProjectSettingsState.getInstance(psiFile.getProject());
@@ -174,7 +180,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
          * If the project is analyzed by Code Inspector and the file not modified, get that data from
          * the existing Code Inspector Analysis from our backend.
          */
-        if(fileStatus == FileStatus.NOT_CHANGED &&
+        if(isFileUnderGit && !isFileModifiedInGit &&
             PROJECT_SETTINGS.isProjectAssociated && !settings.projectId.equals(INVALID_PROJECT_ID)) {
             LOGGER.debug("Get data from project analysis");
             return getAnnotationFromProjectAnalysis(psiFile, settings.projectId);

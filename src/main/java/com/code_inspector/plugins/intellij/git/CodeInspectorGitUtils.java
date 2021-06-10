@@ -64,7 +64,7 @@ public final class CodeInspectorGitUtils {
         try {
             return Optional.of(GitUtil.getRootForFile(psiFile.getProject(), psiFile.getVirtualFile()));
         } catch (VcsException e) {
-            e.printStackTrace();
+            LOGGER.debug("[CodeInspectorGitUtils] no vcs found");
             return Optional.empty();
         }
     }
@@ -123,12 +123,12 @@ public final class CodeInspectorGitUtils {
         Optional<VirtualFile> repositoryRoot = CodeInspectorGitUtils.getRepositoryRoot(psiFile);
         Optional<String> filePath = CodeInspectorGitUtils.getFilePathInRepository(psiFile);
 
-        if(repositoryRoot.isEmpty()) {
+        if(!repositoryRoot.isPresent()) {
             LOGGER.debug("[getPatchesForWorkingDirectoryForFile] cannot find the repository root");
             return ImmutableList.of();
         }
 
-        if(filePath.isEmpty()) {
+        if(!filePath.isPresent()) {
             LOGGER.debug("[getPatchesForWorkingDirectoryForFile] cannot find the file path in the repository");
             return ImmutableList.of();
         }
