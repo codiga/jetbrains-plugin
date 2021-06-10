@@ -4,6 +4,7 @@ import com.code_inspector.api.GetFileAnalysisQuery;
 import com.code_inspector.api.GetFileDataQuery;
 import com.code_inspector.api.type.LanguageEnumeration;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
+import com.code_inspector.plugins.intellij.graphql.GraphQlQueryException;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -75,7 +76,7 @@ public final class AnalysisDataCache {
      * @param code - the code to analyze
      * @return
      */
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getViolationsFromFileAnalysis(Optional<Long> projectId, String filename, String code) {
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getViolationsFromFileAnalysis(Optional<Long> projectId, String filename, String code) throws GraphQlQueryException {
         String digest = getMD5(code);
         CacheKey cacheKey = new CacheKey(projectId, null, filename, digest);
         LanguageEnumeration language = getLanguageFromFilename(filename);
@@ -90,6 +91,7 @@ public final class AnalysisDataCache {
         if (!cacheFileAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));
             Optional<GetFileAnalysisQuery.GetFileAnalysis> query = codeInspectorApi.getFileAnalysis(filename, code, language, projectId);
+
             cacheFileAnalysis.put(cacheKey, query);
         } else {
             LOGGER.debug(String.format("[AnalysisDataCache] cache hit on key %s", cacheKey));
@@ -108,7 +110,7 @@ public final class AnalysisDataCache {
      * @param path - the path of the file to analyze
      * @return
      */
-    public Optional<GetFileDataQuery.Project> getViolationsFromProjectAnalysis(Long projectId, String revision, String path) {
+    public Optional<GetFileDataQuery.Project> getViolationsFromProjectAnalysis(Long projectId, String revision, String path) throws GraphQlQueryException {
         CacheKey cacheKey = new CacheKey(Optional.of(projectId), revision, path, null);
         if (!cacheProjectAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));

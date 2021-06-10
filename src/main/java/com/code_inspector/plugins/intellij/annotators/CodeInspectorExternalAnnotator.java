@@ -4,6 +4,7 @@ import com.code_inspector.api.GetFileAnalysisQuery;
 import com.code_inspector.api.GetFileDataQuery;
 import com.code_inspector.plugins.intellij.cache.AnalysisDataCache;
 import com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils;
+import com.code_inspector.plugins.intellij.graphql.GraphQlQueryException;
 import com.code_inspector.plugins.intellij.settings.project.ProjectSettingsState;
 import com.google.common.collect.ImmutableList;
 import com.intellij.codeInspection.ProblemHighlightType;
@@ -11,6 +12,9 @@ import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProgressManager;
@@ -29,6 +33,7 @@ import static com.code_inspector.plugins.intellij.Constants.NO_ANNOTATION;
 import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.getFileStatus;
 import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromFileAnalysisQueryResult;
 import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromProjectQueryResult;
+import static com.code_inspector.plugins.intellij.ui.NotificationUtils.*;
 import static com.code_inspector.plugins.intellij.ui.UIConstants.ANNOTATION_PREFIX;
 
 public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, List<CodeInspectionAnnotation>> {
@@ -71,9 +76,17 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
         final long startAnalysisTimeMillis = System.currentTimeMillis();
 
-        Optional<GetFileAnalysisQuery.GetFileAnalysis> queryResult = AnalysisDataCache
-            .getInstance()
-            .getViolationsFromFileAnalysis(projectId, filename, code);
+        Optional<GetFileAnalysisQuery.GetFileAnalysis> queryResult;
+        try {
+            queryResult = AnalysisDataCache
+                .getInstance()
+                .getViolationsFromFileAnalysis(projectId, filename, code);
+        } catch (GraphQlQueryException e) {
+            LOGGER.debug("receive invalid graphql call, sending notification");
+            notififyProjectOnce(psiFile.getProject(), NOTIFICATION_API_KEYS_INCORRECT, NOTIFICATION_GROUP_API);
+            queryResult = Optional.empty();
+
+        }
 
         final long endAnalysisTimeMillis = System.currentTimeMillis();
 
@@ -113,9 +126,17 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
             return NO_ANNOTATION;
         }
 
-        Optional<GetFileDataQuery.Project> query = AnalysisDataCache
-            .getInstance()
-            .getViolationsFromProjectAnalysis(projectId, revision.get(), filePath.get());
+        Optional<GetFileDataQuery.Project> query;
+        try {
+            query = AnalysisDataCache
+                .getInstance()
+                .getViolationsFromProjectAnalysis(projectId, revision.get(), filePath.get());
+        } catch (GraphQlQueryException e) {
+            LOGGER.debug("receive invalid graphql call, sending notification");
+            notififyProjectOnce(psiFile.getProject(), NOTIFICATION_API_KEYS_INCORRECT, NOTIFICATION_GROUP_API);
+            query = Optional.empty();
+        }
+
 
         if (!query.isPresent()) {
             LOGGER.info("no data from query");
@@ -138,6 +159,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     @Override
     public List<CodeInspectionAnnotation> doAnnotate(PsiFile psiFile) {
         final FileStatus fileStatus = getFileStatus(psiFile);
+
         LOGGER.info("calling doAnnotate on file: " + psiFile.getName());
         final ProjectSettingsState PROJECT_SETTINGS = ProjectSettingsState.getInstance(psiFile.getProject());
 

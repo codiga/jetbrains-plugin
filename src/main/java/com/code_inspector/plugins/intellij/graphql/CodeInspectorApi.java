@@ -68,7 +68,7 @@ public interface CodeInspectorApi {
      * @param path      - the path of the file we are looking for.
      * @return - all the data we need to surface to the project. Data comes from the GraphQL generated data.
      */
-    public Optional<GetFileDataQuery.Project> getDataForFile(Long projectId, String revision, String path);
+    public Optional<GetFileDataQuery.Project> getDataForFile(Long projectId, String revision, String path) throws GraphQlQueryException;
 
     /**
      * Add a violation to ignore through the API.
@@ -108,5 +108,5 @@ public interface CodeInspectorApi {
      * @param projectId - the optional project identifier.
      * @return - the list of potential issues.
      */
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId);
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) throws GraphQlQueryException;
 }

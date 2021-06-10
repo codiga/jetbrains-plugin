@@ -3,6 +3,7 @@ package com.code_inspector.plugins.intellij.cache;
 import com.code_inspector.api.GetFileAnalysisQuery;
 import com.code_inspector.api.GetFileDataQuery;
 import com.code_inspector.plugins.intellij.git.CodeInspectorGitUtilsTest;
+import com.code_inspector.plugins.intellij.graphql.GraphQlQueryException;
 import com.code_inspector.plugins.intellij.testutils.TestBase;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ public class AnalysisDataCacheTest extends TestBase {
     private static Logger LOGGER = LoggerFactory.getLogger(CodeInspectorGitUtilsTest.class);
 
     @Test
-    public void testGetViolationsFromFileAnalysis() {
+    public void testGetViolationsFromFileAnalysis() throws GraphQlQueryException {
         AnalysisDataCache analysisDataCache = AnalysisDataCache.getInstance();
         analysisDataCache.invalidateCache();
         assertEquals(0, analysisDataCache.getCacheFileAnalysis().size());
@@ -28,7 +29,7 @@ public class AnalysisDataCacheTest extends TestBase {
     }
 
     @Test
-    public void testFetchViolationsFromProjectAnalysis() {
+    public void testFetchViolationsFromProjectAnalysis() throws GraphQlQueryException {
         AnalysisDataCache analysisDataCache = AnalysisDataCache.getInstance();
         analysisDataCache.invalidateCache();
         assertEquals(0, analysisDataCache.getCacheFileAnalysis().size());
@@ -41,7 +42,7 @@ public class AnalysisDataCacheTest extends TestBase {
     }
 
     @Test
-    public void testByPassCacheIsLanguageIsUnknown() {
+    public void testByPassCacheIsLanguageIsUnknown() throws GraphQlQueryException {
         AnalysisDataCache analysisDataCache = AnalysisDataCache.getInstance();
         analysisDataCache.invalidateCache();
         assertEquals(0, analysisDataCache.getCacheFileAnalysis().size());

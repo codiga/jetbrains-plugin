@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static com.code_inspector.plugins.intellij.Constants.*;
 import static com.code_inspector.plugins.intellij.graphql.Constants.*;
+import static com.code_inspector.plugins.intellij.ui.NotificationUtils.notififyProjectOnce;
 
 /**
  * This class implements the Code Inspector API, which is a GraphQL API.
@@ -149,7 +150,7 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
      *
      * @return - all the data we need to surface to the project. Data comes from the GraphQL generated data.
      */
-    public Optional<GetFileDataQuery.Project> getDataForFile(Long projectId, String revision, String path) {
+    public Optional<GetFileDataQuery.Project> getDataForFile(Long projectId, String revision, String path) throws GraphQlQueryException {
         ApiRequest<GetFileDataQuery.Project> apiRequest = new ApiRequest();
 
         LOGGER.debug(String.format("getting data for project %s, revision %s, path %s", projectId, revision, path));
@@ -168,7 +169,6 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
                         apiRequest.setData(response.getData().project());
 
                     }
-
                 }
 
                 @Override
@@ -177,7 +177,11 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
                 }
             });
 
-        return apiRequest.getData();
+        Optional<GetFileDataQuery.Project> result = apiRequest.getData();
+        if (!result.isPresent()) {
+            throw new GraphQlQueryException("invalid-query");
+        }
+        return result;
     }
 
     /**
@@ -281,7 +285,7 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
      * @return the list of violations.
      */
     @Override
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) {
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) throws GraphQlQueryException {
         ApiRequest<Object> apiRequestSendFileForAnalysis = new ApiRequest<Object>();
 
         final Input<Object> inputProjectId = Input.absent();
@@ -323,6 +327,8 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
         if (!fileAnalysisId.isPresent()) {
             LOGGER.debug("no data found from the createFileAnalysis call");
             LOGGER.debug(fileAnalysisId.toString());
+
+            throw new GraphQlQueryException("invalid request");
         }
 
         LOGGER.debug(String.format("Got data from createFileAnalysis call %s", fileAnalysisId.get()));
