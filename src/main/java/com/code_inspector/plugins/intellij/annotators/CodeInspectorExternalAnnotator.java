@@ -161,7 +161,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     public List<CodeInspectionAnnotation> doAnnotate(PsiFile psiFile) {
         final FileStatus fileStatus = getFileStatus(psiFile);
 
-        LOGGER.info("calling doAnnotate on file: " + psiFile.getName());
+        LOGGER.info(String.format("calling doAnnotate on file: %s, status: %s", psiFile.getName(), fileStatus);
         final ProjectSettingsState PROJECT_SETTINGS = ProjectSettingsState.getInstance(psiFile.getProject());
 
         final ProjectSettingsState settings = ProjectSettingsState.getInstance(psiFile.getProject());

@@ -28,7 +28,7 @@ public final class NotificationUtils {
     /**
      * Do not instantiate this class.
      */
-    private final NotificationUtils {}
+    private NotificationUtils() {}
 
     /**
      * Record the error already sent to projects
