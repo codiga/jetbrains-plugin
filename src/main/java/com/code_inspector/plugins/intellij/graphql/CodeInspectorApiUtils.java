@@ -103,12 +103,14 @@ public class CodeInspectorApiUtils {
      * This is done for the file analysis endpoint.
      * @param violation - the violation to map
      * @param fileOffset - the offset of the violation in the file (in IntelliJ term).
+     * @param projectId - Code Inspector project identifier that is associated with this IntelliJ project
      * @return
      */
     private static final Optional<CodeInspectionAnnotation> mapViolationFromFileAnalysis(
         GetFileAnalysisQuery.Violation violation,
         FileOffset fileOffset,
-        String filename) {
+        String filename,
+        Optional<Long> projectId) {
         LOGGER.debug(String.format("mapping violation %s", violation));
         Integer violationLine = ((BigDecimal)violation.line()).toBigInteger().intValue();
 
@@ -122,7 +124,7 @@ public class CodeInspectorApiUtils {
         TextRange range = new TextRange(lineOffset.get().codeStartOffset, lineOffset.get().endOffset);
         return Optional.of(
             new CodeInspectionAnnotation(
-                Optional.empty(),
+                projectId,
                 Optional.empty(),
                 CodeInspectionAnnotationKind.Violation,
                 violation.description(),
@@ -306,9 +308,11 @@ public class CodeInspectorApiUtils {
      * Get all the annotations to surface in IntelliJ based on the results from the GraphQL API.
      * @param query - the query results from the GraphQL API.
      * @param psiFile - the file being edited in IntelliJ
+     * @param projectId - the Code Inspector project id being used and associated
      * @return a list of annotation (empty if there is any problem).
      */
-    public static List<CodeInspectionAnnotation> getAnnotationsFromFileAnalysisQueryResult(GetFileAnalysisQuery.GetFileAnalysis query, PsiFile psiFile) {
+    public static List<CodeInspectionAnnotation> getAnnotationsFromFileAnalysisQueryResult(
+        GetFileAnalysisQuery.GetFileAnalysis query, PsiFile psiFile, Optional<Long> projectId) {
 
         LOGGER.debug(String.format("received %s annotations", query.violations().size()));
 
@@ -319,7 +323,7 @@ public class CodeInspectorApiUtils {
 
             List<Optional<CodeInspectionAnnotation>> allAnnotations = query.violations()
                 .stream()
-                .map(v -> mapViolationFromFileAnalysis(v, fileOffset, filename))
+                .map(v -> mapViolationFromFileAnalysis(v, fileOffset, filename, projectId))
                 .collect(Collectors.toList());
 
             return allAnnotations

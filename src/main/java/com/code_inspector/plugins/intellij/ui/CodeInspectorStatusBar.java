@@ -25,12 +25,12 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
 
         private static final float fontToScale = JBUIScale.scale(12f);
 
-        private static final Icon errorGray = scaleIcon(AllIcons.Nodes.WarningIntroduction);
-        private static final Icon errorColor = scaleIcon(AllIcons.General.Error);
-        private static final Icon warningGray = scaleIcon(AllIcons.General.ShowWarning);
-        private static final Icon warningColor = scaleIcon(AllIcons.General.Warning);
-        private static final Icon infoGray = scaleIcon(AllIcons.General.Note);
-        private static final Icon infoColor = scaleIcon(AllIcons.General.Information);
+        private static final Icon errorGray = AllIcons.Nodes.WarningIntroduction;
+        private static final Icon errorColor = AllIcons.General.Error;
+        private static final Icon warningGray = AllIcons.General.ShowWarning;
+        private static final Icon warningColor = AllIcons.General.Warning;
+        private static final Icon infoGray = AllIcons.General.Note;
+        private static final Icon infoColor = AllIcons.General.Information;
 
         public static final Icon EMPTY_EWI_ICON = warningColor;
         private final Project project;
@@ -38,9 +38,6 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
         private Icon myCurrentIcon = EMPTY_EWI_ICON;
         private String myToolTipText = "CodeInspector";
 
-        private static Icon scaleIcon(Icon sourceIcon) {
-            return IconUtil.scaleByFont(sourceIcon, null, fontToScale - 2);
-        }
 
         public CodeInspectorStatusBarWidget(@NotNull Project project) {
             this.project = project;
@@ -54,7 +51,7 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
 
         private void update() {
             myCurrentIcon = EMPTY_EWI_ICON;
-            myToolTipText = "blabla";
+            myToolTipText = "Code Inspector";
         }
 
         @NotNull
@@ -73,8 +70,6 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
         public void dispose() {
             // no need to change anything here
         }
-
-
 
         @Nullable
         @Override
@@ -118,7 +113,7 @@ public class CodeInspectorStatusBar implements StatusBarWidgetFactory {
 
     @Override
     public void disposeWidget(@NotNull StatusBarWidget widget) {
-
+        // no need to do anything here
     }
 
     @Override

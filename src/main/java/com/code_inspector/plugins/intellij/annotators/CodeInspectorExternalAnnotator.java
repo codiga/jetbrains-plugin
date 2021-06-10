@@ -95,7 +95,8 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
             endAnalysisTimeMillis - startAnalysisTimeMillis));
 
         if (queryResult.isPresent()){
-            List<CodeInspectionAnnotation> res = getAnnotationsFromFileAnalysisQueryResult(queryResult.get(), psiFile);
+            List<CodeInspectionAnnotation> res = getAnnotationsFromFileAnalysisQueryResult(
+                queryResult.get(), psiFile, projectId);
             LOGGER.debug(String.format("number of annotations for file %s: %s", filename, res.size()));
             return res;
         } else {

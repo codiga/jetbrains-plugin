@@ -95,19 +95,16 @@ public final class AnalysisDataCache {
         LanguageEnumeration language = getLanguageFromFilename(filename);
 
         if (language == LanguageEnumeration.UNKNOWN) {
-            LOGGER.debug(String.format("Language unknown for file %s", filename));
+            LOGGER.debug(String.format("[AnalysisDataCache] Language unknown for file %s", filename));
             return Optional.empty();
         }
 
-        LOGGER.debug(String.format("Language file %s: %s", filename, language));
+        LOGGER.debug(String.format("[AnalysisDataCache] Language file %s: %s", filename, language));
 
         if (!cacheFileAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));
             Optional<GetFileAnalysisQuery.GetFileAnalysis> query = codeInspectorApi.getFileAnalysis(filename, code, language, projectId);
-
             cacheFileAnalysis.put(cacheKey, query);
-        } else {
-            LOGGER.debug(String.format("[AnalysisDataCache] cache hit on key %s", cacheKey));
         }
 
         return cacheFileAnalysis.get(cacheKey);

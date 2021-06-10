@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Optional;
 
+import static com.code_inspector.api.type.AnalysisResultStatus.DONE;
+import static com.code_inspector.api.type.AnalysisResultStatus.ERROR;
 import static com.code_inspector.plugins.intellij.Constants.*;
 import static com.code_inspector.plugins.intellij.graphql.Constants.*;
 import static com.code_inspector.plugins.intellij.ui.NotificationUtils.notififyProjectOnce;
@@ -382,24 +384,28 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
              */
             LOGGER.debug(String.format("Waiting for data from GetFileAnalysisQuery for file %s", filename));
             Optional<GetFileAnalysisQuery.GetFileAnalysis> returnedData = getFileAnalysisData.getData();
-            if (!returnedData.isPresent()) {
+
+            if (returnedData.isPresent()) {
+                /**
+                 * Loop until we get something.
+                 */
+                if (returnedData.get().status() == DONE) {
+                    return returnedData;
+                }
+                if (returnedData.get().status() == ERROR) {
+                    LOGGER.debug("error when getting the request");
+                    return Optional.empty();
+                }
+            }
+            else {
                 LOGGER.debug("error getting data from the analysis");
                 LOGGER.debug(returnedData.get().toString());
                 return Optional.empty();
             }
-            else {
-                /**
-                 * Loop until we get something.
-                 */
-                switch (returnedData.get().status()) {
-                    case DONE:
-                        return returnedData;
-                    case ERROR:
-                        LOGGER.debug("error when getting the request");
-                        return Optional.empty();
-                }
-            }
 
+            /**
+             * Sleep between we poll the API.
+             */
             try {
                 Thread.sleep(SLEEP_BETWEEN_FILE_ANALYSIS_MILLIS);
             } catch (InterruptedException e) {

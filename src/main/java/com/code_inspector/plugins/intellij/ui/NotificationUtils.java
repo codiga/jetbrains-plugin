@@ -15,7 +15,7 @@ import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 /**
  * Utility classes to send notification to IntelliJ.
  */
-public class NotificationUtils {
+public final class NotificationUtils {
 
     public static final String NOTIFICATION_GROUP_API = "Code Inspector API";
 
@@ -24,6 +24,11 @@ public class NotificationUtils {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
+
+    /**
+     * Do not instantiate this class.
+     */
+    private final NotificationUtils {}
 
     /**
      * Record the error already sent to projects

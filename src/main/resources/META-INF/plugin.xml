@@ -136,7 +136,7 @@
         <externalAnnotator
                 language="JAVA"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
-        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>
+<!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
     </extensions>
 
     <actions>

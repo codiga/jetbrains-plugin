@@ -6,11 +6,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.util.Map;
 
-public class LanguageUtils {
-
-    private LanguageUtils() {
-        // do not instantiate
-    }
+public final class LanguageUtils {
 
     private static Map<String, LanguageEnumeration> EXTENSION_TO_LANGUAGE = ImmutableMap.<String, LanguageEnumeration>builder()
         .put("c", LanguageEnumeration.C)
@@ -39,10 +35,14 @@ public class LanguageUtils {
         .put("yaml", LanguageEnumeration.YAML)
         .build();
 
+    private LanguageUtils() {
+        // do not instantiate
+    }
+
     public static LanguageEnumeration getLanguageFromFilename(final String filename) {
         final String extension = FilenameUtils.getExtension(filename);
 
-        if (filename.toLowerCase().startsWith("docker")) {
+        if (filename.toLowerCase(java.util.Locale.getDefault()).startsWith("docker")) {
             return LanguageEnumeration.DOCKER;
         }
 
