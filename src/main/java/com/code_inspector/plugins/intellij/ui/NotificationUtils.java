@@ -24,16 +24,15 @@ public final class NotificationUtils {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
+    /**
+     * Record the error already sent to projects
+     */
+    private static Set<Pair<Project, String>> NOTIFICATION_ERROR_ONCE_PER_PROJECT = new ConcurrentSkipListSet<>();
 
     /**
      * Do not instantiate this class.
      */
     private NotificationUtils() {}
-
-    /**
-     * Record the error already sent to projects
-     */
-    private static Set<Pair<Project, String>> NOTIFICATION_ERROR_ONCE_PER_PROJECT = new ConcurrentSkipListSet<>();
 
     /**
      * Notify an error for a project and do it only once.

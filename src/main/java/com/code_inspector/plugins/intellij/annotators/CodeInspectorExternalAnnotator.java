@@ -12,9 +12,6 @@ import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
-import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProgressManager;
@@ -161,10 +158,15 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     public List<CodeInspectionAnnotation> doAnnotate(PsiFile psiFile) {
         final FileStatus fileStatus = getFileStatus(psiFile);
 
-        LOGGER.info(String.format("calling doAnnotate on file: %s, status: %s", psiFile.getName(), fileStatus);
+        LOGGER.info(String.format("calling doAnnotate on file: %s, status: %s", psiFile.getName(), fileStatus));
         final ProjectSettingsState PROJECT_SETTINGS = ProjectSettingsState.getInstance(psiFile.getProject());
 
         final ProjectSettingsState settings = ProjectSettingsState.getInstance(psiFile.getProject());
+
+        if (!settings.isEnabled) {
+            LOGGER.debug("Code Inspector is disabled on this project");
+            return ImmutableList.of();
+        }
 
         ProgressManager.checkCanceled();
 
@@ -173,12 +175,12 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
          * the existing Code Inspector Analysis from our backend.
          */
         if(fileStatus == FileStatus.NOT_CHANGED &&
-            PROJECT_SETTINGS.isEnabled && !settings.projectId.equals(INVALID_PROJECT_ID)) {
+            PROJECT_SETTINGS.isProjectAssociated && !settings.projectId.equals(INVALID_PROJECT_ID)) {
             LOGGER.debug("Get data from project analysis");
             return getAnnotationFromProjectAnalysis(psiFile, settings.projectId);
         } else {
             Optional<Long> projectId = Optional.empty();
-            if(settings.projectId.equals(INVALID_PROJECT_ID)) {
+            if(!settings.projectId.equals(INVALID_PROJECT_ID)) {
                 projectId = Optional.of(settings.projectId);
             }
             LOGGER.debug("Get data from file analysis");

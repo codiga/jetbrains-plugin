@@ -5,6 +5,7 @@ import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
 import com.code_inspector.plugins.intellij.topics.ApiKeyChangeNotifier;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.messages.MessageBusConnection;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.code_inspector.plugins.intellij.Constants.INVALID_PROJECT_ID;
+import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 import static com.code_inspector.plugins.intellij.topics.ApiKeyChangeNotifier.CODE_INSPECTOR_API_KEY_CHANGE_TOPIC;
 import static com.code_inspector.plugins.intellij.ui.UIConstants.*;
 
@@ -28,12 +30,17 @@ public class ProjectSettingsComponent {
 
     private final JPanel myMainPanel = new JPanel();
     private ComboBox<GetProjectsQuery.Project> projectsCombo;
+    private JCheckBox isProjectAssociatedCheckbox;
     private JCheckBox isEnabledCheckbox;
+    private boolean isProjectAssociated;
+    private boolean isEnabled;
     private List<GetProjectsQuery.Project> projectList;
     private IgnoredViolationsPanel ignoredViolationPanel;
     private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
 
     private Long selectedProjectId = INVALID_PROJECT_ID;
+
+    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     /**
      * Build the UI for the project specific set up. If the API is working, get the list of project
@@ -83,7 +90,20 @@ public class ProjectSettingsComponent {
         myMainPanel.setLayout(new BorderLayout());
         JPanel projectSelectionPanel;
         ignoredViolationPanel = new IgnoredViolationsPanel(null);
+        isProjectAssociatedCheckbox = new JCheckBox();
+
+        isProjectAssociatedCheckbox.addActionListener( event -> {
+            LOGGER.debug("setting project is associated to" + isEnabledCheckbox.isSelected());
+            isProjectAssociated = isProjectAssociatedCheckbox.isSelected();
+        });
+
         isEnabledCheckbox = new JCheckBox();
+
+        isEnabledCheckbox.addActionListener(event -> {
+            LOGGER.debug("setting isDisabled to" + isEnabledCheckbox.isSelected());
+            isEnabled = isEnabledCheckbox.isSelected();
+        });
+
         JButton configureButton = new JButton(SETTINGS_BUTTON_CONFIGURE_PROJECT);
         configureButton.addActionListener( event -> {
             try {
@@ -113,9 +133,11 @@ public class ProjectSettingsComponent {
             );
 
             projectSelectionPanel = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel(SETTINGS_IS_ENABLED), this.isEnabledCheckbox, 0, false)
+                .addLabeledComponent(new JBLabel(SETTINGS_PROJECT_ENABLE), this.isEnabledCheckbox, 0, false)
                 .addVerticalGap(5)
                 .addSeparator(1)
+                .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel(SETTINGS_ASSOCIATE_CODE_INSPECTOR_PROJECT), this.isProjectAssociatedCheckbox, 0, false)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel(SETTINGS_CHOOSE_PROJECT), this.projectsCombo, 0, false)
                 .addVerticalGap(5)
@@ -151,8 +173,12 @@ public class ProjectSettingsComponent {
         return this.selectedProjectId;
     }
 
+    public Boolean isProjectAssociated() {
+        return this.isProjectAssociated;
+    }
+
     public Boolean isEnabled() {
-        return this.isEnabledCheckbox.isEnabled();
+        return this.isEnabled;
     }
 
     /**
@@ -191,9 +217,20 @@ public class ProjectSettingsComponent {
      * Activate the enabled checkbox. Used by the configurable to set the project status.
      * @param b - should we enable for this project or not
      */
-    public void setIsEnabled(Boolean b) {
-        if (this.isEnabledCheckbox != null) {
+    public void setIsProjectAssociatedCheckbox(Boolean b) {
+        if (this.isProjectAssociatedCheckbox != null) {
+            this.isProjectAssociated = b;
+            this.isProjectAssociatedCheckbox.setSelected(b);
+        }
+    }
 
+    /**
+     * Set the status of the disabled checkbox
+     * @param b
+     */
+    public void setIsEnabledCheckbox(Boolean b) {
+        if (this.isEnabledCheckbox != null) {
+            this.isEnabled = b;
             this.isEnabledCheckbox.setSelected(b);
         }
     }
