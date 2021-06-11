@@ -1,0 +1,21 @@
+query GetFileAnalysis($id: Long!){
+    getFileAnalysis(id: $id) {
+        runningTimeSeconds
+        language
+        timestamp
+        status
+        filename
+        code
+        violations{
+            language
+            category
+            severity
+            rule
+            ruleUrl
+            tool
+            line
+            lineCount
+            description
+        }
+    }
+}

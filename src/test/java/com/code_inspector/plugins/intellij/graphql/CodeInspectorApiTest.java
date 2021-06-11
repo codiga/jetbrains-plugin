@@ -93,4 +93,9 @@ public final class CodeInspectorApiTest implements CodeInspectorApi {
     public Optional<String> removeViolationToIgnore(Long projectId, String rule, String tool, LanguageEnumeration language, Optional<String> filename, Optional<String> prefix) {
         return Optional.empty();
     }
+
+    @Override
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) {
+        return Optional.empty();
+    }
 }

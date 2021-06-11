@@ -6,10 +6,27 @@
     <description>
         <![CDATA[
             <p>
-            <a href="https://www.code-inspetor.com">Code Inspector</a> analyzes your code and helps you improve
-            through analysis in IntelliJ or in your code reviews on GitHub, GitLab or Bitbucket. No need to
-            configure and maintain the configuration for dozens of static analyzer, everything is available
-            and configurable in few clicks!
+                Code Inspector is a code analysis platform that lets you analyze code for 12+ languages:
+                Apex, C, C++, Dart, Docker, Go, Java, Javascript, Kotlin, PHP, Python, Ruby, Scala,
+                shellscript, Terraform, Typescript, YAML.
+
+                One single plugin to check all your code in all languages!
+            </p>
+
+            <br />
+
+            <strong>
+                In order to use this plugin, you must create an account on <a href="https://frontend.code-inspector.com">
+                Code Inspector</a> and define your API keys in the plugin preferences.
+            </strong>
+
+            <br />
+
+            <p>
+                <a href="https://www.code-inspetor.com">Code Inspector</a> analyzes your code and helps you improve
+                through analysis in IntelliJ or in your code reviews on GitHub, GitLab or Bitbucket. No need to
+                configure and maintain the configuration for dozens of static analyzer, everything is available
+                and configurable in few clicks!
             </p>
 
             <br />
@@ -30,14 +47,7 @@
             The analysis engine can be configured for each project through the web platform.
             </p>
 
-            <br />
 
-            <strong>
-                In order to use this plugin, you must create an account on <a href="https://frontend.code-inspector.com">
-                Code Inspector</a> and define your API keys in the plugin preferences.
-            </strong>
-
-            <br />
 
             <strong>This plugin is actually in a BETA version</strong>, please send us feedback
             <a href="mailto:support@code-inspector.com">support@code-inspector.com</a>.
@@ -66,6 +76,10 @@
     <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup
+                id="Code Inspector API"
+                displayType="BALLOON"/>
+
         <applicationService
                 serviceInterface="com.code_inspector.plugins.intellij.graphql.CodeInspectorApi"
                 serviceImplementation="com.code_inspector.plugins.intellij.graphql.CodeInspectorApiImpl"
@@ -91,10 +105,7 @@
                 language="TEXT"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
-                language=""
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
-        <externalAnnotator
-                language="Dart"
+                language="Scala"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
                 language="kotlin"
@@ -103,7 +114,16 @@
                 language="yaml"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
+                language="JSX Harmony"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
+                language="ECMAScript 6"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
                 language="JavaScript"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
+                language="TypeScript"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
                 language="ruby"
@@ -121,8 +141,12 @@
                 language="Python"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
+                language="Shell Script"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
                 language="JAVA"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+<!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
     </extensions>
 
     <actions>

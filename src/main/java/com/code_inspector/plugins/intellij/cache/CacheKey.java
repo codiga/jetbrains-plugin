@@ -1,6 +1,7 @@
 package com.code_inspector.plugins.intellij.cache;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This is the key used to cache data in a HashMap. It used the unique combination
@@ -8,21 +9,25 @@ import java.util.Objects;
  * and only be used in AnalysisDataCache.
  */
 public class CacheKey {
-    private final Long projectId;
+    private final Optional<Long> projectId;
     private final String revision;
     private final String filename;
+    private final String digest;
 
-    public CacheKey(Long p, String r, String f) {
-        this.projectId = p;
-        this.revision = r;
-        this.filename = f;
+    public CacheKey(Optional<Long> projectId, String revision, String filename, String digest) {
+        this.projectId = projectId;
+        this.revision = revision;
+        this.filename = filename;
+        this.digest = digest;
     }
+
 
     @Override
     public String toString() {
         return "CacheKey{" +
             "projectId=" + projectId +
             ", revision='" + revision + '\'' +
+            ", digest='" + digest + '\'' +
             ", filename='" + filename + '\'' +
             '}';
     }
@@ -32,11 +37,14 @@ public class CacheKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CacheKey cacheKey = (CacheKey) o;
-        return Objects.equals(projectId, cacheKey.projectId) && Objects.equals(revision, cacheKey.revision) && Objects.equals(filename, cacheKey.filename);
+        return Objects.equals(projectId, cacheKey.projectId) &&
+            Objects.equals(digest, cacheKey.digest) &&
+            Objects.equals(revision, cacheKey.revision) &&
+            Objects.equals(filename, cacheKey.filename);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, revision, filename);
+        return Objects.hash(projectId, revision, filename, digest);
     }
 }

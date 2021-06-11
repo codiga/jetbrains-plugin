@@ -37,7 +37,7 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         when(longFunction.lineStart()).thenReturn(new BigDecimal("1.0"));
         when(longFunction.length()).thenReturn(new BigDecimal("40"));
 
-        Optional<CodeInspectionAnnotation> annotation = mapLongFunction(1L, 42L, longFunction, fileOffset, ImmutableMap.of());
+        Optional<CodeInspectionAnnotation> annotation = mapLongFunction(Optional.of(1L), Optional.of(42L), longFunction, fileOffset, ImmutableMap.of());
         assertTrue(!annotation.isPresent());
     }
 
@@ -55,11 +55,11 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         when(longFunction.filename()).thenReturn("foobar.txt");
         when(longFunction.functionName()).thenReturn("superfunction");
 
-        Optional<CodeInspectionAnnotation> annotationOptional = mapLongFunction(1L, 42L, longFunction, fileOffset, ImmutableMap.of());
+        Optional<CodeInspectionAnnotation> annotationOptional = mapLongFunction(Optional.of(1L), Optional.of(42L), longFunction, fileOffset, ImmutableMap.of());
         assertTrue(annotationOptional.isPresent());
         CodeInspectionAnnotation annotation = annotationOptional.get();
-        assertEquals(1L, annotation.getProjectId().longValue());
-        assertEquals(42L, annotation.getAnalysisId().longValue());
+        assertEquals(1L, annotation.getProjectId().get().longValue());
+        assertEquals(42L, annotation.getAnalysisId().get().longValue());
         assertEquals("foobar.txt", annotation.getFilename());
         assertEquals(CodeInspectionAnnotationKind.LongFunction, annotation.getAnnotationKind());
         assertEquals(new TextRange(45, 51), annotation.range());
@@ -80,7 +80,7 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         when(complexFunction.lineStart()).thenReturn(new BigDecimal("1.0"));
         when(complexFunction.complexity()).thenReturn(new BigDecimal("51"));
 
-        Optional<CodeInspectionAnnotation> annotation = mapComplexFunction(1L, 42L, complexFunction, fileOffset, ImmutableMap.of());
+        Optional<CodeInspectionAnnotation> annotation = mapComplexFunction(Optional.of(1L), Optional.of(42L), complexFunction, fileOffset, ImmutableMap.of());
         assertTrue(!annotation.isPresent());
     }
 
@@ -99,11 +99,11 @@ public class CodeInspectorApiUtilsTest extends TestBase {
         when(complexFunction.filename()).thenReturn("foobar.txt");
         when(complexFunction.functionName()).thenReturn("superfunction");
 
-        Optional<CodeInspectionAnnotation> annotationOptional = mapComplexFunction(1L, 42L, complexFunction, fileOffset, ImmutableMap.of());
+        Optional<CodeInspectionAnnotation> annotationOptional = mapComplexFunction(Optional.of(1L), Optional.of(42L), complexFunction, fileOffset, ImmutableMap.of());
         assertTrue(annotationOptional.isPresent());
         CodeInspectionAnnotation annotation = annotationOptional.get();
-        assertEquals(1L, annotation.getProjectId().longValue());
-        assertEquals(42L, annotation.getAnalysisId().longValue());
+        assertEquals(1L, annotation.getProjectId().get().longValue());
+        assertEquals(42L, annotation.getAnalysisId().get().longValue());
         assertEquals("foobar.txt", annotation.getFilename());
         assertEquals(CodeInspectionAnnotationKind.ComplexFunction, annotation.getAnnotationKind());
         assertEquals(new TextRange(45, 51), annotation.range());

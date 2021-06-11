@@ -1,0 +1,3 @@
+mutation RecordAccess ($accessType: AccessType!, $actionType: ActionType!) {
+    recordAccess(accessType: $accessType, actionType: $actionType)
+}

@@ -18,7 +18,8 @@ import static com.code_inspector.plugins.intellij.Constants.INVALID_PROJECT_ID;
 )
 public class ProjectSettingsState implements PersistentStateComponent<ProjectSettingsState> {
 
-    public Boolean isEnabled = false;
+    public Boolean isProjectAssociated = false;
+    public Boolean isEnabled = true;
     public Long projectId = INVALID_PROJECT_ID;
 
     public static ProjectSettingsState getInstance(Project p) {
