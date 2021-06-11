@@ -3,6 +3,7 @@
 # Code Inspector IntelliJ PlugIn Changelog
 
 ## [Unreleased]
+## [1.0.3]
 ## [1.0.2]
 ### Added
 
