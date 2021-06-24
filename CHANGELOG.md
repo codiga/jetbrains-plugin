@@ -3,8 +3,21 @@
 # Code Inspector IntelliJ PlugIn Changelog
 
 ## [Unreleased]
-## [1.0.2]
+
+
+## [1.0.4]
+
 ### Added
+
+- Correctly fixing the project identifier when analyzing a file (Fixes: #32)
+- Fixes crash when trying to check what project has been notified (Fixes: #31)
+- Use Real-Time Feedback to analyze all files, even when project exists
+- Add the AccessRecord call when creating a file analysis
+
+### Fixed
+
+- Fix exception when sending notification to project (Fixes: #31)
+- Updating dependencies
 
 
 ## [1.0.2]

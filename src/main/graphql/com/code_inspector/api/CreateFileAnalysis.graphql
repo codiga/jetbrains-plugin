@@ -1,3 +1,4 @@
 mutation CreateFileAnalysis ($projectId: Long, $filename: String!, $code: String!, $language: LanguageEnumeration!) {
     createFileAnalysis(projectId: $projectId, code: $code, language: $language, filename: $filename)
+    recordAccess(accessType: IntelliJ, actionType: FileAnalysisRequest)
 }

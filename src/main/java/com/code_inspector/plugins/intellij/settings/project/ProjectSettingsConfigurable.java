@@ -1,6 +1,5 @@
 package com.code_inspector.plugins.intellij.settings.project;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nls;
@@ -8,13 +7,9 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
-
 public class ProjectSettingsConfigurable implements Configurable {
     private ProjectSettingsComponent mySettingsComponent;
     private final Project project;
-
-    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
@@ -41,8 +36,6 @@ public class ProjectSettingsConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         ProjectSettingsState settings = ProjectSettingsState.getInstance(project);
-        LOGGER.debug(settings.isEnabled.toString());
-        LOGGER.debug(this.mySettingsComponent.isEnabled().toString());
         return (
             !this.mySettingsComponent.getSelectedProjectId().equals(settings.projectId) ||
             !this.mySettingsComponent.isProjectAssociated().equals(settings.isProjectAssociated) ||

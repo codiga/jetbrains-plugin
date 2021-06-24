@@ -25,9 +25,10 @@ public final class NotificationUtils {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     /**
-     * Record the error already sent to projects
+     * Record the error already sent to projects.
+     * The tuple is the name of the project and the message being sent.
      */
-    private static Set<Pair<Project, String>> NOTIFICATION_ERROR_ONCE_PER_PROJECT = new ConcurrentSkipListSet<>();
+    private final static Set<Pair<String, String>> NOTIFICATION_ERROR_ONCE_PER_PROJECT = new ConcurrentSkipListSet<>();
 
     /**
      * Do not instantiate this class.
@@ -36,8 +37,8 @@ public final class NotificationUtils {
 
     /**
      * Notify an error for a project and do it only once.
-     * @param project
-     * @param message
+     * @param project - the project to show a notification against
+     * @param message - the message we want to show/highlight.
      */
     public static void notififyProjectOnce(Project project, String message, String notificationGroupName) {
         final NotificationGroupManager notificationGroupManager = NotificationGroupManager.getInstance();
@@ -45,11 +46,10 @@ public final class NotificationUtils {
         LOGGER.debug(notificationGroupManager.toString());
         LOGGER.debug(notificationGroup.toString());
 
-        Pair<Project, String> key = Pair.of(project, message);
+        Pair<String, String> key = Pair.of(project.getName(), message);
 
         if(NOTIFICATION_ERROR_ONCE_PER_PROJECT.contains(key)) {
             LOGGER.debug(String.format("not showing notification %s again on project %s", message, project.getName()));
-            return;
         } else {
             notificationGroup
                 .createNotification(message, NotificationType.ERROR)

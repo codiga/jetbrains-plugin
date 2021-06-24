@@ -290,7 +290,7 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
     public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) throws GraphQlQueryException {
         ApiRequest<Object> apiRequestSendFileForAnalysis = new ApiRequest<Object>();
 
-        final Input<Object> inputProjectId = Input.absent();
+        final Input<Object> inputProjectId = projectId.<Input<Object>>map(Input::fromNullable).orElseGet(Input::absent);
 
         /**
          * Send the analysis query

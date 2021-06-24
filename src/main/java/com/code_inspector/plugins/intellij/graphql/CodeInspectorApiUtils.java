@@ -42,7 +42,7 @@ import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.inde
  * Utility class to convert data from the GraphQL API into data we can use for annotating the
  * source code.
  */
-public class CodeInspectorApiUtils {
+public final class CodeInspectorApiUtils {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -265,10 +265,7 @@ public class CodeInspectorApiUtils {
             final String fileContent = new String(psiFile.getVirtualFile().contentsToByteArray(), StandardCharsets.UTF_8);
             final FileOffset fileOffset = new FileOffset(Arrays.asList(fileContent.split("\n")));
 
-            LOGGER.debug(String.format("fileContent = %s", fileContent));
-
             Map<FileLinePair, FileLinePair> changesFromWorkingDirectory = indexPatchHunks(getPatchesForWorkingDirectoryForFile(psiFile));
-
 
             // TODO - map duplicates
 
