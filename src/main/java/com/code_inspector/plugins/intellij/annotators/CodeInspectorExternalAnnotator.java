@@ -158,12 +158,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     @Nullable
     @Override
     public List<CodeInspectionAnnotation> doAnnotate(PsiFile psiFile) {
-        Optional<VirtualFile> repositoryRoot = CodeInspectorGitUtils.getRepositoryRoot(psiFile);
-        boolean isFileUnderGit = repositoryRoot.isPresent();
-        boolean isFileModifiedInGit = isFileUnderGit && !getPatchesForWorkingDirectoryForFile(psiFile).isEmpty();
-
-        LOGGER.info(String.format("calling doAnnotate on file: %s, is in git: %s, is modified in git: %s",
-            psiFile.getName(), isFileUnderGit, isFileModifiedInGit));
+        LOGGER.info(String.format("calling doAnnotate on file: %s", psiFile.getName()));
 
         final ProjectSettingsState PROJECT_SETTINGS = ProjectSettingsState.getInstance(psiFile.getProject());
 
@@ -176,22 +171,11 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
         ProgressManager.checkCanceled();
 
-        /*
-         * If the project is analyzed by Code Inspector and the file not modified, get that data from
-         * the existing Code Inspector Analysis from our backend.
-         */
-        if(isFileUnderGit && !isFileModifiedInGit &&
-            PROJECT_SETTINGS.isProjectAssociated && !settings.projectId.equals(INVALID_PROJECT_ID)) {
-            LOGGER.debug("Get data from project analysis");
-            return getAnnotationFromProjectAnalysis(psiFile, settings.projectId);
-        } else {
-            Optional<Long> projectId = Optional.empty();
-            if(!settings.projectId.equals(INVALID_PROJECT_ID)) {
-                projectId = Optional.of(settings.projectId);
-            }
-            LOGGER.debug("Get data from file analysis");
-            return getAnnotationFromFileAnalysis(psiFile, projectId);
+        Optional<Long> projectId = Optional.empty();
+        if(PROJECT_SETTINGS.isProjectAssociated && !settings.projectId.equals(INVALID_PROJECT_ID)) {
+            projectId = Optional.of(settings.projectId);
         }
+        return getAnnotationFromFileAnalysis(psiFile, projectId);
     }
 
     /**
