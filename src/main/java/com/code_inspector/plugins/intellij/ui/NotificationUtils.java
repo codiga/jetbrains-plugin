@@ -27,7 +27,7 @@ public final class NotificationUtils {
     /**
      * Record the error already sent to projects
      */
-    private static Set<Pair<Project, String>> NOTIFICATION_ERROR_ONCE_PER_PROJECT = new ConcurrentSkipListSet<>();
+    private static Set<Pair<String, String>> NOTIFICATION_ERROR_ONCE_PER_PROJECT = new ConcurrentSkipListSet<>();
 
     /**
      * Do not instantiate this class.
@@ -45,7 +45,7 @@ public final class NotificationUtils {
         LOGGER.debug(notificationGroupManager.toString());
         LOGGER.debug(notificationGroup.toString());
 
-        Pair<Project, String> key = Pair.of(project, message);
+        Pair<String, String> key = Pair.of(project.getName(), message);
 
         if(NOTIFICATION_ERROR_ONCE_PER_PROJECT.contains(key)) {
             LOGGER.debug(String.format("not showing notification %s again on project %s", message, project.getName()));
