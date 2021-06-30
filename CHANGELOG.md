@@ -3,7 +3,11 @@
 # Code Inspector IntelliJ PlugIn Changelog
 
 ## [Unreleased]
-## [1.0.4]
+## [1.0.5]
+
+### Added
+
+- Support for IntelliJ 2021.1.3
 
 ## [1.0.4]
 
