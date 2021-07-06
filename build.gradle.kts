@@ -11,9 +11,9 @@ plugins {
     // GraphQL
     id("com.apollographql.apollo") version "2.5.9"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "0.7.2"
+    id("org.jetbrains.intellij") version "0.7.3"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "1.1.2"
+    id("org.jetbrains.changelog") version "1.2.0"
 }
 
 group = properties("pluginGroup")
@@ -21,11 +21,11 @@ version = properties("pluginVersion")
 
 // Configure project's dependencies
 repositories {
+    jcenter()
     mavenCentral()
-    maven {
-        url = uri("https://packages.jetbrains.team/maven/p/intellij-plugin-verifier/intellij-plugin-verifier")
-    }
 }
+
+
 dependencies {
     implementation("com.apollographql.apollo:apollo-runtime:2.5.9")
     implementation("org.apache.commons:commons-lang3:3.12.0")
@@ -50,8 +50,8 @@ intellij {
 // Configure gradle-changelog-plugin plugin.
 // Read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
-    version = properties("pluginVersion")
-    groups = emptyList()
+    version.set("${project.version}")
+    path.set("${project.projectDir}/CHANGELOG.md")
 }
 
 
