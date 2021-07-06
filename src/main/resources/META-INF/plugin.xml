@@ -102,6 +102,9 @@
                 language="JSON"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator
+                language="Apex"
+                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+        <externalAnnotator
                 language="TEXT"
                 implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
         <externalAnnotator

@@ -2,6 +2,7 @@ package com.code_inspector.plugins.intellij.settings.application;
 
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
 import com.code_inspector.plugins.intellij.ui.DialogApiStatus;
+import com.intellij.lang.Language;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Optional;
 
 import static com.code_inspector.plugins.intellij.ui.UIConstants.*;
@@ -28,6 +30,15 @@ public class AppSettingsComponent {
     private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
 
     public AppSettingsComponent() {
+        /**
+         * Use the following code only to debug and find all supported languages
+         *         Collection<Language> allLanguages = com.intellij.lang.Language.getRegisteredLanguages();
+         *         System.out.println("showing langauges");
+         *         for(Language language: allLanguages){
+         *             System.out.println(language.getID());
+         *         }
+         */
+
         BorderLayoutPanel p = new BorderLayoutPanel();
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 

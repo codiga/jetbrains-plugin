@@ -63,6 +63,8 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
     }
 
 
+
+
     @Nullable
     private List<CodeInspectionAnnotation> getAnnotationFromFileAnalysis(PsiFile psiFile, Optional<Long> projectId) {
         final String filename = psiFile.getName();
