@@ -22,7 +22,9 @@ version = properties("pluginVersion")
 // Configure project's dependencies
 repositories {
     mavenCentral()
-    jcenter()
+    maven {
+        url = uri("https://packages.jetbrains.team/maven/p/intellij-plugin-verifier/intellij-plugin-verifier")
+    }
 }
 dependencies {
     implementation("com.apollographql.apollo:apollo-runtime:2.5.9")
