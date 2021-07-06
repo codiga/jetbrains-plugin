@@ -413,6 +413,9 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
             }
             currentTimestamp = System.currentTimeMillis();
         }
+        if (currentTimestamp >= deadline){
+            LOGGER.warn("deadline missed during analysis");
+        }
         return Optional.empty();
     }
 }

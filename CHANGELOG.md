@@ -3,6 +3,13 @@
 # Code Inspector IntelliJ PlugIn Changelog
 
 ## [Unreleased]
+
+## [1.0.6]
+
+### Added
+
+- Support for Apex with Illuminated Cloud
+
 ## [1.0.5]
 
 ### Added
