@@ -11,7 +11,7 @@ plugins {
     // GraphQL
     id("com.apollographql.apollo") version "2.5.9"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "0.7.3"
+    id("org.jetbrains.intellij") version "1.1.2"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.2.0"
 }
@@ -37,14 +37,14 @@ dependencies {
 // Configure gradle-intellij-plugin plugin.
 // Read more: https://github.com/JetBrains/gradle-intellij-plugin
 intellij {
-    pluginName = properties("pluginName")
-    version = properties("platformVersion")
-    type = properties("platformType")
-    downloadSources = properties("platformDownloadSources").toBoolean()
-    updateSinceUntilBuild = true
+    pluginName.set(properties("pluginName"))
+    version.set(properties("platformVersion"))
+    type.set(properties("platformType"))
+    downloadSources.set(("platformDownloadSources").toBoolean())
+    updateSinceUntilBuild.set(true)
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    setPlugins(*properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
+    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
 }
 
 // Configure gradle-changelog-plugin plugin.
@@ -67,28 +67,28 @@ tasks {
 
 
     patchPluginXml {
-        version(properties("pluginVersion"))
-        sinceBuild(properties("pluginSinceBuild"))
-        untilBuild(properties("pluginUntilBuild"))
+        version.set(properties("pluginVersion"))
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
 
         // Get the latest available change notes from the changelog file
-        changeNotes(
-            closure {
+        changeNotes.set(
+            provider {
                 changelog.getLatest().toHTML()
             }
         )
     }
 
     runPluginVerifier {
-        ideVersions(properties("pluginVerifierIdeVersions"))
+        ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
     }
 
     publishPlugin {
         dependsOn("patchChangelog")
-        token(System.getenv("PUBLISH_TOKEN"))
+        token.set(System.getenv("PUBLISH_TOKEN"))
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first())
+        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 }
