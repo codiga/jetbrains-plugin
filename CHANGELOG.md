@@ -6,6 +6,7 @@
 ### Added
 
 ### Changed
+- migrate `org.jetbrains.intellij` to `1.1.2`
 
 ### Deprecated
 
@@ -14,7 +15,6 @@
 ### Fixed
 
 ### Security
-## [1.0.6]
 
 ## [1.0.6]
 
