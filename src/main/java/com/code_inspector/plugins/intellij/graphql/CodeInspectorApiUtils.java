@@ -42,7 +42,7 @@ import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.inde
  * Utility class to convert data from the GraphQL API into data we can use for annotating the
  * source code.
  */
-public class CodeInspectorApiUtils {
+public final class CodeInspectorApiUtils {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -326,11 +326,17 @@ public class CodeInspectorApiUtils {
                 .map(v -> mapViolationFromFileAnalysis(v, fileOffset, filename, projectId))
                 .collect(Collectors.toList());
 
-            return allAnnotations
+            List<CodeInspectionAnnotation> allAnnotationsWithoutEmpty = allAnnotations
                 .stream()
                 .filter(v -> v.isPresent())
                 .map(v -> v.get())
                 .collect(Collectors.toList());
+
+            /**
+             * Before returning the list of errors, make sure we filter
+             * the error with the exact same message on the same text range.
+             */
+            return CodeInspectionAnnotation.filterDuplicatesByFileNameLineAndDescription(allAnnotationsWithoutEmpty);
         } catch (IOException ioe){
             ioe.printStackTrace();
             LOGGER.debug("cannot read file");

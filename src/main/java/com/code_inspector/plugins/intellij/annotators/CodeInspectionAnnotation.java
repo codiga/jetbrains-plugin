@@ -4,7 +4,9 @@ import com.code_inspector.api.type.LanguageEnumeration;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * This class represent an annotation from Code Inspector with the different attributes coming from the API
@@ -89,6 +91,52 @@ public class CodeInspectionAnnotation {
         this.description = Optional.empty();
         this.rule = Optional.empty();
         this.tool = Optional.empty();
+    }
+
+    /**
+     * Filter annotations and removes duplicates if they are
+     *  - in the same file
+     *  - at the same line
+     *  - have the same description
+     * @param annotations - list of annotations
+     * @return - list of unique annotations
+     */
+    public static List<CodeInspectionAnnotation> filterDuplicatesByFileNameLineAndDescription(List<CodeInspectionAnnotation> annotations) {
+
+        /**
+         * Class to distinguish violation per file, message and range.
+         */
+        class HashValue {
+            String filename;
+            String message;
+            TextRange range;
+
+            HashValue(String f, String m, TextRange t) {
+                this.filename = f;
+                this.message = m;
+                this.range = t;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                HashValue hashValue = (HashValue) o;
+                return Objects.equals(filename, hashValue.filename) && Objects.equals(message, hashValue.message) && Objects.equals(range, hashValue.range);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(filename, message, range);
+            }
+        }
+
+        Map<HashValue, List<CodeInspectionAnnotation>> grouped =
+                annotations
+                        .stream()
+                        .collect(Collectors.groupingBy(v -> new HashValue(v.getFilename(), v.getMessage(), v.range())));
+        return grouped.values().stream().map(v -> v.stream().findFirst()).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+
     }
 
 }

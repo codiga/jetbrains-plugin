@@ -62,9 +62,12 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
         return psiFile;
     }
 
-
-
-
+    /**
+     * Get annotations for a file
+     * @param psiFile - the file opened in IntelliJ
+     * @param projectId - the related projectId if selected in IntelliJ
+     * @return - the list of annotations to add.
+     */
     @Nullable
     private List<CodeInspectionAnnotation> getAnnotationFromFileAnalysis(PsiFile psiFile, Optional<Long> projectId) {
         final String filename = psiFile.getName();
