@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 ### Added
+- remove duplicated errors that have the same message
 
 ### Changed
 - migrate `org.jetbrains.intellij` to `1.1.2`
