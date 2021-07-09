@@ -1,9 +1,7 @@
 package com.code_inspector.plugins.intellij.annotators;
 
 import com.code_inspector.api.GetFileAnalysisQuery;
-import com.code_inspector.api.GetFileDataQuery;
 import com.code_inspector.plugins.intellij.cache.AnalysisDataCache;
-import com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils;
 import com.code_inspector.plugins.intellij.graphql.GraphQlQueryException;
 import com.code_inspector.plugins.intellij.settings.project.ProjectSettingsState;
 import com.google.common.collect.ImmutableList;
@@ -16,10 +14,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vcs.FileStatus;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.intellij.vcsUtil.VcsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,10 +24,7 @@ import java.util.Optional;
 import static com.code_inspector.plugins.intellij.Constants.INVALID_PROJECT_ID;
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 import static com.code_inspector.plugins.intellij.Constants.NO_ANNOTATION;
-import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.getFileStatus;
-import static com.code_inspector.plugins.intellij.git.CodeInspectorGitUtils.getPatchesForWorkingDirectoryForFile;
 import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromFileAnalysisQueryResult;
-import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromProjectQueryResult;
 import static com.code_inspector.plugins.intellij.ui.NotificationUtils.*;
 import static com.code_inspector.plugins.intellij.ui.UIConstants.ANNOTATION_PREFIX;
 
@@ -111,48 +103,6 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
     }
 
-    @Nullable
-    private List<CodeInspectionAnnotation> getAnnotationFromProjectAnalysis(PsiFile psiFile, Long projectId) {
-        LOGGER.debug(String.format(
-            "calling getAnnotationFromExistingAnalysis on file %s, type %s",
-            psiFile.getVirtualFile().getPath(),
-            psiFile.getLanguage()));
-
-        Optional<String> revision = CodeInspectorGitUtils.getGitRevision(psiFile);
-
-        if (!revision.isPresent()) {
-            LOGGER.info("cannot get file revision");
-            return NO_ANNOTATION;
-        }
-
-        Optional<String> filePath = CodeInspectorGitUtils.getFilePathInRepository(psiFile);
-
-        if (!filePath.isPresent()) {
-            LOGGER.info("cannot get file patch");
-            return NO_ANNOTATION;
-        }
-
-        Optional<GetFileDataQuery.Project> query;
-        try {
-            query = AnalysisDataCache
-                .getInstance()
-                .getViolationsFromProjectAnalysis(projectId, revision.get(), filePath.get());
-        } catch (GraphQlQueryException e) {
-            LOGGER.debug("receive invalid graphql call, sending notification");
-            notififyProjectOnce(psiFile.getProject(), NOTIFICATION_API_KEYS_INCORRECT, NOTIFICATION_GROUP_API);
-            query = Optional.empty();
-        }
-
-        if (!query.isPresent()) {
-            LOGGER.info("no data from query");
-            return NO_ANNOTATION;
-        }
-
-        // If the API took too long, check that this is still okay to proceed.
-        ProgressManager.checkCanceled();
-
-        return getAnnotationsFromProjectQueryResult(query.get(), psiFile);
-    }
 
     /**
      * Gather all the annotations from the Code Inspector API and generates a list of annotation
