@@ -3,12 +3,17 @@
 # Code Inspector IntelliJ PlugIn Changelog
 
 ## [Unreleased]
+
+## [1.0.7]
+
 ### Added
 - remove duplicated errors that have the same message
 
 ### Changed
 - migrate `org.jetbrains.intellij` to `1.1.2`
-
+- use the document manager to get offset, which should
+  lead to more accurate annotations.
+  
 ### Deprecated
 
 ### Removed
