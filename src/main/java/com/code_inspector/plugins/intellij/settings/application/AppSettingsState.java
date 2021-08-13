@@ -6,6 +6,7 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Tag;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,9 +25,18 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     private String accessKey = "";
     @Tag
     private String secretKey = "";
+    @Tag
+    private String fingerprint = "";
 
     public static AppSettingsState getInstance() {
         return ServiceManager.getService(AppSettingsState.class);
+    }
+
+    public String getFingerprint() {
+        if(this.fingerprint == null || this.fingerprint.length() == 0) {
+            this.fingerprint = RandomStringUtils.randomAlphanumeric(20);
+        }
+        return this.fingerprint;
     }
 
     public String getAccessKey() {
@@ -43,6 +53,10 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     public void setSecretKey(String s) {
         this.secretKey = s;
+    }
+
+    public boolean hasApiKeys() {
+        return getAccessKey().length() > 0 && getSecretKey().length() > 0;
     }
 
     @Nullable

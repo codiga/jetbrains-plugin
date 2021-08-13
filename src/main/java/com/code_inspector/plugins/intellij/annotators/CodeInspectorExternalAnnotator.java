@@ -3,6 +3,7 @@ package com.code_inspector.plugins.intellij.annotators;
 import com.code_inspector.api.GetFileAnalysisQuery;
 import com.code_inspector.plugins.intellij.cache.AnalysisDataCache;
 import com.code_inspector.plugins.intellij.graphql.GraphQlQueryException;
+import com.code_inspector.plugins.intellij.settings.application.AppSettingsState;
 import com.code_inspector.plugins.intellij.settings.project.ProjectSettingsState;
 import com.google.common.collect.ImmutableList;
 import com.intellij.codeInspection.ProblemHighlightType;
@@ -182,6 +183,9 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
         @NotNull final PsiFile psiFile,
         @NotNull final CodeInspectionAnnotation annotation,
         @NotNull AnnotationHolder holder) {
+
+        AppSettingsState settings = AppSettingsState.getInstance();
+
         final Optional<Long> projectId = annotation.getProjectId();
 
         final String message = String.format("%s (%s)", annotation.getMessage(), ANNOTATION_PREFIX);
@@ -205,7 +209,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
          */
         if (annotation.getRule().isPresent() && annotation.getTool().isPresent() &&
             annotation.getDescription().isPresent() && annotation.getLanguage().isPresent() &&
-            projectId.isPresent()) {
+            projectId.isPresent() && settings.hasApiKeys()) {
             LOGGER.debug("Adding fix for annotation");
             annotationBuilder = annotationBuilder
                 .withFix(

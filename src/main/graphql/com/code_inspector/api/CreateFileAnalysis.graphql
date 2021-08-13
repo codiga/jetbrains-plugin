@@ -1,4 +1,4 @@
-mutation CreateFileAnalysis ($projectId: Long, $filename: String!, $code: String!, $language: LanguageEnumeration!) {
-    createFileAnalysis(projectId: $projectId, code: $code, language: $language, filename: $filename)
+mutation CreateFileAnalysis ($projectId: Long, $filename: String!, $code: String!, $language: LanguageEnumeration!, $fingerprint: String) {
+    createFileAnalysis(projectId: $projectId, code: $code, language: $language, filename: $filename, fingerprint: $fingerprint)
     recordAccess(accessType: IntelliJ, actionType: FileAnalysisRequest)
 }

@@ -1,5 +1,5 @@
-query GetFileAnalysis($id: Long!){
-    getFileAnalysis(id: $id) {
+query GetFileAnalysis($id: Long!, $fingerprint: String){
+    getFileAnalysis(id: $id, fingerprint: $fingerprint) {
         runningTimeSeconds
         language
         timestamp
