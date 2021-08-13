@@ -14,6 +14,18 @@
 ### Fixed
 
 ### Security
+## [1.0.8]
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
 
 ## [1.0.8]
 
