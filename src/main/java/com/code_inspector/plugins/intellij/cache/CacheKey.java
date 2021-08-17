@@ -13,12 +13,14 @@ public class CacheKey {
     private final String revision;
     private final String filename;
     private final String digest;
+    private final Optional<String> parameters;
 
-    public CacheKey(Optional<Long> projectId, String revision, String filename, String digest) {
+    public CacheKey(Optional<Long> projectId, String revision, String filename, String digest, Optional<String> parameters) {
         this.projectId = projectId;
         this.revision = revision;
         this.filename = filename;
         this.digest = digest;
+        this.parameters = parameters;
     }
 
 
@@ -29,6 +31,7 @@ public class CacheKey {
             ", revision='" + revision + '\'' +
             ", digest='" + digest + '\'' +
             ", filename='" + filename + '\'' +
+            ", parameters='" + parameters + '\'' +
             '}';
     }
 
@@ -40,6 +43,7 @@ public class CacheKey {
         return Objects.equals(projectId, cacheKey.projectId) &&
             Objects.equals(digest, cacheKey.digest) &&
             Objects.equals(revision, cacheKey.revision) &&
+            Objects.equals(parameters, cacheKey.parameters) &&
             Objects.equals(filename, cacheKey.filename);
     }
 

@@ -287,7 +287,7 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
      * @return the list of violations.
      */
     @Override
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) throws GraphQlQueryException {
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId, Optional<String> parameters) throws GraphQlQueryException {
         ApiRequest<Object> apiRequestSendFileForAnalysis = new ApiRequest<Object>();
         AppSettingsState settings = AppSettingsState.getInstance();
         String fingerPrintText = settings.getFingerprint();
@@ -295,11 +295,14 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
 
         final Input<Object> inputProjectId = projectId.<Input<Object>>map(Input::fromNullable).orElseGet(Input::absent);
 
+        final Input<String> inputParameters = parameters.map(Input::fromNullable).orElse(Input.absent());
+
+
         /**
          * Send the analysis query
          */
         ApolloMutationCall<CreateFileAnalysisMutation.Data> mutationCall =
-            apolloClient.mutate(new CreateFileAnalysisMutation(inputProjectId, filename, code, language, fingerprint))
+            apolloClient.mutate(new CreateFileAnalysisMutation(inputProjectId, filename, code, language, fingerprint, inputParameters))
             .toBuilder()
             .requestHeaders(getHeaders())
             .build();

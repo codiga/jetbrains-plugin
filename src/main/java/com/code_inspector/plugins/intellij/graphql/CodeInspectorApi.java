@@ -108,5 +108,5 @@ public interface CodeInspectorApi {
      * @param projectId - the optional project identifier.
      * @return - the list of potential issues.
      */
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId) throws GraphQlQueryException;
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId, Optional<String> parameters) throws GraphQlQueryException;
 }

@@ -1,0 +1,42 @@
+{
+  "name": "login",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev-local": "export REACT_APP_BACKEND_URL=\"http://localhost:5000/graphql\" && react-scripts start",
+    "dev": "export REACT_APP_BACKEND_URL=\"https://dashboard-api.code-inspector.com/graphql\" && react-scripts start",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/query-string": "^6.3.0",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/react-table": "^7.7.1",
+    "@types/styled-components": "^5.1.9",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "babel-plugin-styled-components": "^1.12.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "typescript": "^4.3.2"
+  }
+}

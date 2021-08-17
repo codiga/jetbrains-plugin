@@ -14,6 +14,22 @@
 ### Fixed
 
 ### Security
+
+## [1.0.9]
+### Added
+
+ - Detect package and context for Javascript analysis
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
 ## [1.0.8]
 ### Added
 

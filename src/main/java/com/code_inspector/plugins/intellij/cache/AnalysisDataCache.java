@@ -89,9 +89,9 @@ public final class AnalysisDataCache {
      * @param code - the code to analyze
      * @return
      */
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getViolationsFromFileAnalysis(Optional<Long> projectId, String filename, String code) throws GraphQlQueryException {
+    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getViolationsFromFileAnalysis(Optional<Long> projectId, String filename, String code, Optional<String> parameters) throws GraphQlQueryException {
         String digest = getFileHash(code);
-        CacheKey cacheKey = new CacheKey(projectId, null, filename, digest);
+        CacheKey cacheKey = new CacheKey(projectId, null, filename, digest, parameters);
         LanguageEnumeration language = getLanguageFromFilename(filename);
 
         if (language == LanguageEnumeration.UNKNOWN) {
@@ -103,7 +103,7 @@ public final class AnalysisDataCache {
 
         if (!cacheFileAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));
-            Optional<GetFileAnalysisQuery.GetFileAnalysis> query = codeInspectorApi.getFileAnalysis(filename, code, language, projectId);
+            Optional<GetFileAnalysisQuery.GetFileAnalysis> query = codeInspectorApi.getFileAnalysis(filename, code, language, projectId, parameters);
             cacheFileAnalysis.put(cacheKey, query);
         }
 
@@ -121,7 +121,7 @@ public final class AnalysisDataCache {
      * @return
      */
     public Optional<GetFileDataQuery.Project> getViolationsFromProjectAnalysis(Long projectId, String revision, String path) throws GraphQlQueryException {
-        CacheKey cacheKey = new CacheKey(Optional.of(projectId), revision, path, null);
+        CacheKey cacheKey = new CacheKey(Optional.of(projectId), revision, path, null, null);
         if (!cacheProjectAnalysis.containsKey(cacheKey)) {
             LOGGER.debug(String.format("[AnalysisDataCache] cache miss, fetching from API for key %s", cacheKey));
             Optional<GetFileDataQuery.Project> query = codeInspectorApi.getDataForFile(projectId, revision, path);

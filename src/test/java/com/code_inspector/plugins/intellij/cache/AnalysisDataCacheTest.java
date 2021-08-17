@@ -22,7 +22,7 @@ public class AnalysisDataCacheTest extends TestBase {
         assertEquals(0, analysisDataCache.getCacheFileAnalysis().size());
         assertEquals(0, analysisDataCache.getCacheProjectAnalysis().size());
         Optional<GetFileAnalysisQuery.GetFileAnalysis> res =
-            analysisDataCache.getViolationsFromFileAnalysis(Optional.empty(), "filename.java", "code");
+            analysisDataCache.getViolationsFromFileAnalysis(Optional.empty(), "filename.java", "code", Optional.empty());
         assertTrue(!res.isPresent());
         assertEquals(1, analysisDataCache.getCacheFileAnalysis().size());
         assertEquals(0, analysisDataCache.getCacheProjectAnalysis().size());
@@ -48,7 +48,7 @@ public class AnalysisDataCacheTest extends TestBase {
         assertEquals(0, analysisDataCache.getCacheFileAnalysis().size());
         assertEquals(0, analysisDataCache.getCacheProjectAnalysis().size());
         Optional<GetFileAnalysisQuery.GetFileAnalysis> res =
-            analysisDataCache.getViolationsFromFileAnalysis(Optional.empty(), "filename", "code");
+            analysisDataCache.getViolationsFromFileAnalysis(Optional.empty(), "filename", "code", Optional.empty());
         assertTrue(!res.isPresent());
         assertEquals(0, analysisDataCache.getCacheFileAnalysis().size());
         assertEquals(0, analysisDataCache.getCacheProjectAnalysis().size());
