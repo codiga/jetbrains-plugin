@@ -24,8 +24,8 @@ import java.util.Optional;
 
 import static com.code_inspector.plugins.intellij.Constants.INVALID_PROJECT_ID;
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
-import static com.code_inspector.plugins.intellij.Constants.NO_ANNOTATION;
 import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromFileAnalysisQueryResult;
+import static com.code_inspector.plugins.intellij.parameters.AnalysisParameters.getAnalysisParameters;
 import static com.code_inspector.plugins.intellij.ui.NotificationUtils.*;
 import static com.code_inspector.plugins.intellij.ui.UIConstants.ANNOTATION_PREFIX;
 
@@ -74,11 +74,20 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
 
         final long startAnalysisTimeMillis = System.currentTimeMillis();
 
+        /**
+         * TODO: add the parameters
+         */
+        Optional<String> parameters = getAnalysisParameters(psiFile);
+        if(parameters.isPresent()){
+            LOGGER.info(String.format("parameters: %s", parameters.get()));
+        } else {
+            LOGGER.info("parameters absent");
+        }
         Optional<GetFileAnalysisQuery.GetFileAnalysis> queryResult;
         try {
             queryResult = AnalysisDataCache
                 .getInstance()
-                .getViolationsFromFileAnalysis(projectId, filename, code);
+                .getViolationsFromFileAnalysis(projectId, filename, code, parameters);
         } catch (GraphQlQueryException e) {
             LOGGER.debug("receive invalid graphql call, sending notification");
             notififyProjectOnce(psiFile.getProject(), NOTIFICATION_API_KEYS_INCORRECT, NOTIFICATION_GROUP_API);

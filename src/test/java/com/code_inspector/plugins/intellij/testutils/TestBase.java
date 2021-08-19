@@ -4,6 +4,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.junit.Ignore;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -23,8 +24,20 @@ public class TestBase extends BasePlatformTestCase {
         String completePath = this.getTestDataPath() + "/" + path;
 
         try {
-            String content = new String(Files.readAllBytes(new File(completePath).toPath()));
-            return content;
+            return new String(Files.readAllBytes(new File(completePath).toPath()));
+        }
+
+        catch (Exception e) {
+            e.getStackTrace();
+        }
+        return null;
+    }
+
+    public final FileInputStream getInputStream(String path){
+        String completePath = this.getTestDataPath() + "/" + path;
+
+        try {
+            return new FileInputStream(completePath);
         }
 
         catch (Exception e) {
