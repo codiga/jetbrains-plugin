@@ -4,22 +4,25 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.*;
 import com.google.gson.stream.MalformedJsonException;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.ResourceUtil;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 
-public class AnalysisParametersJavascript {
+public final class AnalysisParametersJavascript {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -35,6 +38,8 @@ public class AnalysisParametersJavascript {
                     .put("aws-sdk", "ENGINE_ESLINT_AWS_SDK_ENABLED=true")
                     .put("typeorm", "ENGINE_ESLINT_TYPEORM_ENABLED=true")
                     .build();
+
+    private AnalysisParametersJavascript() {}
 
     @VisibleForTesting
     public static Optional<String> getAnalysisParametersInputStream(InputStream inputStream) {
@@ -79,14 +84,22 @@ public class AnalysisParametersJavascript {
      * @return - the list of parameters if any.
      */
     public static Optional<String> getAnalysisParameters(PsiFile psiFile) {
-        VirtualFile virtualFile = psiFile.getProject().getProjectFile().findFileByRelativePath("package.json");
+        // Get all the files in the root directory of the project
+        List<VirtualFile> rootFiles = Arrays.stream(ProjectRootManager.getInstance(psiFile.getProject())
+                .getContentRoots())
+                .flatMap(v -> Arrays.stream(VfsUtil.getChildren(v)))
+                .collect(Collectors.toList());
 
-        if (virtualFile == null){
+        // Find package.json in these files
+        Optional<VirtualFile> packageFileOptional = rootFiles.stream().filter(v -> v.getName().equalsIgnoreCase("package.json")).findFirst();
+
+        // if no package present, we do not have any option to show
+        if (!packageFileOptional.isPresent()) {
             return Optional.empty();
         }
 
         try {
-            InputStream inputStream = virtualFile.getInputStream();
+            InputStream inputStream = packageFileOptional.get().getInputStream();
             Optional<String> result = getAnalysisParametersInputStream(inputStream);
             inputStream.close();
             return result;
@@ -94,6 +107,5 @@ public class AnalysisParametersJavascript {
             LOGGER.error("error when opening the file");
             return Optional.empty();
         }
-
     }
 }

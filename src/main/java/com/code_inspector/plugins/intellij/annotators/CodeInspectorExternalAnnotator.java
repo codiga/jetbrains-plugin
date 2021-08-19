@@ -25,6 +25,7 @@ import java.util.Optional;
 import static com.code_inspector.plugins.intellij.Constants.INVALID_PROJECT_ID;
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 import static com.code_inspector.plugins.intellij.graphql.CodeInspectorApiUtils.getAnnotationsFromFileAnalysisQueryResult;
+import static com.code_inspector.plugins.intellij.parameters.AnalysisParameters.getAnalysisParameters;
 import static com.code_inspector.plugins.intellij.ui.NotificationUtils.*;
 import static com.code_inspector.plugins.intellij.ui.UIConstants.ANNOTATION_PREFIX;
 
@@ -76,7 +77,12 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
         /**
          * TODO: add the parameters
          */
-        Optional<String> parameters = Optional.empty();
+        Optional<String> parameters = getAnalysisParameters(psiFile);
+        if(parameters.isPresent()){
+            LOGGER.info(String.format("parameters: %s", parameters.get()));
+        } else {
+            LOGGER.info("parameters absent");
+        }
         Optional<GetFileAnalysisQuery.GetFileAnalysis> queryResult;
         try {
             queryResult = AnalysisDataCache

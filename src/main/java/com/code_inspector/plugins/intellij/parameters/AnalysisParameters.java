@@ -7,7 +7,9 @@ import java.util.Optional;
 
 import static com.code_inspector.plugins.intellij.graphql.LanguageUtils.getLanguageFromFilename;
 
-public class AnalysisParameters {
+public final class AnalysisParameters {
+
+    private AnalysisParameters() {}
 
     public static Optional<String> getAnalysisParameters(PsiFile psiFile) {
 

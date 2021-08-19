@@ -30,7 +30,7 @@ public class AnalysisParametersJavascriptTest extends TestBase {
     private static Logger LOGGER = LoggerFactory.getLogger(CodeInspectorGitUtilsTest.class);
 
     @Test
-    public void testParsePackageFrontendJsonValid() {
+    public void testParsePackageFrontendJsonValid() throws IOException {
         FileInputStream fileInputStream = getInputStream("package-frontend.json");
         Optional<String> result = getAnalysisParametersInputStream(fileInputStream);
         Assertions.assertTrue(result.isPresent());
@@ -40,15 +40,12 @@ public class AnalysisParametersJavascriptTest extends TestBase {
         Assertions.assertTrue(parameters.contains("ENGINE_ESLINT_GRAPHQL_ENABLED=true"));
         Assertions.assertFalse(parameters.contains("ENGINE_ESLINT_AWS_SDK_ENABLED=true"));
         Assertions.assertFalse(parameters.contains("ENGINE_ESLINT_TYPEORM_ENABLED=true"));
-        try {
-            fileInputStream.close();
-        } catch (IOException e) {
-            LOGGER.error("cannot close resource");
-        }
+
+        fileInputStream.close();
     }
 
     @Test
-    public void testParsePackageBackendJsonValid() {
+    public void testParsePackageBackendJsonValid() throws IOException {
         FileInputStream fileInputStream = getInputStream("package-backend.json");
         Optional<String> result = getAnalysisParametersInputStream(fileInputStream);
         Assertions.assertTrue(result.isPresent());
@@ -58,34 +55,25 @@ public class AnalysisParametersJavascriptTest extends TestBase {
         Assertions.assertTrue(parameters.contains("ENGINE_ESLINT_GRAPHQL_ENABLED=true"));
         Assertions.assertTrue(parameters.contains("ENGINE_ESLINT_AWS_SDK_ENABLED=true"));
         Assertions.assertTrue(parameters.contains("ENGINE_ESLINT_TYPEORM_ENABLED=true"));
-        try {
-            fileInputStream.close();
-        } catch (IOException e) {
-            LOGGER.error("cannot close resource");
-        }
+
+        fileInputStream.close();
     }
 
     @Test
-    public void testParsePackageInvalid() {
+    public void testParsePackageInvalid() throws IOException{
         FileInputStream fileInputStream = getInputStream("package-invalid.json");
+
         Optional<String> result = getAnalysisParametersInputStream(fileInputStream);
         Assertions.assertFalse(result.isPresent());
-        try {
-            fileInputStream.close();
-        } catch (IOException e) {
-            LOGGER.error("cannot close resource");
-        }
+        fileInputStream.close();
     }
 
     @Test
-    public void testParsePackageWithoutDependencies() {
+    public void testParsePackageWithoutDependencies() throws IOException{
         FileInputStream fileInputStream = getInputStream("package-without-dependencies.json");
         Optional<String> result = getAnalysisParametersInputStream(fileInputStream);
         Assertions.assertFalse(result.isPresent());
-        try {
-            fileInputStream.close();
-        } catch (IOException e) {
-            LOGGER.error("cannot close resource");
-        }
+
+        fileInputStream.close();
     }
 }

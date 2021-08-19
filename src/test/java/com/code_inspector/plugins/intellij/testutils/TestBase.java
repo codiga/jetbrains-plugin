@@ -24,8 +24,7 @@ public class TestBase extends BasePlatformTestCase {
         String completePath = this.getTestDataPath() + "/" + path;
 
         try {
-            String content = new String(Files.readAllBytes(new File(completePath).toPath()));
-            return content;
+            return new String(Files.readAllBytes(new File(completePath).toPath()));
         }
 
         catch (Exception e) {
@@ -38,8 +37,7 @@ public class TestBase extends BasePlatformTestCase {
         String completePath = this.getTestDataPath() + "/" + path;
 
         try {
-            FileInputStream fileInputStream = new FileInputStream(completePath);
-            return fileInputStream;
+            return new FileInputStream(completePath);
         }
 
         catch (Exception e) {
