@@ -30,7 +30,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testCompile("org.mockito:mockito-core:3.11.2")
+    testCompile("org.mockito:mockito-core:3.12.4")
 }
 
 // Configure gradle-intellij-plugin plugin.
