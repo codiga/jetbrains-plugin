@@ -15,6 +15,12 @@
 
 ### Security
 
+## [1.0.10]
+
+### Fixed
+ - Exception when violation line is 0
+
+
 ## [1.0.9]
 ### Added
 

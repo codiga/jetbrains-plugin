@@ -75,6 +75,15 @@ public final class CodeInspectorApiUtils {
             LOGGER.debug("document null");
             return Optional.empty();
         }
+
+        /**
+         * If the line is 0, violationLine - 1 will be -1 and
+         * throw an exception.
+         */
+        if (violationLine < 1) {
+            return Optional.empty();
+        }
+
         int startOffset = document.getLineStartOffset(violationLine - 1);
         int endOffset = document.getLineEndOffset(violationLine - 1);
 
