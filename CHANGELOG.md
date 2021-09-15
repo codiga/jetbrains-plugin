@@ -15,12 +15,7 @@
 
 ### Security
 
-## [1.0.11]
-
-### Fixed
-- Exception with bug on value not present
-
-## [1.0.10]
+## [1.1.0]
 ### Added
 
 ### Changed
@@ -32,6 +27,10 @@
 ### Fixed
 
 ### Security
+
+## [1.0.11]
+### Fixed
+- Exception with bug on value not present
 
 ## [1.0.10]
 
