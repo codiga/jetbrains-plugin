@@ -405,7 +405,6 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
             }
             else {
                 LOGGER.debug("error getting data from the analysis");
-                LOGGER.debug(returnedData.get().toString());
                 return Optional.empty();
             }
 
