@@ -37,6 +37,7 @@ public final class AnalysisParametersJavascript {
                     .put("express", "ENGINE_ESLINT_EXPRESS_ENABLED=true")
                     .put("aws-sdk", "ENGINE_ESLINT_AWS_SDK_ENABLED=true")
                     .put("typeorm", "ENGINE_ESLINT_TYPEORM_ENABLED=true")
+                    .put("jest", "ENGINE_ESLINT_JEST_ENABLED=true")
                     .build();
 
     private AnalysisParametersJavascript() {}
