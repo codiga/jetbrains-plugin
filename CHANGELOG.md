@@ -15,7 +15,7 @@
 
 ### Security
 
-## [1.1.0]
+## [1.1.1]
 ### Added
 
 ### Changed
@@ -27,6 +27,8 @@
 ### Fixed
 
 ### Security
+
+## [1.1.0]
 
 ## [1.0.11]
 ### Fixed
