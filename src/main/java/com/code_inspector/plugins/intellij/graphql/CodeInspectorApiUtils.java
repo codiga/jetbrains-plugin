@@ -83,9 +83,14 @@ public final class CodeInspectorApiUtils {
         if (violationLine < 1) {
             return Optional.empty();
         }
-
-        int startOffset = document.getLineStartOffset(violationLine - 1);
-        int endOffset = document.getLineEndOffset(violationLine - 1);
+        int startOffset = 0;
+        int endOffset = 0;
+        try {
+            startOffset = document.getLineStartOffset(violationLine - 1);
+            endOffset = document.getLineEndOffset(violationLine - 1);
+        } catch (IndexOutOfBoundsException e) {
+            return Optional.empty();
+        }
 
         String lineText = document.getText(new TextRange(startOffset, endOffset));
         int pos = 0;
