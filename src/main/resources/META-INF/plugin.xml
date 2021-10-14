@@ -153,6 +153,13 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
+        <action id="com.code_inspector.plugins.intellij.actions.AssistantAction" class="com.code_inspector.plugins.intellij.actions.AssistantAction"
+                text="Codiga: Assistant" description="Search for Codiga suggestions"
+                icon="CodigaIcons.Codiga_default_icon">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <override-text place="MainMenu" text="Codiga Assistant"/>
+            <keyboard-shortcut first-keystroke="control alt A" second-keystroke="C" keymap="$default"/>
+            <mouse-shortcut keystroke="control button3 doubleClick" keymap="$default"/>
+        </action>
     </actions>
 </idea-plugin>

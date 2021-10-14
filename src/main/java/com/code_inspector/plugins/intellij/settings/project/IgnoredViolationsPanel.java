@@ -4,6 +4,7 @@ import com.code_inspector.api.GetProjectsQuery;
 import com.code_inspector.plugins.intellij.cache.AnalysisDataCache;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -26,7 +27,7 @@ public class IgnoredViolationsPanel extends JPanel {
     private final JBTable table;
     private GetProjectsQuery.Project currentProject;
 
-    private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
+    private final CodeInspectorApi codeInspectorApi = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
 
     /**
      * Build the panel

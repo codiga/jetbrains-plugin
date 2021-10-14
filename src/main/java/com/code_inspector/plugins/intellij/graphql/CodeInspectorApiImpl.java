@@ -33,7 +33,7 @@ import static com.code_inspector.plugins.intellij.ui.NotificationUtils.notififyP
  * <p>
  * This class is declared as a service to be retrieved as an application
  * service within the plugin. To retrieve it, just to
- * CodeInspectorApi api = ServiceManager.getService(CodeInspectorApi.class);
+ * CodeInspectorApi api = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
  * <p>
  * See https://plugins.jetbrains.com/docs/intellij/plugin-services.html#declaring-a-service
  */
@@ -139,6 +139,38 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
                     apiRequest.setError();
                 }
             });
+
+        return apiRequest.getData().orElse(ImmutableList.of());
+    }
+
+    @Override
+    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language) {
+        ApiRequest<List<GetRecipesForClientQuery.GetRecipesForClient>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+
+        ApolloQueryCall<GetRecipesForClientQuery.Data> queryCall = apolloClient.query(
+                new GetRecipesForClientQuery(fingerprint, keywords, dependencies, Input.absent(), language))
+                .toBuilder()
+                .requestHeaders(getHeaders())
+                .build();
+        queryCall.enqueue(
+                new ApolloCall.Callback<GetRecipesForClientQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<GetRecipesForClientQuery.Data> response) {
+                        if (response.getData() == null) {
+                            apiRequest.setError();
+                        } else {
+                            apiRequest.setData(response.getData().getRecipesForClient());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        apiRequest.setError();
+                    }
+                });
 
         return apiRequest.getData().orElse(ImmutableList.of());
     }

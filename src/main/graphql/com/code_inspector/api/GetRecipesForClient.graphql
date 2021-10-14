@@ -1,0 +1,10 @@
+query GetRecipesForClient($fingerprint: String, $keywords: [String!]!, $dependencies: [String!]!, $parameters: String, $language: LanguageEnumeration!){
+  getRecipesForClient(fingerprint: $fingerprint, keywords: $keywords, dependencies:$dependencies, parameters:$parameters,language:$language){
+    code
+    keywords
+    description
+    id
+  }
+}
+
+

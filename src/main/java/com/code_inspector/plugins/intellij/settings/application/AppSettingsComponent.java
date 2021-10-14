@@ -3,6 +3,7 @@ package com.code_inspector.plugins.intellij.settings.application;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
 import com.code_inspector.plugins.intellij.ui.DialogApiStatus;
 import com.intellij.lang.Language;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
@@ -27,7 +28,7 @@ public class AppSettingsComponent {
     private final JPanel myMainPanel;
     private final JBTextField accessKey = new JBTextField();
     private final JBTextField secretKey = new JBTextField();
-    private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
+    private final CodeInspectorApi codeInspectorApi = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
 
     public AppSettingsComponent() {
         /**
