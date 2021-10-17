@@ -56,7 +56,18 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
 
         final String accessKey = settings == null || settings.getAccessKey() == null ? "" : settings.getAccessKey();
         final String secretKey = settings == null || settings.getSecretKey() == null ? "" : settings.getSecretKey();
+        final String apiToken = settings == null || settings.getApiToken() == null ? "" : settings.getApiToken();
 
+        /**
+         * If the API token is available, and defined, use them. Otherwise, use the old
+         * method to connect with the ACCESS_KEY and SECRET_KEY.
+          */
+        if (settings.getApiToken() != null && settings.getApiToken().length() > 0) {
+            return RequestHeaders
+                    .builder()
+                    .addHeader(API_TOKEN_HEADER, apiToken)
+                    .build();
+        }
         return RequestHeaders
             .builder()
             .addHeader(ACCESS_KEY_HEADER, accessKey)
@@ -454,5 +465,42 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
             LOGGER.warn("deadline missed during analysis");
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void recordRecipeUse(Long recipeId) {
+        AppSettingsState settings = AppSettingsState.getInstance();
+
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+        ApiRequest<String> apiRecordRecipeUse = new ApiRequest<String>();
+
+        ApolloMutationCall<RecordRecipeUseMutation.Data> mutationCall =
+                apolloClient.mutate(new RecordRecipeUseMutation(recipeId, fingerprint))
+                        .toBuilder()
+                        .requestHeaders(getHeaders())
+                        .build();
+        mutationCall.enqueue(
+                new ApolloCall.Callback<RecordRecipeUseMutation.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<RecordRecipeUseMutation.Data> response) {
+                        if (response.getData() == null) {
+                            LOGGER.info(String.format("RecordRecipeUseMutation response %s", response));
+                            apiRecordRecipeUse.setError();
+                        } else {
+                            LOGGER.info(String.format("RecordRecipeUseMutation response data: %s ", response.getData()));
+                            LOGGER.info(String.format("RecordRecipeUseMutation response data: %s ", response.getData().recordAccess()));
+                            apiRecordRecipeUse.setData(response.getData().recordAccess());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        LOGGER.debug("api call to ignore failure fails");
+                        LOGGER.debug(e.getMessage());
+                        e.printStackTrace();
+                        apiRecordRecipeUse.setError();
+                    }
+                });
     }
 }

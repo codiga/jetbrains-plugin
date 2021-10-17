@@ -103,4 +103,9 @@ public final class CodeInspectorApiTest implements CodeInspectorApi {
     public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId, Optional<String> parameters) {
         return Optional.empty();
     }
+
+    @Override
+    public void recordRecipeUse(Long recipeId) {
+
+    }
 }

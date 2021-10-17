@@ -114,4 +114,6 @@ public interface CodeInspectorApi {
      * @return - the list of potential issues.
      */
     public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId, Optional<String> parameters) throws GraphQlQueryException;
+
+    public void recordRecipeUse(Long recipeId);
 }

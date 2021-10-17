@@ -1,0 +1,3 @@
+mutation RecordRecipeUse ($recipeId: Long!, $fingerprint: String) {
+      recordAccess(accessType:IntelliJ, actionType:AssistantRecipeUse, recipeId: $recipeId, userFingerprint: $fingerprint)
+}
