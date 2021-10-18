@@ -17,15 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.code_inspector.plugins.intellij.Constants.JAVASCRIPT_DEPENDENCY_FILE;
-import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
+import static com.code_inspector.plugins.intellij.Constants.*;
 
 public class JavascriptDependency extends AbstractDependency{
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     @VisibleForTesting
-    public static List<Dependency> getDependenciesFromInputStream(InputStream inputStream) {
+    @Override
+    public List<Dependency> getDependenciesFromInputStream(InputStream inputStream) {
         List<Dependency> result = new ArrayList<>();
         try{
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
@@ -54,20 +54,7 @@ public class JavascriptDependency extends AbstractDependency{
     }
 
     @Override
-    public List<Dependency> getDependencies(PsiFile psiFile) {
-        Optional<VirtualFile> dependencyFile = this.getDependencyFile(psiFile, JAVASCRIPT_DEPENDENCY_FILE);
-        if(!dependencyFile.isPresent()) {
-            return ImmutableList.of();
-        }
-
-        try {
-            InputStream inputStream = dependencyFile.get().getInputStream();
-            List<Dependency> result = getDependenciesFromInputStream(inputStream);
-            inputStream.close();
-            return result;
-        } catch (IOException e){
-            LOGGER.error("JavascriptDependency - getDependenciesFromInputStream - error when opening the file");
-            return ImmutableList.of();
-        }
+    public String getDependencyFilename() {
+        return JAVASCRIPT_DEPENDENCY_FILE;
     }
 }

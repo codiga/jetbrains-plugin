@@ -12,10 +12,12 @@ import java.util.List;
 
 public class PythonDependencyTest extends TestBase {
 
+    PythonDependency pythonDependency = new PythonDependency();
+
     @Test
     public void testParseRequirements1Valid() throws IOException {
         FileInputStream fileInputStream = getInputStream("requirements1.txt");
-        List<Dependency> dependencies = PythonDependency.getDependenciesFromInputStream(fileInputStream);
+        List<Dependency> dependencies = pythonDependency.getDependenciesFromInputStream(fileInputStream);
         Assertions.assertFalse(dependencies.isEmpty());
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("cryptography")));
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("mock")));
@@ -26,7 +28,7 @@ public class PythonDependencyTest extends TestBase {
     @Test
     public void testParseRequirements2Valid() throws IOException {
         FileInputStream fileInputStream = getInputStream("requirements2.txt");
-        List<Dependency> dependencies = PythonDependency.getDependenciesFromInputStream(fileInputStream);
+        List<Dependency> dependencies = pythonDependency.getDependenciesFromInputStream(fileInputStream);
         Assertions.assertFalse(dependencies.isEmpty());
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("tqdm")));
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("requests")));
@@ -39,7 +41,7 @@ public class PythonDependencyTest extends TestBase {
     @Test
     public void testParseRequirementsInvalid() throws IOException {
         FileInputStream fileInputStream = getInputStream("requirements-invalid.txt");
-        List<Dependency> dependencies = PythonDependency.getDependenciesFromInputStream(fileInputStream);
+        List<Dependency> dependencies = pythonDependency.getDependenciesFromInputStream(fileInputStream);
         Assertions.assertTrue(dependencies.isEmpty());
         fileInputStream.close();
     }

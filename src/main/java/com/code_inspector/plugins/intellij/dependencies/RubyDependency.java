@@ -18,24 +18,28 @@ import java.util.regex.Pattern;
 
 import static com.code_inspector.plugins.intellij.Constants.*;
 
-public class PythonDependency extends AbstractDependency{
-
+public class RubyDependency extends AbstractDependency{
 
 
     @VisibleForTesting
     @Override
     public List<Dependency> getDependenciesFromInputStream(InputStream inputStream) {
         List<Dependency> result = new ArrayList<>();
-        String pattern = "^([a-zA-Z0-9\\-]+)";
+        String pattern = "^\\s*gem\\s+[\\'|\\\"]([a-zA-Z0-9\\-]+)[\\'|\\\"]";
         Pattern r = Pattern.compile(pattern);
         try{
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
             while ((line = bufferedReader.readLine()) != null){
+                System.out.println(line);
+                // if there is a comment, do not use
+                if (line.contains("#")) {
+                    continue;
+                }
                 Matcher m = r.matcher(line);
-                if (m.find( )) {
-                    result.add(new Dependency(m.group(0), Optional.empty()));
+                if (m.find()) {
+                    result.add(new Dependency(m.group(1), Optional.empty()));
                 }
             }
 
@@ -49,8 +53,6 @@ public class PythonDependency extends AbstractDependency{
 
     @Override
     public String getDependencyFilename() {
-        return PYTHON_DEPENDENCY_FILE;
+        return RUBY_DEPENDENCY_FILE;
     }
-
-
 }

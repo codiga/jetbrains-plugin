@@ -21,7 +21,7 @@ public class JavascriptDependencyTest extends TestBase {
     @Test
     public void testParsePackageFrontendJsonValid() throws IOException {
         FileInputStream fileInputStream = getInputStream("package-frontend.json");
-        List<Dependency> dependencies = JavascriptDependency.getDependenciesFromInputStream(fileInputStream);
+        List<Dependency> dependencies = javascriptDependency.getDependenciesFromInputStream(fileInputStream);
         Assertions.assertFalse(dependencies.isEmpty());
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("react")));
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("@apollo/client")));
@@ -33,7 +33,7 @@ public class JavascriptDependencyTest extends TestBase {
     public void testParsePackageInvalid() throws IOException{
         FileInputStream fileInputStream = getInputStream("package-invalid.json");
 
-        List<Dependency> dependencies = JavascriptDependency.getDependenciesFromInputStream(fileInputStream);
+        List<Dependency> dependencies = javascriptDependency.getDependenciesFromInputStream(fileInputStream);
         Assertions.assertTrue(dependencies.isEmpty());
 
         fileInputStream.close();
@@ -42,7 +42,7 @@ public class JavascriptDependencyTest extends TestBase {
     @Test
     public void testParsePackageWithoutDependencies() throws IOException{
         FileInputStream fileInputStream = getInputStream("package-without-dependencies.json");
-        List<Dependency> dependencies = JavascriptDependency.getDependenciesFromInputStream(fileInputStream);
+        List<Dependency> dependencies = javascriptDependency.getDependenciesFromInputStream(fileInputStream);
         Assertions.assertTrue(dependencies.isEmpty());
 
         fileInputStream.close();

@@ -18,6 +18,9 @@ public class Constants {
     // JavaScript constants
     public static final String JAVASCRIPT_DEPENDENCY_FILE = "package.json";
 
+    // Ruby constants
+    public static final String RUBY_DEPENDENCY_FILE = "Gemfile";
+
     public static final java.util.List<CodeInspectionAnnotation> NO_ANNOTATION = ImmutableList.of();
     public static final long REAL_TIME_FEEDBACK_TIMEOUT_MILLIS = 15 * 1000 ; // 15 seconds
     public static final long SLEEP_BETWEEN_FILE_ANALYSIS_MILLIS = 200;
