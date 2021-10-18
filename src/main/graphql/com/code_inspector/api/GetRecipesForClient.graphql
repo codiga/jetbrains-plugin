@@ -3,6 +3,8 @@ query GetRecipesForClient($fingerprint: String, $keywords: [String!]!, $dependen
     id
     code
     keywords
+    imports
+    language
     description
   }
 }

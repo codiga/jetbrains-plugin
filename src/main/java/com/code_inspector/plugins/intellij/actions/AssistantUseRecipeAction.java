@@ -3,6 +3,7 @@ package com.code_inspector.plugins.intellij.actions;
 import com.code_inspector.api.GetRecipesForClientQuery;
 import com.code_inspector.api.type.LanguageEnumeration;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
+import com.code_inspector.plugins.intellij.model.CodeInsertion;
 import com.google.common.collect.ImmutableList;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -15,6 +16,7 @@ import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.ui.WindowWrapperBuilder;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextField;
@@ -31,8 +33,12 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
+import static com.code_inspector.plugins.intellij.Constants.LINE_SEPARATOR;
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 import static com.code_inspector.plugins.intellij.graphql.LanguageUtils.getLanguageFromFilename;
+import static com.code_inspector.plugins.intellij.utils.CodeImportUtils.generateImportStatement;
+import static com.code_inspector.plugins.intellij.utils.CodeImportUtils.hasDependency;
+import static com.code_inspector.plugins.intellij.utils.CodePositionUtils.*;
 
 /**
  * This action is used to use a recipe. It is invoked by the user when in an editor.
@@ -55,11 +61,11 @@ public class AssistantUseRecipeAction extends AnAction {
 
     // status of the action: is code inserted, what are the recipes, etc.
     private boolean codeInserted = false;
-    private int codeInsertedOffsetStart = 0;
-    private int codeInsertedOffsetEnd = 0;
+    private final List<CodeInsertion> codeInsertions = new ArrayList<CodeInsertion>();
+
     private int currentRecipeIndex = 0;
     private long lastRequestTimestamp = 0;
-    RangeHighlighter currentHighlighter = null; // current code that is highlighted
+    private final List<RangeHighlighter> highlighters = new ArrayList<>();
 
     List<GetRecipesForClientQuery.GetRecipesForClient> currentRecipes = null;
 
@@ -89,7 +95,13 @@ public class AssistantUseRecipeAction extends AnAction {
             try{
                 WriteCommandAction.writeCommandAction(project).run(
                         (ThrowableRunnable<Throwable>) () -> {
-                            document.deleteString(codeInsertedOffsetStart, codeInsertedOffsetEnd);
+                            int deletedLength = 0;
+                            for(CodeInsertion codeInsertion: codeInsertions) {
+                                document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
+                                deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());
+                            }
+
+                            codeInsertions.clear();
                             codeInserted = false;
                         }
                 );
@@ -108,6 +120,7 @@ public class AssistantUseRecipeAction extends AnAction {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
         Project project = anActionEvent.getProject();
         Document document = editor.getDocument();
+        String currentCode = document.getText();
 
         if (editor == null || project == null || document == null) {
             LOGGER.info("showCurrentRecipe - editor, project or document is null");
@@ -121,7 +134,17 @@ public class AssistantUseRecipeAction extends AnAction {
         }
 
         GetRecipesForClientQuery.GetRecipesForClient recipe = currentRecipes.get(currentRecipeIndex);
-        String code = new String(Base64.getDecoder().decode(recipe.code()));
+
+        // Get the code from the recipe and remove all \r\n which are not use by IntelliJ
+        String code = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
+
+        // Get the current line and get the indentation
+        int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
+        String currentLine = document.getText(new TextRange(document.getLineStartOffset(selectedLine), document.getLineEndOffset(selectedLine)));
+        int indentationCurrentLine = getIndentation(currentLine);
+
+        // reindent the code based on the indentation of the current line.
+        String indentedCode = indentOtherLines(code, indentationCurrentLine);
 
         // Update the label in the box with the description.
         String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
@@ -132,20 +155,44 @@ public class AssistantUseRecipeAction extends AnAction {
         try {
             WriteCommandAction.writeCommandAction(project).run(
                     (ThrowableRunnable<Throwable>) () -> {
-                        int offset = editor.getCaretModel().getOffset();
-                        String finalCode = code.replaceAll("\r\n", "\n");
-                        int startOffset = offset;
-                        int endOffset = startOffset + finalCode.length();
-                        codeInsertedOffsetStart = startOffset;
-                        codeInsertedOffsetEnd = endOffset;
+                        List<String> imports = recipe.imports();
+                        int editorOffset = editor.getCaretModel().getOffset();
+                        int firstInsertion = firstPositionToInsert(currentCode, recipe.language());
+                        int lengthInsertedForImport = 0;
+
+                        for(String importName: imports) {
+                            if(!hasDependency(currentCode, importName, recipe.language())) {
+                                Optional<String> dependencyStatementOptional = generateImportStatement(importName, recipe.language());
+
+                                if (!dependencyStatementOptional.isPresent()) {
+                                    continue;
+                                }
+
+                                String dependencyStatement = dependencyStatementOptional.get() + LINE_SEPARATOR;
+
+                                codeInsertions.add(new CodeInsertion(
+                                        dependencyStatement,
+                                        firstInsertion + lengthInsertedForImport,
+                                        firstInsertion + lengthInsertedForImport + dependencyStatement.length()));
+                                lengthInsertedForImport = lengthInsertedForImport + dependencyStatement.length();
+                            }
+                        }
+
+                        int startOffset = editorOffset + lengthInsertedForImport;
+                        int endOffset = startOffset + indentedCode.length();
+                        codeInsertions.add(new CodeInsertion(indentedCode, startOffset, endOffset));
+
                         codeInserted = true;
-                        document.insertString(offset, finalCode);
 
-                        currentHighlighter = editor.getMarkupModel()
-                                .addRangeHighlighter(startOffset, endOffset, 0,
-                                        new TextAttributes(JBColor.black, JBColor.WHITE, JBColor.PINK, EffectType.ROUNDED_BOX, 13),
-                                        HighlighterTargetArea.EXACT_RANGE);
+                        for (CodeInsertion codeInsertion: codeInsertions) {
+                            document.insertString(codeInsertion.getPositionStart(), codeInsertion.getCode());
 
+                            RangeHighlighter newHighlighter = editor.getMarkupModel()
+                                    .addRangeHighlighter(codeInsertion.getPositionStart(), codeInsertion.getPositionStart() + codeInsertion.getCode().length(), 0,
+                                            new TextAttributes(JBColor.black, JBColor.WHITE, JBColor.PINK, EffectType.ROUNDED_BOX, 13),
+                                            HighlighterTargetArea.EXACT_RANGE);
+                            highlighters.add(newHighlighter);
+                        }
                     }
             );
         } catch (Throwable e) {
@@ -169,8 +216,6 @@ public class AssistantUseRecipeAction extends AnAction {
         // get the keywords and get them as a list.
         String text = searchTextfield.getText();
         java.util.List<String> keywords = Arrays.<String>asList(text.split(" "));
-        System.out.println(keywords.size());
-        keywords.forEach(l -> System.out.println(l));
 
         // if there is no keywords, just reset.
         if(keywords.isEmpty() || searchTextfield.getText().length() == 0) {
@@ -178,7 +223,7 @@ public class AssistantUseRecipeAction extends AnAction {
             currentRecipes = null;
             currentRecipeIndex = 0;
             jLabelResults.setText(ENTER_SEARCH_TERM_TEXT);
-            currentHighlighter = null;
+            highlighters.clear();
             updateButtonState();
             return;
         }
@@ -226,8 +271,6 @@ public class AssistantUseRecipeAction extends AnAction {
             GetRecipesForClientQuery.GetRecipesForClient insertedRecipe = currentRecipes.get(currentRecipeIndex);
             if (insertedRecipe != null)
             {
-                System.out.println("inserted recipe");
-                System.out.println(insertedRecipe);
                 long recipeId = ((BigDecimal) insertedRecipe.id()).longValue();
                 codeInspectorApi.recordRecipeUse(recipeId);
             } else {
@@ -239,14 +282,13 @@ public class AssistantUseRecipeAction extends AnAction {
         currentRecipes = null;
         currentRecipeIndex = 0;
         codeInserted = false;
-        codeInsertedOffsetStart = 0;
-        codeInsertedOffsetEnd = 0;
+        codeInsertions.clear();
 
         // remmove the highlighted code.
-        if (currentHighlighter != null) {
-            editor.getMarkupModel().removeHighlighter(currentHighlighter);
+        for (RangeHighlighter rangeHighlighter: highlighters) {
+            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
         }
-        currentHighlighter = null;
+        highlighters.clear();
 
         windowWrapper.close();
     }
@@ -256,12 +298,20 @@ public class AssistantUseRecipeAction extends AnAction {
      * @param event
      */
     private void cancelChanges(@NotNull AnActionEvent event) {
+        Editor editor = event.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
+
+        // remmove the highlighted code.
+        for (RangeHighlighter rangeHighlighter: highlighters) {
+            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+        }
+        highlighters.clear();
+
         if(currentRecipes != null && currentRecipeIndex < currentRecipes.size()) {
             removeAddedCode(event);
         }
         currentRecipes = null;
         currentRecipeIndex = 0;
-        currentHighlighter = null;
+        highlighters.clear();
     }
 
     /**
@@ -315,8 +365,7 @@ public class AssistantUseRecipeAction extends AnAction {
         currentRecipes = null;
         currentRecipeIndex = 0;
         codeInserted = false;
-        codeInsertedOffsetEnd = 0;
-        codeInsertedOffsetStart = 0;
+        codeInsertions.clear();
 
         // main panel.
         JPanel jPanelMain = new JPanel();
@@ -362,7 +411,6 @@ public class AssistantUseRecipeAction extends AnAction {
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                System.out.println("remove update");
                 lastRequestTimestamp = System.currentTimeMillis();
                 long thisRequestTimestamp = lastRequestTimestamp;
                 timer.schedule(new TimerTask() {

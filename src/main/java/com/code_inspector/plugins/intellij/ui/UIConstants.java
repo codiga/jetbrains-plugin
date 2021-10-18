@@ -10,7 +10,7 @@ public class UIConstants {
     public final static String SETTINGS_API_TOKEN_LABEL = "API Token:";
     public final static String SETTINGS_CHOOSE_PROJECT = "Choose Project:";
     public final static String SETTINGS_ASSOCIATE_CODE_INSPECTOR_PROJECT = "Associate a Code Inspector project";
-    public final static String SETTINGS_PROJECT_ENABLE = "Enable Code Inspector on this project";
+    public final static String SETTINGS_PROJECT_ENABLE = "Enable Code Analysis on this project";
 
     public final static String API_STATUS_TITLE = "API Connection status";
     public final static String API_STATUS_TEXT_OK = "Connection Successful";
