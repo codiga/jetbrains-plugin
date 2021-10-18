@@ -35,4 +35,12 @@ public class PythonDependencyTest extends TestBase {
         Assertions.assertFalse(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("pandas")));
         fileInputStream.close();
     }
+
+    @Test
+    public void testParseRequirementsInvalid() throws IOException {
+        FileInputStream fileInputStream = getInputStream("requirements-invalid.txt");
+        List<Dependency> dependencies = PythonDependency.getDependenciesFromInputStream(fileInputStream);
+        Assertions.assertTrue(dependencies.isEmpty());
+        fileInputStream.close();
+    }
 }
