@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.code_inspector.plugins.intellij.Constants.JAVASCRIPT_DEPENDENCY_FILE;
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
 
 public final class AnalysisParametersJavascript {
@@ -92,7 +93,7 @@ public final class AnalysisParametersJavascript {
                 .collect(Collectors.toList());
 
         // Find package.json in these files
-        Optional<VirtualFile> packageFileOptional = rootFiles.stream().filter(v -> v.getName().equalsIgnoreCase("package.json")).findFirst();
+        Optional<VirtualFile> packageFileOptional = rootFiles.stream().filter(v -> v.getName().equalsIgnoreCase(JAVASCRIPT_DEPENDENCY_FILE)).findFirst();
 
         // if no package present, we do not have any option to show
         if (!packageFileOptional.isPresent()) {
