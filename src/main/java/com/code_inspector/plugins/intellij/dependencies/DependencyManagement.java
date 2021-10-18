@@ -9,10 +9,17 @@ import java.util.List;
 
 import static com.code_inspector.plugins.intellij.graphql.LanguageUtils.getLanguageFromFilename;
 
+/**
+ * This is the main entrypoint to manage dependency. It just needs
+ * to be called with the PsiFile and all dependencies in the project
+ * are being retrieved.
+ *
+ */
 public class DependencyManagement {
     JavascriptDependency javascriptDependency = new JavascriptDependency();
     PythonDependency pythonDependency = new PythonDependency();
     RubyDependency rubyDependency = new RubyDependency();
+    PhpDependency phpDependency = new PhpDependency();
 
     /**
      * Get all the dependencies for a particular file.
@@ -29,6 +36,8 @@ public class DependencyManagement {
                 return pythonDependency.getDependencies(psiFile);
             case RUBY:
                 return rubyDependency.getDependencies(psiFile);
+            case PHP:
+                return phpDependency.getDependencies(psiFile);
             default:
                 return ImmutableList.of();
         }

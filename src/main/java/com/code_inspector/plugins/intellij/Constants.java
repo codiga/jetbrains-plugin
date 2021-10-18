@@ -21,6 +21,9 @@ public class Constants {
     // Ruby constants
     public static final String RUBY_DEPENDENCY_FILE = "Gemfile";
 
+    // PHP constants
+    public static final String PHP_DEPENDENCY_FILE = "composer.json";
+
     public static final java.util.List<CodeInspectionAnnotation> NO_ANNOTATION = ImmutableList.of();
     public static final long REAL_TIME_FEEDBACK_TIMEOUT_MILLIS = 15 * 1000 ; // 15 seconds
     public static final long SLEEP_BETWEEN_FILE_ANALYSIS_MILLIS = 200;
