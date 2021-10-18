@@ -11,6 +11,7 @@ import static com.code_inspector.plugins.intellij.graphql.LanguageUtils.getLangu
 
 public class DependencyManagement {
     JavascriptDependency javascriptDependency = new JavascriptDependency();
+    PythonDependency pythonDependency = new PythonDependency();
 
     /**
      * Get all the dependencies for a particular file.
@@ -23,6 +24,8 @@ public class DependencyManagement {
             case JAVASCRIPT:
             case TYPESCRIPT:
                 return javascriptDependency.getDependencies(psiFile);
+            case PYTHON:
+                return pythonDependency.getDependencies(psiFile);
             default:
                 return ImmutableList.of();
         }

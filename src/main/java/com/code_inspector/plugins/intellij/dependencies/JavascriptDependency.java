@@ -69,6 +69,5 @@ public class JavascriptDependency extends AbstractDependency{
             LOGGER.error("JavascriptDependency - getDependenciesFromInputStream - error when opening the file");
             return ImmutableList.of();
         }
-
     }
 }

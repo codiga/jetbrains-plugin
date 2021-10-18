@@ -237,6 +237,7 @@ public class AssistantUseRecipeAction extends AnAction {
         // get the list of keywords from the API
         try{
             List<String> dependenciesName = dependencyManagement.getDependencies(psiFile).stream().map(d -> d.getName()).collect(Collectors.toList());
+            
             currentRecipes = codeInspectorApi.getRecipesForClient(
                     keywords,
                     dependenciesName,
