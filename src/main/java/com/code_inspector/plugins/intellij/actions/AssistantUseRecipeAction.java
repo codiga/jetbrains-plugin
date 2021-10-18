@@ -2,6 +2,7 @@ package com.code_inspector.plugins.intellij.actions;
 
 import com.code_inspector.api.GetRecipesForClientQuery;
 import com.code_inspector.api.type.LanguageEnumeration;
+import com.code_inspector.plugins.intellij.dependencies.DependencyManagement;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
 import com.code_inspector.plugins.intellij.model.CodeInsertion;
 import com.google.common.collect.ImmutableList;
@@ -18,6 +19,7 @@ import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.ui.WindowWrapperBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ThrowableRunnable;
@@ -32,6 +34,7 @@ import java.awt.event.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.code_inspector.plugins.intellij.Constants.LINE_SEPARATOR;
 import static com.code_inspector.plugins.intellij.Constants.LOGGER_NAME;
@@ -68,6 +71,8 @@ public class AssistantUseRecipeAction extends AnAction {
     private final List<RangeHighlighter> highlighters = new ArrayList<>();
 
     List<GetRecipesForClientQuery.GetRecipesForClient> currentRecipes = null;
+
+    DependencyManagement dependencyManagement = new DependencyManagement();
 
     // used to get the list of recipes, trigger the recipes 500 ms after
     // the user finished typing.
@@ -205,6 +210,7 @@ public class AssistantUseRecipeAction extends AnAction {
     public void updateSuggestions(AnActionEvent anActionEvent){
         // Get the language to prepare the request
         VirtualFile virtualFile = anActionEvent.getDataContext().getData(LangDataKeys.VIRTUAL_FILE);
+        PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
 
         if (virtualFile == null){
             LOGGER.error("updateSuggestions - cannot get virtualFile");
@@ -230,9 +236,10 @@ public class AssistantUseRecipeAction extends AnAction {
 
         // get the list of keywords from the API
         try{
+            List<String> dependenciesName = dependencyManagement.getDependencies(psiFile).stream().map(d -> d.getName()).collect(Collectors.toList());
             currentRecipes = codeInspectorApi.getRecipesForClient(
                     keywords,
-                    ImmutableList.of(),
+                    dependenciesName,
                     Optional.empty(),
                     language);
             currentRecipeIndex = 0;
