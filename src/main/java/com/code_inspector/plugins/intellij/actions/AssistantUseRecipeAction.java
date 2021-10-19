@@ -238,11 +238,19 @@ public class AssistantUseRecipeAction extends AnAction {
         try{
             List<String> dependenciesName = dependencyManagement.getDependencies(psiFile).stream().map(d -> d.getName()).collect(Collectors.toList());
 
+            String filename = null;
+
+            if (psiFile.getVirtualFile() != null)
+            {
+                filename = psiFile.getVirtualFile().getName();
+            }
+
             currentRecipes = codeInspectorApi.getRecipesForClient(
                     keywords,
                     dependenciesName,
                     Optional.empty(),
-                    language);
+                    language,
+                    filename);
             currentRecipeIndex = 0;
             updateButtonState();
 

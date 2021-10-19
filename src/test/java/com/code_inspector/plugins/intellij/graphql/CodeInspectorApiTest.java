@@ -59,7 +59,7 @@ public final class CodeInspectorApiTest implements CodeInspectorApi {
     }
 
     @Override
-    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language) {
+    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
         return null;
     }
 

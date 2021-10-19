@@ -155,14 +155,14 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
     }
 
     @Override
-    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language) {
+    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
         ApiRequest<List<GetRecipesForClientQuery.GetRecipesForClient>> apiRequest = new ApiRequest();
         AppSettingsState settings = AppSettingsState.getInstance();
         String fingerPrintText = settings.getFingerprint();
         Input<String> fingerprint = Input.fromNullable(fingerPrintText);
 
         ApolloQueryCall<GetRecipesForClientQuery.Data> queryCall = apolloClient.query(
-                new GetRecipesForClientQuery(fingerprint, keywords, dependencies, Input.absent(), language))
+                new GetRecipesForClientQuery(fingerprint, Input.fromNullable(filename), keywords, dependencies, Input.absent(), language))
                 .toBuilder()
                 .requestHeaders(getHeaders())
                 .build();

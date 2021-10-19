@@ -63,7 +63,8 @@ public interface CodeInspectorApi {
     public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords,
                                                                                   List<String> dependencies,
                                                                                   Optional<String> parameters,
-                                                                                  LanguageEnumeration language);
+                                                                                  LanguageEnumeration language,
+                                                                                  String filename);
 
     /**
      * Get all the data from the API for a specific file
