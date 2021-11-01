@@ -1,0 +1,6 @@
+python-dateutil @ file///home/ktietz/src/ci/python-dateutil_1611928101742/work
+requests @ file///tmp/build/80754af9/requests_1608241421344/work
+scipy==1.6.2
+sklearn==0.0
+tqdm @ file:///tmp/build/80754af9/tqdm_1611857934208/work
+zipp @ file:///tmp/build/80754af9/zipp_1604001098328/work

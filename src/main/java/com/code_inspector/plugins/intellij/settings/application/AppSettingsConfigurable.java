@@ -37,16 +37,14 @@ public class AppSettingsConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         AppSettingsState settings = AppSettingsState.getInstance();
-        boolean accessKeymodified = !mySettingsComponent.getAccessKey().equals(settings.getAccessKey());
-        boolean secretKeymodified = !mySettingsComponent.getSecretKey().equals(settings.getSecretKey());
-        return accessKeymodified | secretKeymodified;
+        boolean apiTokenModified = !mySettingsComponent.getApiToken().equals(settings.getApiToken());
+        return apiTokenModified;
     }
 
     @Override
     public void apply() {
         AppSettingsState settings = AppSettingsState.getInstance();
-        settings.setAccessKey(mySettingsComponent.getAccessKey());
-        settings.setSecretKey(mySettingsComponent.getSecretKey());
+        settings.setApiToken(mySettingsComponent.getApiToken());
 
         // Trigger all the subscriber of the API key notification so that they can change their behavior
         // accordingly.
@@ -56,8 +54,7 @@ public class AppSettingsConfigurable implements Configurable {
     @Override
     public void reset() {
         AppSettingsState settings = AppSettingsState.getInstance();
-        mySettingsComponent.setAccessKey(settings.getAccessKey());
-        mySettingsComponent.setSecretKey(settings.getSecretKey());
+        mySettingsComponent.setApiToken(settings.getApiToken());
     }
 
     @Override

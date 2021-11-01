@@ -153,6 +153,26 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
+        <action id="com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction"
+                class="com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction"
+                text="Codiga: Assistant" description="Search for Codiga suggestions"
+                icon="CodigaIcons.Codiga_default_icon">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <override-text place="MainMenu" text="Codiga Assistant"/>
+            <keyboard-shortcut first-keystroke="control alt A" second-keystroke="C" keymap="$default"/>
+            <mouse-shortcut keystroke="control button3 doubleClick" keymap="$default"/>
+        </action>
+
+
+
+        <action id="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
+                class="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
+                text="Create Codiga Recipe" description="Use the selected code to create a recipe"
+                icon="CodigaIcons.Codiga_default_icon">
+
+            <add-to-group group-id="EditorPopupMenu"  anchor="last"/>
+            <override-text place="MainMenu" text="Codiga Assistant"/>
+        </action>
+
     </actions>
 </idea-plugin>

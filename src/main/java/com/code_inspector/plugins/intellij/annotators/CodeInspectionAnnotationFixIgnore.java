@@ -9,6 +9,7 @@ import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -39,7 +40,7 @@ public class CodeInspectionAnnotationFixIgnore implements IntentionAction {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
+    private final CodeInspectorApi codeInspectorApi = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
 
     public CodeInspectionAnnotationFixIgnore(PsiFile _psiFile, Long _projectId, Optional<String> _filename, String _rule, LanguageEnumeration _language, String _tool) {
         this.projectId = _projectId;

@@ -23,7 +23,7 @@ public class ProjectSettingsState implements PersistentStateComponent<ProjectSet
     public Long projectId = INVALID_PROJECT_ID;
 
     public static ProjectSettingsState getInstance(Project p) {
-        return ServiceManager.getService(p, ProjectSettingsState.class);
+        return p.getService(ProjectSettingsState.class);
     }
 
     public ProjectSettingsState(){

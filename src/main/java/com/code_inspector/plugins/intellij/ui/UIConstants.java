@@ -6,12 +6,11 @@ public class UIConstants {
     public final static String SETTINGS_LABEL_CONFIGURE_PROJECT = "Configure Project on Code Inspector";
     public final static String SETTINGS_BUTTON_CONFIGURE_PROJECT = "Configure Project";
     public final static String SETTINGS_TEST_API_BUTTON_TEXT = "Test API connection";
-    public final static String SETTINGS_GET_API_KEYS_BUTTON_TEXT = "Get API keys";
-    public final static String SETTINGS_ACCESS_KEY_LABEL = "Access Key:";
-    public final static String SETTINGS_SECRET_KEY_LABEL = "Secret Key:";
+    public final static String SETTINGS_GET_API_TOKEN_BUTTON_TEXT = "Get API token";
+    public final static String SETTINGS_API_TOKEN_LABEL = "API Token:";
     public final static String SETTINGS_CHOOSE_PROJECT = "Choose Project:";
     public final static String SETTINGS_ASSOCIATE_CODE_INSPECTOR_PROJECT = "Associate a Code Inspector project";
-    public final static String SETTINGS_PROJECT_ENABLE = "Enable Code Inspector on this project";
+    public final static String SETTINGS_PROJECT_ENABLE = "Enable Code Analysis on this project";
 
     public final static String API_STATUS_TITLE = "API Connection status";
     public final static String API_STATUS_TEXT_OK = "Connection Successful";

@@ -36,7 +36,7 @@ public class ProjectSettingsComponent {
     private boolean isEnabled;
     private List<GetProjectsQuery.Project> projectList;
     private IgnoredViolationsPanel ignoredViolationPanel;
-    private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
+    private final CodeInspectorApi codeInspectorApi = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
 
     private Long selectedProjectId = INVALID_PROJECT_ID;
 

@@ -6,6 +6,7 @@ import com.code_inspector.api.type.LanguageEnumeration;
 import com.code_inspector.plugins.intellij.graphql.CodeInspectorApi;
 import com.code_inspector.plugins.intellij.graphql.GraphQlQueryException;
 import com.google.common.annotations.VisibleForTesting;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -30,7 +31,7 @@ public final class AnalysisDataCache {
     ConcurrentHashMap<CacheKey, Optional<GetFileAnalysisQuery.GetFileAnalysis>> cacheFileAnalysis;
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private final CodeInspectorApi codeInspectorApi = ServiceManager.getService(CodeInspectorApi.class);
+    private final CodeInspectorApi codeInspectorApi = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
     private static AnalysisDataCache _INSTANCE = new AnalysisDataCache();
 
     private AnalysisDataCache() {

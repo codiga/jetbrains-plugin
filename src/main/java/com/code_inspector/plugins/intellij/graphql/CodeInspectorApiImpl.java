@@ -33,7 +33,7 @@ import static com.code_inspector.plugins.intellij.ui.NotificationUtils.notififyP
  * <p>
  * This class is declared as a service to be retrieved as an application
  * service within the plugin. To retrieve it, just to
- * CodeInspectorApi api = ServiceManager.getService(CodeInspectorApi.class);
+ * CodeInspectorApi api = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
  * <p>
  * See https://plugins.jetbrains.com/docs/intellij/plugin-services.html#declaring-a-service
  */
@@ -56,7 +56,18 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
 
         final String accessKey = settings == null || settings.getAccessKey() == null ? "" : settings.getAccessKey();
         final String secretKey = settings == null || settings.getSecretKey() == null ? "" : settings.getSecretKey();
+        final String apiToken = settings == null || settings.getApiToken() == null ? "" : settings.getApiToken();
 
+        /**
+         * If the API token is available, and defined, use them. Otherwise, use the old
+         * method to connect with the ACCESS_KEY and SECRET_KEY.
+          */
+        if (settings.getApiToken() != null && settings.getApiToken().length() > 0) {
+            return RequestHeaders
+                    .builder()
+                    .addHeader(API_TOKEN_HEADER, apiToken)
+                    .build();
+        }
         return RequestHeaders
             .builder()
             .addHeader(ACCESS_KEY_HEADER, accessKey)
@@ -139,6 +150,38 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
                     apiRequest.setError();
                 }
             });
+
+        return apiRequest.getData().orElse(ImmutableList.of());
+    }
+
+    @Override
+    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+        ApiRequest<List<GetRecipesForClientQuery.GetRecipesForClient>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+
+        ApolloQueryCall<GetRecipesForClientQuery.Data> queryCall = apolloClient.query(
+                new GetRecipesForClientQuery(fingerprint, Input.fromNullable(filename), keywords, dependencies, Input.absent(), language))
+                .toBuilder()
+                .requestHeaders(getHeaders())
+                .build();
+        queryCall.enqueue(
+                new ApolloCall.Callback<GetRecipesForClientQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<GetRecipesForClientQuery.Data> response) {
+                        if (response.getData() == null) {
+                            apiRequest.setError();
+                        } else {
+                            apiRequest.setData(response.getData().getRecipesForClient());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        apiRequest.setError();
+                    }
+                });
 
         return apiRequest.getData().orElse(ImmutableList.of());
     }
@@ -422,5 +465,42 @@ public final class CodeInspectorApiImpl implements CodeInspectorApi{
             LOGGER.warn("deadline missed during analysis");
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void recordRecipeUse(Long recipeId) {
+        AppSettingsState settings = AppSettingsState.getInstance();
+
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+        ApiRequest<String> apiRecordRecipeUse = new ApiRequest<String>();
+
+        ApolloMutationCall<RecordRecipeUseMutation.Data> mutationCall =
+                apolloClient.mutate(new RecordRecipeUseMutation(recipeId, fingerprint))
+                        .toBuilder()
+                        .requestHeaders(getHeaders())
+                        .build();
+        mutationCall.enqueue(
+                new ApolloCall.Callback<RecordRecipeUseMutation.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<RecordRecipeUseMutation.Data> response) {
+                        if (response.getData() == null) {
+                            LOGGER.info(String.format("RecordRecipeUseMutation response %s", response));
+                            apiRecordRecipeUse.setError();
+                        } else {
+                            LOGGER.info(String.format("RecordRecipeUseMutation response data: %s ", response.getData()));
+                            LOGGER.info(String.format("RecordRecipeUseMutation response data: %s ", response.getData().recordAccess()));
+                            apiRecordRecipeUse.setData(response.getData().recordAccess());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        LOGGER.debug("api call to ignore failure fails");
+                        LOGGER.debug(e.getMessage());
+                        e.printStackTrace();
+                        apiRecordRecipeUse.setError();
+                    }
+                });
     }
 }

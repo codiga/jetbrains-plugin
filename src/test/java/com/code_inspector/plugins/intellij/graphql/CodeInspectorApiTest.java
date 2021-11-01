@@ -29,7 +29,7 @@ import static com.code_inspector.plugins.intellij.graphql.Constants.*;
  * <p>
  * This class is declared as a service to be retrieved as an application
  * service within the plugin. To retrieve it, just to
- * CodeInspectorApi api = ServiceManager.getService(CodeInspectorApi.class);
+ * CodeInspectorApi api = ApplicationManager.getApplication().getService(CodeInspectorApi.class);
  * <p>
  * See https://plugins.jetbrains.com/docs/intellij/plugin-services.html#declaring-a-service
  */
@@ -56,6 +56,11 @@ public final class CodeInspectorApiTest implements CodeInspectorApi {
      */
     public List<GetProjectsQuery.Project> getProjects() {
         return ImmutableList.of();
+    }
+
+    @Override
+    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+        return null;
     }
 
     public Optional<GetFileDataQuery.Project> getDataForFile(Long projectId, String revision, String path) {
@@ -97,5 +102,10 @@ public final class CodeInspectorApiTest implements CodeInspectorApi {
     @Override
     public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId, Optional<String> parameters) {
         return Optional.empty();
+    }
+
+    @Override
+    public void recordRecipeUse(Long recipeId) {
+
     }
 }

@@ -1,0 +1,13 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 412.7244 476.5732">
+  <defs>
+    <linearGradient id="linear-gradient" x1="43.6095" y1="401.0394" x2="369.115" y2="75.5338" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f71c9d"/>
+      <stop offset="1" stop-color="#fc8926"/>
+    </linearGradient>
+  </defs>
+  <title>logo_mark_full_color_rgb</title>
+  <g id="logoMark">
+    <polygon id="logoMark_PathItem_" data-name="logoMark &lt;PathItem&gt;" points="206.362 357.43 412.724 238.287 412.724 357.43 206.362 476.573 0 357.43 0 119.143 206.362 0 412.724 119.143 206.362 238.287 103.181 178.715 103.181 297.858 206.362 357.43" style="fill: url(#linear-gradient)"/>
+    <polygon id="logoMark_PathItem_2" data-name="logoMark &lt;PathItem&gt;" points="309.543 178.715 206.362 238.287 103.181 178.715 206.362 119.143 309.543 178.715" style="fill: #fff;opacity: 0.6"/>
+  </g>
+</svg>

@@ -218,7 +218,7 @@ public class CodeInspectorExternalAnnotator extends ExternalAnnotator<PsiFile, L
          */
         if (annotation.getRule().isPresent() && annotation.getTool().isPresent() &&
             annotation.getDescription().isPresent() && annotation.getLanguage().isPresent() &&
-            projectId.isPresent() && settings.hasApiKeys()) {
+            projectId.isPresent() && (settings.hasApiKeys() || settings.hasApiToken())) {
             LOGGER.debug("Adding fix for annotation");
             annotationBuilder = annotationBuilder
                 .withFix(

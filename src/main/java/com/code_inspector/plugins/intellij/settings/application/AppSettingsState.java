@@ -1,5 +1,6 @@
 package com.code_inspector.plugins.intellij.settings.application;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -26,10 +27,12 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     @Tag
     private String secretKey = "";
     @Tag
+    private String apiToken = "";
+    @Tag
     private String fingerprint = "";
 
     public static AppSettingsState getInstance() {
-        return ServiceManager.getService(AppSettingsState.class);
+        return ApplicationManager.getApplication().getService(AppSettingsState.class);
     }
 
     public String getFingerprint() {
@@ -47,17 +50,22 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         return this.secretKey;
     }
 
-    public void setAccessKey(String s) {
-        this.accessKey = s;
+    public String getApiToken() {
+        return this.apiToken;
     }
 
-    public void setSecretKey(String s) {
-        this.secretKey = s;
+    public void setApiToken(String s) {
+        this.apiToken = s;
     }
 
     public boolean hasApiKeys() {
         return getAccessKey().length() > 0 && getSecretKey().length() > 0;
     }
+
+    public boolean hasApiToken() {
+        return getApiToken().length() > 0 ;
+    }
+
 
     @Nullable
     @Override
