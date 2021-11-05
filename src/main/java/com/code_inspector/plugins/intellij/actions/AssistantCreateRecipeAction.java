@@ -71,7 +71,7 @@ public class AssistantCreateRecipeAction extends AnAction {
         LanguageEnumeration language = getLanguageFromFilename(virtualFile.getCanonicalPath());
 
         // URL to go once the user clicked.
-        String urlString = String.format("%s/assistant/recipe/create?code=%s&language=%s", FRONTEND_URL, encodedContent, language.toString());
+        String urlString = String.format("%s/assistant/recipe/create?code=%s&language=%s", FRONTEND_URL, encodedContent, language.rawValue());
         try {
             Desktop.getDesktop().browse(new URL(urlString).toURI());
         } catch (IOException e) {
