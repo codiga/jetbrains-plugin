@@ -1,12 +1,12 @@
 <idea-plugin>
-    <id>com.code-inspector.plugins.intellij-plugin</id>
-    <name>Code Inspector</name>
-    <vendor email="support@code-inspector.com" url="http://www.code-inspector.com">Code Inspector</vendor>
+    <id>io.codiga.plugins.jetbrains-plugin</id>
+    <name>Codiga</name>
+    <vendor email="support@codiga.io" url="http://www.codiga.io">Codiga</vendor>
 
     <description>
         <![CDATA[
             <p>
-                Code Inspector is a code analysis platform that lets you analyze code for 12+ languages:
+                Codiga is a code analysis platform that lets you analyze code for 12+ languages:
                 Apex, C, C++, Dart, Docker, Go, Java, Javascript, Kotlin, PHP, Python, Ruby, Scala,
                 shellscript, Terraform, Typescript, YAML.
 
@@ -17,13 +17,13 @@
 
             <strong>
                 In order to use this plugin, you must create an account on <a href="https://frontend.code-inspector.com">
-                Code Inspector</a> and define your API keys in the plugin preferences.
+                Codiga</a> and define your API keys in the plugin preferences.
             </strong>
 
             <br />
 
             <p>
-                <a href="https://www.code-inspetor.com">Code Inspector</a> analyzes your code and helps you improve
+                <a href="https://www.codiga.io">Codiga</a> analyzes your code and helps you improve
                 through analysis in IntelliJ or in your code reviews on GitHub, GitLab or Bitbucket. No need to
                 configure and maintain the configuration for dozens of static analyzer, everything is available
                 and configurable in few clicks!
@@ -49,18 +49,13 @@
 
 
 
-            <strong>This plugin is actually in a BETA version</strong>, please send us feedback
-            <a href="mailto:support@code-inspector.com">support@code-inspector.com</a>.
-
-            <br />
-
             <p>
                 More information
             </p>
             <ul>
-                <li><a href="https://www.code-inspector.com">Code Inspector</a></li>
-                <li><a href="https://doc.code-inspector.com">Code Inspector Documentation</a></li>
-                <li><a href="https://doc.code-inspector.com/docs/integration-jetbrains-idea-intellij">Plugin Configuration</a></li>
+                <li><a href="https://www.codiga.io">Codiga</a></li>
+                <li><a href="https://doc.codiga.io">Codiga Documentation</a></li>
+                <li><a href="https://doc.codiga.io/docs/integration-jetbrains">Plugin Configuration</a></li>
             </ul>
 
             <p>
@@ -77,96 +72,96 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup
-                id="Code Inspector API"
+                id="Codiga API"
                 displayType="BALLOON"/>
 
         <applicationService
-                serviceInterface="com.code_inspector.plugins.intellij.graphql.CodeInspectorApi"
-                serviceImplementation="com.code_inspector.plugins.intellij.graphql.CodeInspectorApiImpl"
-                testServiceImplementation="com.code_inspector.plugins.intellij.graphql.CodeInspectorApiTest"
+                serviceInterface="io.codiga.plugins.jetbrains.graphql.CodigaApi"
+                serviceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiImpl"
+                testServiceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiTest"
         />
 
-        <applicationService serviceImplementation="com.code_inspector.plugins.intellij.settings.application.AppSettingsState"/>
+        <applicationService serviceImplementation="io.codiga.plugins.jetbrains.settings.application.AppSettingsState"/>
         <applicationConfigurable
                 parentId="tools"
-                instance="com.code_inspector.plugins.intellij.settings.application.AppSettingsConfigurable"
+                instance="io.codiga.plugins.jetbrains.settings.application.AppSettingsConfigurable"
                 id="com.code_inspector.settings.AppSettingsConfigurable"
-                displayName="Code Inspector API"/>
-        <projectService serviceImplementation="com.code_inspector.plugins.intellij.settings.project.ProjectSettingsState"/>
+                displayName="Codiga API"/>
+        <projectService serviceImplementation="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsState"/>
         <projectConfigurable
                 parentId="tools"
-                instance="com.code_inspector.plugins.intellij.settings.project.ProjectSettingsConfigurable"
-                id="com.code_inspector.settings.ProjectSettingsConfigurable"
-                displayName="Code Inspector Project"/>
+                instance="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsConfigurable"
+                id="io.codiga.settings.ProjectSettingsConfigurable"
+                displayName="Codiga Project"/>
         <externalAnnotator
                 language="JSON"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="Apex"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="TEXT"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="Scala"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="kotlin"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="yaml"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="JSX Harmony"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="ECMAScript 6"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="JavaScript"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="TypeScript"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="ruby"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="go"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="PHP"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="C"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="Python"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="Shell Script"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
         <externalAnnotator
                 language="JAVA"
-                implementationClass="com.code_inspector.plugins.intellij.annotators.CodeInspectorExternalAnnotator"/>
+                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
 <!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
     </extensions>
 
     <actions>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction"
-                class="com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction"
+                class="io.codiga.plugins.jetbrains.actions.AssistantUseRecipeAction"
                 text="Codiga: Assistant" description="Search for Codiga suggestions"
                 icon="CodigaIcons.Codiga_default_icon">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <override-text place="MainMenu" text="Codiga Assistant"/>
-            <keyboard-shortcut first-keystroke="control alt A" second-keystroke="C" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="control alt C" second-keystroke="C" keymap="$default"/>
             <mouse-shortcut keystroke="control button3 doubleClick" keymap="$default"/>
         </action>
 
 
 
         <action id="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
-                class="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
+                class="io.codiga.plugins.jetbrains.actions.AssistantCreateRecipeAction"
                 text="Create Codiga Recipe" description="Use the selected code to create a recipe"
                 icon="CodigaIcons.Codiga_default_icon">
 
