@@ -1,12 +1,12 @@
 [![Code Quality Score](https://www.code-inspector.com/project/20239/score/svg)](https://frontend.code-inspector.com/public/project/20239/intellij-plugin/dashboard)
 [![Code Status](https://www.code-inspector.com/project/20239/status/svg)](https://frontend.code-inspector.com/public/project/20239/intellij-plugin/dashboard)
 
-# Code Inspector Plugin for IntelliJ
+# Code Inspector Plugin for Jetbrains products
 
-This is the source code for the IntelliJ plugin for Code Inspector.
+This is the source code for the Jetbrains plugin for Code Inspector.
 
-It is available on the [IntelliJ marketplace](https://plugins.jetbrains.com/plugin/16341-code-inspector) 
-and you can install it directly within any IntelliJ product (IntelliJ, PHPStorm, PYCharm, etc).
+It is available on the [Jetbrains marketplace](https://plugins.jetbrains.com/plugin/16341-code-inspector) 
+and you can install it directly within any Jetbrains product (IntelliJ, PHPStorm, PYCharm, etc).
 
 You can watch a [short description of the plugin](https://www.youtube.com/watch?v=ecGhMpynHXQ).
 

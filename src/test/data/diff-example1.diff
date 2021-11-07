@@ -1,7 +1,7 @@
-diff --git a/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java b/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java
+diff --git a/src/main/java/io/codiga/plugins/jetbrains/git/CodigaGitUtils.java b/src/main/java/io/codiga/plugins/jetbrains/git/CodigaGitUtils.java
 index 8819e26..2337eae 100644
---- a/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java
-+++ b/src/main/java/com/code_inspector/plugins/intellij/git/CodeInspectorGitUtils.java
+--- a/src/main/java/io/codiga/plugins/jetbrains/git/CodigaGitUtils.java
++++ b/src/main/java/io/codiga/plugins/jetbrains/git/CodigaGitUtils.java
 @@ -1,11 +1,10 @@
  package com.code_inspector.plugins.intellij.git;
  
@@ -83,10 +83,10 @@ index 8819e26..2337eae 100644
 +        return result;
 +    }
  }
-diff --git a/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java b/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java
+diff --git a/src/main/java/io/codiga/plugins/jetbrains/graphql/CodigaApiUtils.java b/src/main/java/io/codiga/plugins/jetbrains/graphql/CodigaApiUtils.java
 index c3bfe1e..1d9d003 100644
---- a/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java
-+++ b/src/main/java/com/code_inspector/plugins/intellij/graphql/CodeInspectorApiUtils.java
+--- a/src/main/java/io/codiga/plugins/intellij/graphql/CodigaApiUtils.java
++++ b/src/main/java/io/codiga/plugins/intellij/graphql/CodigaApiUtils.java
 @@ -4,6 +4,7 @@ import com.code_inspector.api.GetFileDataQuery;
  import com.code_inspector.plugins.intellij.annotators.CodeInspectionAnnotation;
  import com.code_inspector.plugins.intellij.annotators.CodeInspectionAnnotationKind;
