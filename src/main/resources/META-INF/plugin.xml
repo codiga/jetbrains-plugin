@@ -6,48 +6,32 @@
     <description>
         <![CDATA[
             <p>
-                Codiga is a code analysis platform that lets you analyze code for 12+ languages:
-                Apex, C, C++, Dart, Docker, Go, Java, Javascript, Kotlin, PHP, Python, Ruby, Scala,
-                shellscript, Terraform, Typescript, YAML.
+                Codiga provides two main features:
 
-                One single plugin to check all your code in all languages!
+                <ul>
+                    <li><strong>Coding Assistant</strong>: import, create and share reusable blocks of code</li>
+                    <li><strong>Code Analysis</strong>: analysis code for 12+ languages without any configuration (Apex, C, C++, Dart, Docker, Go, Java, Javascript, Kotlin, PHP, Python, Ruby, Scala,
+                        shellscript, Terraform, Typescript, YAML)</li>
+                </ul>
             </p>
-
-            <br />
-
-            <strong>
-                In order to use this plugin, you must create an account on <a href="https://frontend.code-inspector.com">
-                Codiga</a> and define your API keys in the plugin preferences.
-            </strong>
-
-            <br />
 
             <p>
-                <a href="https://www.codiga.io">Codiga</a> analyzes your code and helps you improve
-                through analysis in IntelliJ or in your code reviews on GitHub, GitLab or Bitbucket. No need to
-                configure and maintain the configuration for dozens of static analyzer, everything is available
-                and configurable in few clicks!
+                To use the Coding Assistant, just open the menu <em>Tools > Codiga Assistant</em> or use the shortcut <em>control alt C</em>
+            </p>
+
+            <p>
+                To use the code analysis features, just edit and write code in your IDE.
             </p>
 
             <br />
 
-            <p>
-            The platform supports more than 10+ languages (Java, C, C++, Javascript, Python, Ruby and many more!) and reports:
-            </p>
-            <ul>
-                <li><strong>Code Violations</strong> such as security issues or vulnerabilities or lack of documentation</li>
-                <li><strong>Complex Functions</strong>: functions with high cyclomatic complexity</li>
-                <li><strong>Long Functions</strong>: functions that are too long to fit on your screen (threshold can be changed)</li>
-                <li><strong>Code Duplicates</strong>: block of code duplicated in your product</li>
-            </ul>
-
-            <br />
 
             <p>
-            The analysis engine can be configured for each project through the web platform.
+                If you want to use your personal recipes or code analysis preferences
+                from your Codiga account, you need to add your API token
+                from the Codiga platform. You can get more information to do this in our
+                <a href="https://doc.codiga.io">documentation</a>.
             </p>
-
-
 
             <p>
                 More information
@@ -88,6 +72,15 @@
                 id="com.code_inspector.settings.AppSettingsConfigurable"
                 displayName="Codiga API"/>
         <projectService serviceImplementation="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsState"/>
+        <completion.contributor
+                implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
+                language="JAVA"
+        />
+        <completion.contributor
+                implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
+                language="TEXT"
+        />
+
         <projectConfigurable
                 parentId="tools"
                 instance="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsConfigurable"
@@ -154,7 +147,7 @@
                 icon="CodigaIcons.Codiga_default_icon">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <override-text place="MainMenu" text="Codiga Assistant"/>
-            <keyboard-shortcut first-keystroke="control alt C" second-keystroke="C" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="control alt C" keymap="$default"/>
             <mouse-shortcut keystroke="control button3 doubleClick" keymap="$default"/>
         </action>
 

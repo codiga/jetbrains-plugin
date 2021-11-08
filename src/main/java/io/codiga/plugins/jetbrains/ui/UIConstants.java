@@ -17,7 +17,7 @@ public class UIConstants {
     public final static String API_STATUS_TEXT_FAIL =
             "Connection Failed. Check your access/secret keys and make sure you Apply changes before testing";
     public final static String SETTINGS_API_NOT_WORKING =
-        "API is not configured correctly. Check your access and secret keys";
+        "API is not configured correctly. Check your access and secret keys to enable project-specific parameters.";
 
     public final static String ANNOTATION_PREFIX = "Codiga";
 

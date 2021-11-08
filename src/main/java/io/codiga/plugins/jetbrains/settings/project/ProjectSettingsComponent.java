@@ -151,6 +151,11 @@ public class ProjectSettingsComponent {
                 .getPanel();
         } else {
             projectSelectionPanel = FormBuilder.createFormBuilder()
+
+                .addLabeledComponent(new JBLabel(SETTINGS_PROJECT_ENABLE), this.isEnabledCheckbox, 0, false)
+                .addVerticalGap(5)
+                .addSeparator(1)
+                .addVerticalGap(5)
                 .addComponent(new JBLabel(SETTINGS_API_NOT_WORKING), 1)
                 .addComponentFillVertically(new JPanel(), 1)
                 .getPanel();
