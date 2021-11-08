@@ -15,6 +15,22 @@
 
 ### Security
 
+## [1.1.7]
+### Added
+
+- Coding assistant support for Haskell, Solidity, Css, HTML and much more.
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+
+### Fixed
+
+### Security
+
 ## [1.1.6]
 ### Added
 
