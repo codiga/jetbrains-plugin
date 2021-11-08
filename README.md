@@ -16,12 +16,12 @@ and you can install it directly within any Jetbrains product (IntelliJ, PHPStorm
 
 Go in the plugin section of your Jetbrains product and look for "Codiga" on the marketplace.
 
-![Codiga Jetbrains plugin](src/main/resources/imgs/plugin-description.png "Codiga PlugIn")
+![Codiga Jetbrains plugin](images/plugin-description.png "Codiga PlugIn")
 
 
 ### Use the Coding Assistant
 
-![Coding Assistant](src/main/resources/imgs/coding-assistant.gif "Coding Assistant in Action")
+![Coding Assistant](images/coding-assistant.gif "Coding Assistant in Action")
 
 You can trigger the coding assistant by either
 
@@ -29,12 +29,12 @@ You can trigger the coding assistant by either
  - Use the menu item as shown below
 
 
-![Coding Assistant Menu](src/main/resources/imgs/codiga-assistant-menu.png "Coding Assistant Menu")
+![Coding Assistant Menu](images/codiga-assistant-menu.png "Coding Assistant Menu")
 
 
 ### Creating and sharing reusable code blocks
 
-![Create Recipe](src/main/resources/imgs/create-recipe.gif "Creating Recipe")
+![Create Recipe](images/create-recipe.gif "Creating Recipe")
 
  1. Select the code in your editor
  2. Right click on "Create Codiga Recipe"
@@ -46,11 +46,11 @@ You can trigger the coding assistant by either
 Codiga analyses your code and surfaces any issue. It works for 12+ languages. Codiga annotates directly You can select to learn more
 about each violation, see them on Code Inspector or just ignore it.
 
-![Action Available](src/main/resources/imgs/actions-available.png)
+![Action Available](images/actions-available.png)
 
 You can select to disable the code analysis directly in the project preference, as shown below.
 
-![Disable Code Analysis](src/main/resources/imgs/disable-code-analysis.gif)
+![Disable Code Analysis](images/disable-code-analysis.gif)
 
 ## Connecting your Codiga Account
 
@@ -62,12 +62,12 @@ You can connect your Codiga account in order to
 In order to link your Codiga account, you need to add your API token to your preferences.
 First, go on our application and generate an API token as shown below.
 
-![API Token Creation](src/main/resources/imgs/api-token-creation.gif)
+![API Token Creation](images/api-token-creation.gif)
 
 
 Then, enter your API token in the Jetbrains plugin configuration, as shown below.
 
-![Project Configuration](src/main/resources/imgs/api-token.png)
+![Project Configuration](images/api-token.png)
 
 Once the token is added, click on "Apply" and then "Test API connection".
 
@@ -77,7 +77,7 @@ Once the token is added, click on "Apply" and then "Test API connection".
 ## Dependencies
 
  * [apollo-android](https://github.com/apollographql/apollo-android) 
-   to access the [Code Inspector GraphQL API](https://doc.code-inspector.com/docs/api/)
+   to access the [Code Inspector GraphQL API](https://doc.codiga.io/docs/api/)
 
 ## License
 
