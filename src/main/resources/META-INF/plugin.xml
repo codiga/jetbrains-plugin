@@ -88,6 +88,15 @@
                 id="com.code_inspector.settings.AppSettingsConfigurable"
                 displayName="Codiga API"/>
         <projectService serviceImplementation="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsState"/>
+        <completion.contributor
+                implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
+                language="JAVA"
+        />
+        <completion.contributor
+                implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
+                language="TEXT"
+        />
+
         <projectConfigurable
                 parentId="tools"
                 instance="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsConfigurable"
@@ -154,7 +163,7 @@
                 icon="CodigaIcons.Codiga_default_icon">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <override-text place="MainMenu" text="Codiga Assistant"/>
-            <keyboard-shortcut first-keystroke="control alt C" second-keystroke="C" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="control alt C" keymap="$default"/>
             <mouse-shortcut keystroke="control button3 doubleClick" keymap="$default"/>
         </action>
 

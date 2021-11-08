@@ -1,53 +1,78 @@
-[![Code Quality Score](https://www.code-inspector.com/project/20239/score/svg)](https://frontend.code-inspector.com/public/project/20239/intellij-plugin/dashboard)
-[![Code Status](https://www.code-inspector.com/project/20239/status/svg)](https://frontend.code-inspector.com/public/project/20239/intellij-plugin/dashboard)
+# Codiga Plugin for Jetbrains products
 
-# Code Inspector Plugin for Jetbrains products
+This is the source code for the Jetbrains plugin for Codiga.
 
-This is the source code for the Jetbrains plugin for Code Inspector.
+Codiga provides two main functionalities:
 
-It is available on the [Jetbrains marketplace](https://plugins.jetbrains.com/plugin/16341-code-inspector) 
+ - **Coding Assistant**: import reusable code blocks based on your context
+ - **Code Analysis**: no-configuration code analysis for 12+ languages
+
+It is available on the [Jetbrains marketplace](https://plugins.jetbrains.com/plugin/17969-codiga) 
 and you can install it directly within any Jetbrains product (IntelliJ, PHPStorm, PYCharm, etc).
 
-You can watch a [short description of the plugin](https://www.youtube.com/watch?v=ecGhMpynHXQ).
 
 
 ## Quick Start
 
-![Code Inspector IntelliJ plugin](src/main/resources/imgs/plugin-description.png "Code Inspector PlugIn")
+Go in the plugin section of your Jetbrains product and look for "Codiga" on the marketplace.
 
-You need to have an account on [Code Inspector](https://www.code-inspector.com) and have your project
-inspected by Code Inspector. Once done, get your API keys on Code Inspector on 
-[your profile page](https://frontend.code-inspector.com/account/profile). 
+![Codiga Jetbrains plugin](src/main/resources/imgs/plugin-description.png "Codiga PlugIn")
 
 
-![API keys configuration](src/main/resources/imgs/api-keys.png)
+### Use the Coding Assistant
 
-Once the API keys are validated, you associate your Code Inspector project with your IntelliJ project as shown
-below.
+![Coding Assistant](src/main/resources/imgs/coding-assistant.gif "Coding Assistant in Action")
 
-![Project Configuration](src/main/resources/imgs/project-preferences.png)
+You can trigger the coding assistant by either
 
-Code Inspector will annotate your source code and surface all issues it detects. You can select to learn more
+ - Use the shortcut control + alt + C
+ - Use the menu item as shown below
+
+
+![Coding Assistant Menu](src/main/resources/imgs/codiga-assistant-menu.png "Coding Assistant Menu")
+
+
+### Creating and sharing reusable code blocks
+
+![Create Recipe](src/main/resources/imgs/create-recipe.gif "Creating Recipe")
+
+ 1. Select the code in your editor
+ 2. Right click on "Create Codiga Recipe"
+
+
+
+### Code Analysis
+
+Codiga analyses your code and surfaces any issue. It works for 12+ languages. Codiga annotates directly You can select to learn more
 about each violation, see them on Code Inspector or just ignore it.
 
 ![Action Available](src/main/resources/imgs/actions-available.png)
 
+You can select to disable the code analysis directly in the project preference, as shown below.
 
-## Features
+![Disable Code Analysis](src/main/resources/imgs/disable-code-analysis.gif)
 
- * Surface Code Inspector Issues in IntelliJ
- * Ability to ignore violations directly within IntelliJ
- * Direct link between Code Inspector and the IntelliJ editor
+## Connecting your Codiga Account
 
-## Architecture
+You can connect your Codiga account in order to 
 
-There are two stores for the preferences of this plugin
+ 1. use the code recipes and cookbooks you define and subscribe to
+ 2. use all your code analysis preferences on Codiga
 
- * **Application-level**: preferences for the application to store and get the access and secret keys
- * **Project-level**: preferences that stores what project is being used.
+In order to link your Codiga account, you need to add your API token to your preferences.
+First, go on our application and generate an API token as shown below.
 
-Then, once the project is selected, annotations for each file on Code Inspector
-are being surfaced within the IDE.
+![API Token Creation](src/main/resources/imgs/api-token-creation.gif)
+
+
+Then, enter your API token in the Jetbrains plugin configuration, as shown below.
+
+![Project Configuration](src/main/resources/imgs/api-token.png)
+
+Once the token is added, click on "Apply" and then "Test API connection".
+
+
+# Implementation concerns
 
 ## Dependencies
 
@@ -60,4 +85,4 @@ This project is under the GPL-3. See the LICENSE file for more information.
 
 ## Contact
 
-If you have any bugreport: support@code-inspector.com
+If you have any bugreport, submit an issue directly on the [GitHub issue tracker](https://github.com/codiga/jetbrains-plugin/issues).
