@@ -34,36 +34,19 @@
 ## [1.1.6]
 ### Added
 
- - Support for Coding Assistant
-
 ### Changed
-
- - Rebrand as Codiga
 
 ### Deprecated
 
 ### Removed
 
- - Remove unecessary media files
-
 ### Fixed
 
 ### Security
 
-
+## [1.1.6]
 
 ## [1.1.3]
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## [1.1.1]
 
