@@ -26,7 +26,7 @@ repositories {
 
 
 dependencies {
-    implementation("com.apollographql.apollo:apollo-runtime:2.5.10")
+    implementation("com.apollographql.apollo:apollo-runtime:2.5.11")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
