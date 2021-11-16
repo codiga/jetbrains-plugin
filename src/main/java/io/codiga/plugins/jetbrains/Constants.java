@@ -9,6 +9,9 @@ public class Constants {
     public static final String LINE_SEPARATOR = "\n";
     public static final char CHARACTER_SPACE = ' ';
 
+    public static final int NUMBER_OF_RECIPES_TO_KEEP_FOR_COMPLETION = 3;
+    public static final int MINIMUM_LINE_LENGTH_TO_TRIGGER_AUTOCOMPLETION = 5;
+
 
     // Python-specific constants
     public static final String PYTHON_IMPORT_KEYWORD = "import";

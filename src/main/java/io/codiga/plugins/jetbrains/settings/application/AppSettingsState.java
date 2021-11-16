@@ -29,6 +29,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     private String apiToken = "";
     @Tag
     private String fingerprint = "";
+    @Tag
+    private Boolean useCompletion = true;
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
@@ -39,6 +41,10 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
             this.fingerprint = RandomStringUtils.randomAlphanumeric(20);
         }
         return this.fingerprint;
+    }
+
+    public Boolean getUseCompletion() {
+        return this.useCompletion;
     }
 
     public String getAccessKey() {
@@ -55,6 +61,10 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     public void setApiToken(String s) {
         this.apiToken = s;
+    }
+
+    public void setUseCompletion(Boolean b) {
+        this.useCompletion = b;
     }
 
     public boolean hasApiKeys() {

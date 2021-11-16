@@ -74,12 +74,9 @@
         <projectService serviceImplementation="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsState"/>
         <completion.contributor
                 implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
-                language="JAVA"
+                language="any"
         />
-        <completion.contributor
-                implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
-                language="TEXT"
-        />
+
 
         <projectConfigurable
                 parentId="tools"

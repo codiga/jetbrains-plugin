@@ -38,14 +38,15 @@ public class AppSettingsConfigurable implements Configurable {
     public boolean isModified() {
         AppSettingsState settings = AppSettingsState.getInstance();
         boolean apiTokenModified = !mySettingsComponent.getApiToken().equals(settings.getApiToken());
-        return apiTokenModified;
+        boolean completionModified = mySettingsComponent.useCompletion() != settings.getUseCompletion();
+        return apiTokenModified || completionModified;
     }
 
     @Override
     public void apply() {
         AppSettingsState settings = AppSettingsState.getInstance();
         settings.setApiToken(mySettingsComponent.getApiToken());
-
+        settings.setUseCompletion(mySettingsComponent.useCompletion());
         // Trigger all the subscriber of the API key notification so that they can change their behavior
         // accordingly.
         apiKeyChangeNotifier.afterAction(null);
@@ -55,6 +56,7 @@ public class AppSettingsConfigurable implements Configurable {
     public void reset() {
         AppSettingsState settings = AppSettingsState.getInstance();
         mySettingsComponent.setApiToken(settings.getApiToken());
+        mySettingsComponent.setUseEnabledCheckbox(settings.getUseCompletion());
     }
 
     @Override
