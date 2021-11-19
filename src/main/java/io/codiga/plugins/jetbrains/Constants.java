@@ -4,6 +4,8 @@ import io.codiga.plugins.jetbrains.annotators.Annotation;
 import com.google.common.collect.ImmutableList;
 
 public class Constants {
+    public final static String FRONTEND_URL = "https://app.codiga.io";
+
     public static Long INVALID_PROJECT_ID = 0L;
     public static final String LOGGER_NAME = "Codiga";
     public static final String LINE_SEPARATOR = "\n";

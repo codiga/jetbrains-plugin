@@ -20,6 +20,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import static io.codiga.plugins.jetbrains.Constants.FRONTEND_URL;
+
 /**
  * Action to create a recipe. This action appears in the contextual menu
  * when selecting code.
@@ -29,7 +31,7 @@ public class AssistantCreateRecipeAction extends AnAction {
         super();
     }
 
-    public final static String FRONTEND_URL = "https://frontend.code-inspector.com";
+
     /**
      * This constructor is used to support dynamically added menu actions.
      * It sets the text, description to be displayed for the menu item.
