@@ -38,8 +38,7 @@ import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LINE_SEPARATOR;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
-import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.generateImportStatement;
-import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasDependency;
+import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasImport;
 import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
 
 /**
@@ -150,6 +149,7 @@ public class AssistantUseRecipeAction extends AnAction {
         // reindent the code based on the indentation of the current line.
         String indentedCode = indentOtherLines(code, indentationCurrentLine);
 
+
         // Update the label in the box with the description.
         String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
         String descriptionLabelText = String.format("result %s/%s: %s", currentRecipeIndex + 1, currentRecipes.size(), finalDescription);
@@ -164,15 +164,10 @@ public class AssistantUseRecipeAction extends AnAction {
                         int firstInsertion = firstPositionToInsert(currentCode, recipe.language());
                         int lengthInsertedForImport = 0;
 
-                        for(String importName: imports) {
-                            if(!hasDependency(currentCode, importName, recipe.language())) {
-                                Optional<String> dependencyStatementOptional = generateImportStatement(importName, recipe.language());
+                        for(String importStatement: imports) {
+                            if(!hasImport(currentCode, importStatement, recipe.language())) {
 
-                                if (!dependencyStatementOptional.isPresent()) {
-                                    continue;
-                                }
-
-                                String dependencyStatement = dependencyStatementOptional.get() + LINE_SEPARATOR;
+                                String dependencyStatement = importStatement + LINE_SEPARATOR;
 
                                 codeInsertions.add(new CodeInsertion(
                                         dependencyStatement,

@@ -20,6 +20,13 @@ public class Constants {
     public static final String PYTHON_COMMENT_CHARACTER = "#";
     public static final String PYTHON_DEPENDENCY_FILE = "requirements.txt";
 
+
+    // Java constants
+    public static final String JAVA_PACKAGE_KEYWORD = "package";
+
+    // Scala constants
+    public static final String SCALA_PACKAGE_KEYWORD = "package";
+
     // JavaScript constants
     public static final String JAVASCRIPT_DEPENDENCY_FILE = "package.json";
 
