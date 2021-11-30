@@ -108,7 +108,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
 
             LookupElementBuilder element = LookupElementBuilder
                 .create(lookup)
-                .withTypeText(recipe.description())
+                .withTypeText(String.join(",", recipe.keywords()))
                 .withLookupString(lookup)
                 .withInsertHandler((insertionContext, lookupElement) -> {
                     insertionContext.setAddCompletionChar(false);

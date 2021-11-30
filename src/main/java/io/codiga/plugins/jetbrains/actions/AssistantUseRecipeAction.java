@@ -1,5 +1,7 @@
 package io.codiga.plugins.jetbrains.actions;
 
+import com.github.rjeschke.txtmark.Processor;
+import com.intellij.ui.components.JBScrollPane;
 import io.codiga.api.GetRecipesForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
@@ -27,8 +29,11 @@ import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
@@ -49,7 +54,7 @@ public class AssistantUseRecipeAction extends AnAction {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     public static final String ENTER_SEARCH_TERM_TEXT = "(enter search terms)";
-
+    private final CodigaMarkdownDecorator codigaMarkdownDecorator = new CodigaMarkdownDecorator();
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
     // UI elements
@@ -59,6 +64,8 @@ public class AssistantUseRecipeAction extends AnAction {
     private JButton nextButton = null;
     private JButton previousButton = null;
     private JButton okButton = null;
+    private final JEditorPane jEditorPane = new JEditorPane();
+    private final JBScrollPane scrollPane = new JBScrollPane(jEditorPane);
 
     // status of the action: is code inserted, what are the recipes, etc.
     private boolean codeInserted = false;
@@ -148,11 +155,18 @@ public class AssistantUseRecipeAction extends AnAction {
 
         // reindent the code based on the indentation of the current line.
         String indentedCode = indentOtherLines(code, indentationCurrentLine);
+        String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
+        String finalDescriptionWithLink = finalDescription + String.format("\n\n[%s](https://app.codiga.io/marketplace/recipe/%s/view)", "View Recipe on Codiga", recipe.id());
+
+
+        String html = Processor.process(finalDescriptionWithLink, codigaMarkdownDecorator);
+        jEditorPane.setContentType("text/html");
+        jEditorPane.setText(html);
 
 
         // Update the label in the box with the description.
-        String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
-        String descriptionLabelText = String.format("result %s/%s: %s", currentRecipeIndex + 1, currentRecipes.size(), finalDescription);
+
+        String descriptionLabelText = String.format("result %s/%s: %s", currentRecipeIndex + 1, currentRecipes.size(), recipe.name());
         jLabelResults.setText(descriptionLabelText);
 
         // add the code and update global variables to indicate code has been inserted.
@@ -385,9 +399,33 @@ public class AssistantUseRecipeAction extends AnAction {
 
         JPanel jPanelMiddle = new JPanel(new FlowLayout());
         JPanel jPanelBottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel jPanelDescription = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         // bottom panel
         jPanelBottom.add(jLabelResults);
+
+        // description panel
+        jEditorPane.setContentType("text/html");
+        jEditorPane.setText(Processor.process("Recipe description will appear here", codigaMarkdownDecorator));
+        jEditorPane.setEditable(false);
+
+        jEditorPane.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent hle) {
+                if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+                    Desktop desktop = Desktop.getDesktop();
+                    try {
+                        desktop.browse(hle.getURL().toURI());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        jPanelDescription.setBorder(BorderFactory.createEmptyBorder(0, CodigaIcons.Codiga_default_icon.getIconWidth() + 10, 0, 0));
+        scrollPane.setPreferredSize(new Dimension(800 - (CodigaIcons.Codiga_default_icon.getIconWidth() + 10) * 2 , 200));
+        scrollPane.setMinimumSize(new Dimension(800 - (CodigaIcons.Codiga_default_icon.getIconWidth() + 10) * 2, 200));
+        jPanelDescription.add(scrollPane);
 
         // middle panel
         JLabel codigaLabel = new JLabel(CodigaIcons.Codiga_default_icon);
@@ -493,6 +531,7 @@ public class AssistantUseRecipeAction extends AnAction {
         // build the main panel
         jPanelMain.add(jPanelMiddle);
         jPanelMain.add(jPanelBottom);
+        jPanelMain.add(jPanelDescription);
 
         // Build the main window to keep it with an IntelliJ style
         windowWrapper = new WindowWrapperBuilder(WindowWrapper.Mode.FRAME, jPanelMain)
@@ -506,8 +545,9 @@ public class AssistantUseRecipeAction extends AnAction {
                     return true;
                 })
                 .build();
-        windowWrapper.getWindow().setPreferredSize(new Dimension(800, 100));
-        windowWrapper.getWindow().setSize(new Dimension(800, 100));
+
+        windowWrapper.getWindow().setPreferredSize(new Dimension(800, 300));
+        windowWrapper.getWindow().setSize(new Dimension(800, 300));
 
         windowWrapper.show();
 
