@@ -73,6 +73,26 @@ public final class CodePositionUtils {
             }
 
         }
+        if (languageEnumeration == LanguageEnumeration.JAVA) {
+
+            for (String line: codeArray) {
+                if (line.startsWith(JAVA_PACKAGE_KEYWORD)) {
+                    start = line.length() + 1;
+                } else {
+                    break;
+                }
+            }
+        }
+        if (languageEnumeration == LanguageEnumeration.SCALA) {
+
+            for (String line: codeArray) {
+                if (line.startsWith(SCALA_PACKAGE_KEYWORD)) {
+                    start = line.length() + 1;
+                } else {
+                    break;
+                }
+            }
+        }
         return start;
     }
 }
