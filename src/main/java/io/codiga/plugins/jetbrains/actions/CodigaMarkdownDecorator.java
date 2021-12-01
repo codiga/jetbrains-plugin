@@ -4,7 +4,7 @@ import com.github.rjeschke.txtmark.DefaultDecorator;
 
 public class CodigaMarkdownDecorator extends DefaultDecorator {
 
-    final String style = " style=\"font-family: Arial;\" ";
+    private static final String style = " style=\"font-family: Arial;\" ";
 
     @Override
     public void openHeadline(final StringBuilder out, final int level)
