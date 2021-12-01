@@ -21,10 +21,7 @@ import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.*;
@@ -82,12 +79,12 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         }
 
         // Get all recipes parameters.
-        final List<String> keywords = Arrays.asList(currentLine.split(" "));
+        final List<String> keywords = Arrays.asList(currentLine.split(" ")).stream().filter(p -> !p.isEmpty()).collect(Collectors.toList());
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
         List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile()).stream().map(d -> d.getName()).collect(Collectors.toList());
         final String filename = virtualFile.getName();
-
+        LOGGER.debug(String.format("keywords |%s|", String.join(",", keywords)));
         // Get the recipes from the API.
         List<GetRecipesForClientQuery.GetRecipesForClient> recipes = codigaApi.getRecipesForClient(
             keywords,
@@ -104,11 +101,16 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
          * For each of them, add a completion item and add a routine to insert the code.
          */
         for(GetRecipesForClientQuery.GetRecipesForClient recipe: recipes.stream().limit(NUMBER_OF_RECIPES_TO_KEEP_FOR_COMPLETION).collect(Collectors.toList())){
-            String lookup = String.join(" ", recipe.keywords());
+            List<String> recipeKeywords = new ArrayList<>(recipe.keywords());
+            if (recipe.shortcut() != null) {
+                recipeKeywords.add(recipe.shortcut());
+            }
+
+            String lookup = String.join(" ", recipeKeywords);
 
             LookupElementBuilder element = LookupElementBuilder
-                .create(lookup)
-                .withTypeText(String.join(",", recipe.keywords()))
+                .create(recipe.name())
+                .withTypeText(String.join(",", recipeKeywords))
                 .withLookupString(lookup)
                 .withInsertHandler((insertionContext, lookupElement) -> {
                     insertionContext.setAddCompletionChar(false);
@@ -128,6 +130,8 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                     codigaApi.recordRecipeUse(recipeId);
                 })
                 .withIcon(CodigaIcons.Codiga_default_icon);
+
+
 
             result.addElement(element);
         }
