@@ -3,31 +3,42 @@ package io.codiga.plugins.jetbrains.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.InsertionContext;
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
+import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.JBColor;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.ThrowableRunnable;
 import icons.CodigaIcons;
 import io.codiga.api.GetRecipesForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.model.CodeInsertion;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.*;
+import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasImport;
+import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
 
 /**
  * Provide completion when the user type some code on one line.
@@ -42,6 +53,68 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
     CodigaCompletionProvider() {
+    }
+
+    /**
+     * Add the recipe into the editor.
+     * @param recipe
+     * @param indentationCurrentLine
+     * @param parameters
+     * @param insertionContext
+     */
+    private void addRecipeInEditor(GetRecipesForClientQuery.GetRecipesForClient recipe,
+                                   int indentationCurrentLine,
+                                   @NotNull CompletionParameters parameters,
+                                   @NotNull InsertionContext insertionContext) {
+        insertionContext.setAddCompletionChar(false);
+        final Editor editor = parameters.getEditor();
+        final Document document = editor.getDocument();
+        final String currentCode = document.getText();
+        final Project project = parameters.getEditor().getProject();
+
+        // remove the code on the line
+        int startOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
+        final int endOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
+        insertionContext.getEditor().getDocument().deleteString(startOffetToRemove + indentationCurrentLine, endOffetToRemove );
+
+        // add the code and update the document.
+        String code = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
+        String indentedCode = indentOtherLines(code, indentationCurrentLine) + "\n";
+
+        /**
+         * Insert the code
+         */
+        EditorModificationUtil.insertStringAtCaret(insertionContext.getEditor(), indentedCode);
+        insertionContext.commitDocument();
+
+        /**
+         * Insert all imports
+         */
+        List<String> imports = recipe.imports();
+        try {
+
+            WriteCommandAction.writeCommandAction(project).run(
+                (ThrowableRunnable<Throwable>) () -> {
+                    int firstInsertion = firstPositionToInsert(currentCode, recipe.language());
+
+                    for(String importStatement: imports) {
+                        if(!hasImport(currentCode, importStatement, recipe.language())) {
+
+                            String dependencyStatement = importStatement + LINE_SEPARATOR;
+                            document.insertString(firstInsertion, dependencyStatement);
+                        }
+                    }
+                }
+            );
+        } catch (Throwable e) {
+            e.printStackTrace();
+            LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+            LOGGER.error(e);
+        }
+
+        // sent a callback that the recipe has been used.
+        long recipeId = ((BigDecimal) recipe.id()).longValue();
+        codigaApi.recordRecipeUse(recipeId);
     }
 
     /**
@@ -69,6 +142,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         if(lineEnd > lineStart + 1){
             currentLine = editor.getDocument().getText(new TextRange(lineStart, lineEnd - 1));
         }
+        int indentationCurrentLine = getIndentation(currentLine);
 
 
         if (currentLine.length() < MINIMUM_LINE_LENGTH_TO_TRIGGER_AUTOCOMPLETION){
@@ -82,12 +156,11 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         }
 
         // Get all recipes parameters.
-        final List<String> keywords = Arrays.asList(currentLine.split(" "));
+        final List<String> keywords = Arrays.asList(currentLine.split(" ")).stream().filter(p -> !p.isEmpty()).collect(Collectors.toList());
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
         List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile()).stream().map(d -> d.getName()).collect(Collectors.toList());
         final String filename = virtualFile.getName();
-
         // Get the recipes from the API.
         List<GetRecipesForClientQuery.GetRecipesForClient> recipes = codigaApi.getRecipesForClient(
             keywords,
@@ -104,30 +177,24 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
          * For each of them, add a completion item and add a routine to insert the code.
          */
         for(GetRecipesForClientQuery.GetRecipesForClient recipe: recipes.stream().limit(NUMBER_OF_RECIPES_TO_KEEP_FOR_COMPLETION).collect(Collectors.toList())){
-            String lookup = String.join(" ", recipe.keywords());
+            List<String> recipeKeywords = new ArrayList<>(recipe.keywords());
+            if (recipe.shortcut() != null) {
+                recipeKeywords.add(recipe.shortcut());
+            }
+
+
+            String lookup = String.join(" ", recipeKeywords);
 
             LookupElementBuilder element = LookupElementBuilder
-                .create(lookup)
-                .withTypeText(recipe.description())
+                .create(recipe.name())
+                .withTypeText(String.join(",", recipeKeywords))
                 .withLookupString(lookup)
                 .withInsertHandler((insertionContext, lookupElement) -> {
-                    insertionContext.setAddCompletionChar(false);
-
-                    // remove the code on the line
-                    final int startOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
-                    final int endOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
-                    insertionContext.getEditor().getDocument().deleteString(startOffetToRemove, endOffetToRemove );
-
-                    // add the code and update the document.
-                    String code = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
-                    EditorModificationUtil.insertStringAtCaret(insertionContext.getEditor(), code);
-                    insertionContext.commitDocument();
-
-                    // sent a callback that the recipe has been used.
-                    long recipeId = ((BigDecimal) recipe.id()).longValue();
-                    codigaApi.recordRecipeUse(recipeId);
+                    addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext);
                 })
                 .withIcon(CodigaIcons.Codiga_default_icon);
+
+
 
             result.addElement(element);
         }
