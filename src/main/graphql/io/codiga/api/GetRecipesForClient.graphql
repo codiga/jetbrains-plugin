@@ -3,6 +3,7 @@ query GetRecipesForClient($fingerprint: String, $filename: String, $keywords: [S
     id
     name
     code
+    jetbrainsFormat
     keywords
     imports
     language

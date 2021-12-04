@@ -4,7 +4,6 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.InsertionContext;
-import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -12,14 +11,9 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
-import com.intellij.openapi.editor.markup.EffectType;
-import com.intellij.openapi.editor.markup.HighlighterTargetArea;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.JBColor;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.ThrowableRunnable;
 import icons.CodigaIcons;
@@ -28,7 +22,8 @@ import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
-import io.codiga.plugins.jetbrains.model.CodeInsertion;
+import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
+import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,13 +67,18 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         final String currentCode = document.getText();
         final Project project = parameters.getEditor().getProject();
 
+
         // remove the code on the line
-        int startOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
-        final int endOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
-        insertionContext.getEditor().getDocument().deleteString(startOffetToRemove + indentationCurrentLine, endOffetToRemove );
+        int startOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
+        final int endOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
+        insertionContext.getEditor().getDocument().deleteString(startOffsetToRemove + indentationCurrentLine, endOffsetToRemove );
 
         // add the code and update the document.
-        String code = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
+        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
+        // process supported variables dynamically
+        final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(parameters.getOriginalFile().getVirtualFile());
+        final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
+        String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
         String indentedCode = indentOtherLines(code, indentationCurrentLine) + "\n";
 
         /**
