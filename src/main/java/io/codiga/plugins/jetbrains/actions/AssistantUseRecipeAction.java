@@ -147,9 +147,9 @@ public class AssistantUseRecipeAction extends AnAction {
         GetRecipesForClientQuery.GetRecipesForClient recipe = currentRecipes.get(currentRecipeIndex);
 
         // Get the code from the recipe and remove all \r\n which are not use by IntelliJ
-        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
+        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.jetbrainsFormat())).replaceAll("\r\n", LINE_SEPARATOR);
         // process supported variables dynamically
-        final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(anActionEvent.getDataContext().getData(LangDataKeys.VIRTUAL_FILE));
+        final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(anActionEvent.getDataContext());
         final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
         String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
 

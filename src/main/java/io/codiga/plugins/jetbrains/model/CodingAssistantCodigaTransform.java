@@ -1,8 +1,8 @@
 package io.codiga.plugins.jetbrains.model;
 
-import io.codiga.plugins.jetbrains.assistant.transformers.VariableTransformer;
-import io.codiga.plugins.jetbrains.assistant.transformers.VariableTransformerFilename;
-import io.codiga.plugins.jetbrains.assistant.transformers.VariableTransformerFilenameNoExtension;
+import com.intellij.ide.macro.Macro;
+import com.intellij.ide.macro.MacroManager;
+import io.codiga.plugins.jetbrains.assistant.transformers.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +29,31 @@ public class CodingAssistantCodigaTransform {
    */
   public String findAndTransformVariables (String code) {
     Map<String, VariableTransformer> VARIABLE_TO_TRANSFORMER = new HashMap();
-    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.GET_FILENAME_NO_EXT,
-      new VariableTransformerFilenameNoExtension());
-    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.GET_FILENAME,
-      new VariableTransformerFilename());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.RANDOM_UUID,
+      new VariableTransformerUUID());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.RANDOM_BASE_10,
+      new VariableTransformerRndNumber());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.RANDOM_BASE_16,
+      new VariableTransformerRndNumberHex());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_DAY_NAME,
+      new VariableTransformerDayName());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_DAY_NAME_SHORT,
+      new VariableTransformerDayNameShort());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_MONTH_NAME,
+      new VariableTransformerMonthName());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_MONTH_NAME_SHORT,
+      new VariableTransformerMonthNameShort());
 
-    String processedCode = code;
+    // expand macros first
+    String processedCode = null;
+    try {
+      processedCode = MacroManager.getInstance().expandMacrosInString(code,
+        true,
+        CodigaTransformationContext.dataContext);
+    } catch (Macro.ExecutionCancelledException e) {
+      e.printStackTrace();
+    }
+
     List<String> detectedVariables = detectVariablesInsideCode(code);
     for (String variableName: VARIABLE_TO_TRANSFORMER.keySet()){
       if (detectedVariables.contains(variableName)){
