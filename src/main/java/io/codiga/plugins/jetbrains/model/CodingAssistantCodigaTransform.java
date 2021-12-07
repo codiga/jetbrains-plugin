@@ -11,24 +11,9 @@ import java.util.stream.Collectors;
 
 public class CodingAssistantCodigaTransform {
   private final CodingAssistantContext CodigaTransformationContext;
-
-  public CodingAssistantCodigaTransform(CodingAssistantContext CodigaTransformationContext) {
-    this.CodigaTransformationContext = CodigaTransformationContext;
-  }
-
-  /**
-   * Search for Codiga's recipe variables in raw code string and transform
-   * any if found into expected value or behavior. If a new variable is
-   * supported, include it in the VARIABLE_TO_TRANSFORMER HashMap and create
-   * a new class for it with its `transform` method inside
-   * assistant.transformers.
-   *
-   * @param code
-   * @return code string with Codiga's recipe variables transform to local if
-   * any was found.
-   */
-  public String findAndTransformVariables (String code) {
-    Map<String, VariableTransformer> VARIABLE_TO_TRANSFORMER = new HashMap();
+  private static Map<String, VariableTransformer> VARIABLE_TO_TRANSFORMER;
+  static {
+    VARIABLE_TO_TRANSFORMER = new HashMap();
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.RANDOM_UUID,
       new VariableTransformerUUID());
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.RANDOM_BASE_10,
@@ -57,7 +42,24 @@ public class CodingAssistantCodigaTransform {
       new VariableTransformerMonthTwoDigits());
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_DAY,
       new VariableTransformerDay());
+  }
 
+  public CodingAssistantCodigaTransform(CodingAssistantContext CodigaTransformationContext) {
+    this.CodigaTransformationContext = CodigaTransformationContext;
+  }
+
+  /**
+   * Search for Codiga's recipe variables in raw code string and transform
+   * any if found into expected value or behavior. If a new variable is
+   * supported, include it in the VARIABLE_TO_TRANSFORMER HashMap and create
+   * a new class for it with its `transform` method inside
+   * assistant.transformers.
+   *
+   * @param code
+   * @return code string with Codiga's recipe variables transform to local if
+   * any was found.
+   */
+  public String findAndTransformVariables (String code) {
     // expand macros first
     String processedCode = null;
     try {

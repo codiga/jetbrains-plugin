@@ -9,6 +9,13 @@ import java.util.Locale;
 import java.util.Random;
 
 public class VariableTransformerRndNumber implements VariableTransformer {
+  /**
+   * Generate a 6 digit random number
+   *
+   * @param code
+   * @param CodigaTransformationContext
+   * @return code with replaced value
+   */
   @Override
   public String transform(String code, CodingAssistantContext CodigaTransformationContext){
     final Random rnd = new Random();

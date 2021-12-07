@@ -7,7 +7,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+
 public class VariableTransformerDay implements VariableTransformer {
+  /**
+   * Get the day of the month
+   *
+   * @param code
+   * @param CodigaTransformationContext
+   * @return code with replaced value
+   */
   @Override
   public String transform(String code, CodingAssistantContext CodigaTransformationContext){
     final Calendar calendar = Calendar.getInstance();

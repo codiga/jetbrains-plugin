@@ -8,6 +8,13 @@ import java.util.Date;
 import java.util.Locale;
 
 public class VariableTransformerHour implements VariableTransformer {
+  /**
+   * Get the current hour digits
+   *
+   * @param code
+   * @param CodigaTransformationContext
+   * @return code with replaced value
+   */
   @Override
   public String transform(String code, CodingAssistantContext CodigaTransformationContext){
     final Calendar calendar = Calendar.getInstance();

@@ -13,7 +13,7 @@ import java.util.List;
  * Codiga recipe variables. This Context must be pass only to init an instance of
  * CodingAssistantCodigaTransform.
  */
-public class CodingAssistantContext {
+final public class CodingAssistantContext {
   public static final String RANDOM_UUID = "&[RANDOM_UUID]";
   public static final String DATE_DAY_NAME = "&[DATE_DAY_NAME]";
   public static final String DATE_DAY_NAME_SHORT = "&[DATE_DAY_NAME_SHORT]";
