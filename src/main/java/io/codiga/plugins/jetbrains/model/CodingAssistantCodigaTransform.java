@@ -41,8 +41,22 @@ public class CodingAssistantCodigaTransform {
       new VariableTransformerDayNameShort());
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_MONTH_NAME,
       new VariableTransformerMonthName());
-    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_MONTH_NAME_SHORT,
-      new VariableTransformerMonthNameShort());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_YEAR,
+      new VariableTransformerYear());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_YEAR_SHORT,
+      new VariableTransformerYearShort());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_HOUR,
+      new VariableTransformerHour());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_MINUTE,
+      new VariableTransformerMinute());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_SECOND,
+      new VariableTransformerSecond());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_SECONDS_UNIX,
+      new VariableTransformerSecondsUnix());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_MONTH_TWO_DIGITS,
+      new VariableTransformerMonthTwoDigits());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_DAY,
+      new VariableTransformerDay());
 
     // expand macros first
     String processedCode = null;
