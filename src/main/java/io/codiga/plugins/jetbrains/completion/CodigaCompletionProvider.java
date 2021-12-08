@@ -4,22 +4,18 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.InsertionContext;
-import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
-import com.intellij.openapi.editor.markup.EffectType;
-import com.intellij.openapi.editor.markup.HighlighterTargetArea;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.JBColor;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.ThrowableRunnable;
 import icons.CodigaIcons;
@@ -28,7 +24,8 @@ import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
-import io.codiga.plugins.jetbrains.model.CodeInsertion;
+import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
+import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,49 +69,57 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         final String currentCode = document.getText();
         final Project project = parameters.getEditor().getProject();
 
+
         // remove the code on the line
-        int startOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
-        final int endOffetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
-        insertionContext.getEditor().getDocument().deleteString(startOffetToRemove + indentationCurrentLine, endOffetToRemove );
+        int startOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
+        final int endOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
+        insertionContext.getEditor().getDocument().deleteString(startOffsetToRemove + indentationCurrentLine, endOffsetToRemove );
 
         // add the code and update the document.
-        String code = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
-        String indentedCode = indentOtherLines(code, indentationCurrentLine) + "\n";
+        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.jetbrainsFormat())).replaceAll("\r\n", LINE_SEPARATOR);
+        // DataContext is exposed easily in Actions, in other places like this, we need to look for it
+        DataManager.getInstance().getDataContextFromFocusAsync().onSuccess(context -> {
+          final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(context);
+          // process supported variables dynamically
+          final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
+          String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
+          String indentedCode = indentOtherLines(code, indentationCurrentLine) + "\n";
 
-        /**
-         * Insert the code
-         */
-        EditorModificationUtil.insertStringAtCaret(insertionContext.getEditor(), indentedCode);
-        insertionContext.commitDocument();
+          /**
+           * Insert the code
+           */
+          EditorModificationUtil.insertStringAtCaret(insertionContext.getEditor(), indentedCode);
+          insertionContext.commitDocument();
 
-        /**
-         * Insert all imports
-         */
-        List<String> imports = recipe.imports();
-        try {
+          /**
+           * Insert all imports
+           */
+          List<String> imports = recipe.imports();
+          try {
 
-            WriteCommandAction.writeCommandAction(project).run(
-                (ThrowableRunnable<Throwable>) () -> {
-                    int firstInsertion = firstPositionToInsert(currentCode, recipe.language());
+              WriteCommandAction.writeCommandAction(project).run(
+                  (ThrowableRunnable<Throwable>) () -> {
+                      int firstInsertion = firstPositionToInsert(currentCode, recipe.language());
 
-                    for(String importStatement: imports) {
-                        if(!hasImport(currentCode, importStatement, recipe.language())) {
+                      for(String importStatement: imports) {
+                          if(!hasImport(currentCode, importStatement, recipe.language())) {
 
-                            String dependencyStatement = importStatement + LINE_SEPARATOR;
-                            document.insertString(firstInsertion, dependencyStatement);
-                        }
-                    }
-                }
-            );
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
-            LOGGER.error(e);
-        }
+                              String dependencyStatement = importStatement + LINE_SEPARATOR;
+                              document.insertString(firstInsertion, dependencyStatement);
+                          }
+                      }
+                  }
+              );
+          } catch (Throwable e) {
+              e.printStackTrace();
+              LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+              LOGGER.error(e);
+          }
 
-        // sent a callback that the recipe has been used.
-        long recipeId = ((BigDecimal) recipe.id()).longValue();
-        codigaApi.recordRecipeUse(recipeId);
+          // sent a callback that the recipe has been used.
+          long recipeId = ((BigDecimal) recipe.id()).longValue();
+          codigaApi.recordRecipeUse(recipeId);
+        });
     }
 
     /**

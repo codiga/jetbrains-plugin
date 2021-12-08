@@ -26,10 +26,11 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ThrowableRunnable;
 import icons.CodigaIcons;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
+import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
@@ -146,7 +147,11 @@ public class AssistantUseRecipeAction extends AnAction {
         GetRecipesForClientQuery.GetRecipesForClient recipe = currentRecipes.get(currentRecipeIndex);
 
         // Get the code from the recipe and remove all \r\n which are not use by IntelliJ
-        String code = new String(Base64.getDecoder().decode(recipe.code())).replaceAll("\r\n", LINE_SEPARATOR);
+        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.jetbrainsFormat())).replaceAll("\r\n", LINE_SEPARATOR);
+        // process supported variables dynamically
+        final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(anActionEvent.getDataContext());
+        final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
+        String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
 
         // Get the current line and get the indentation
         int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
