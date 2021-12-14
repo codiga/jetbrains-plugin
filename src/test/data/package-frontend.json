@@ -42,7 +42,7 @@
   },
   "scripts": {
     "dev-local": "export REACT_APP_BACKEND_URL=\"http://localhost:5000/graphql\" && react-scripts start",
-    "dev": "export REACT_APP_BACKEND_URL=\"https://dashboard-api.code-inspector.com/graphql\" && react-scripts start",
+    "dev": "export REACT_APP_BACKEND_URL=\"https://dashboard-api.codiga.io/graphql\" && react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

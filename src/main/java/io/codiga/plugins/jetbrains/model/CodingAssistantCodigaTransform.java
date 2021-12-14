@@ -27,6 +27,8 @@ public class CodingAssistantCodigaTransform {
       new VariableTransformerDayNameShort());
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_MONTH_NAME,
       new VariableTransformerMonthName());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_MONTH_NAME_SHORT,
+      new VariableTransformerMonthNameShort());
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_YEAR,
       new VariableTransformerYear());
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_YEAR_SHORT,
