@@ -58,7 +58,7 @@ public class AppSettingsComponent {
 
         buttonGetApiKeys.addActionListener(arg0 -> {
             try {
-                Desktop.getDesktop().browse(new URL("https://frontend.code-inspector.com/api-tokens").toURI());
+                Desktop.getDesktop().browse(new URL("https://app.codiga.io/api-tokens").toURI());
             } catch (Exception e) {
                 e.printStackTrace();
             }

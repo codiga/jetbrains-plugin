@@ -61,7 +61,7 @@ public class AnnotationFixOpenBrowser implements IntentionAction {
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         LOGGER.debug("CodeInspectionAnnotationFixOpenBrowser - calling invoke()");
         try {
-            String urlString = String.format("https://frontend.code-inspector.com/analysis/result/%s/%s?file=%s", projectId, analysisId, filename);
+            String urlString = String.format("https://app.codiga.io/analysis/result/%s/%s?file=%s", projectId, analysisId, filename);
             Desktop.getDesktop().browse(new URL(urlString).toURI());
         } catch (Exception e) {
             LOGGER.debug("CodeInspectionAnnotationFixOpenBrowser - cannot open browser");
