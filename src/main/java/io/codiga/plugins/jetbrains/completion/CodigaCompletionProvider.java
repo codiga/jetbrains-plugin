@@ -6,7 +6,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -62,28 +62,30 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
     private void addRecipeInEditor(GetRecipesForClientQuery.GetRecipesForClient recipe,
                                    int indentationCurrentLine,
                                    @NotNull CompletionParameters parameters,
-                                   @NotNull InsertionContext insertionContext) {
+                                   @NotNull InsertionContext insertionContext,
+                                   Boolean usesTabs) {
         insertionContext.setAddCompletionChar(false);
         final Editor editor = parameters.getEditor();
         final Document document = editor.getDocument();
         final String currentCode = document.getText();
         final Project project = parameters.getEditor().getProject();
 
-
         // remove the code on the line
         int startOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
         final int endOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
-        insertionContext.getEditor().getDocument().deleteString(startOffsetToRemove + indentationCurrentLine, endOffsetToRemove );
+        insertionContext.getEditor().getDocument()
+          .deleteString(startOffsetToRemove + indentationCurrentLine, endOffsetToRemove );
 
         // add the code and update the document.
-        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.jetbrainsFormat())).replaceAll("\r\n", LINE_SEPARATOR);
+        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.jetbrainsFormat()))
+          .replaceAll("\r\n", LINE_SEPARATOR);
         // DataContext is exposed easily in Actions, in other places like this, we need to look for it
         DataManager.getInstance().getDataContextFromFocusAsync().onSuccess(context -> {
           final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(context);
           // process supported variables dynamically
           final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
           String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
-          String indentedCode = indentOtherLines(code, indentationCurrentLine) + "\n";
+          String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs) + "\n";
 
           /**
            * Insert the code
@@ -147,8 +149,13 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         if(lineEnd > lineStart + 1){
             currentLine = editor.getDocument().getText(new TextRange(lineStart, lineEnd - 1));
         }
-        int indentationCurrentLine = getIndentation(currentLine);
+        final boolean usesTabs = detectIfTabs(currentLine);
+        final int indentationCurrentLine = usesTabs
+          ? getIndentation(currentLine, true)
+          : getIndentation(currentLine, false);
 
+        // clean tab indentation to correctly look for completion results
+        currentLine = currentLine.replace("\t", "");
 
         if (currentLine.length() < MINIMUM_LINE_LENGTH_TO_TRIGGER_AUTOCOMPLETION){
             LOGGER.debug(String.format("string too small |%s|", currentLine));
@@ -161,10 +168,13 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         }
 
         // Get all recipes parameters.
-        final List<String> keywords = Arrays.asList(currentLine.split(" ")).stream().filter(p -> !p.isEmpty()).collect(Collectors.toList());
+        final List<String> keywords = Arrays.asList(currentLine.split(" ")).stream().filter(p -> !p.isEmpty())
+          .collect(Collectors.toList());
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
-        List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile()).stream().map(d -> d.getName()).collect(Collectors.toList());
+        List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile())
+          .stream().map(d -> d.getName())
+          .collect(Collectors.toList());
         final String filename = virtualFile.getName();
         // Get the recipes from the API.
         List<GetRecipesForClientQuery.GetRecipesForClient> recipes = codigaApi.getRecipesForClient(
@@ -195,7 +205,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                 .withTypeText(String.join(",", recipeKeywords))
                 .withLookupString(lookup)
                 .withInsertHandler((insertionContext, lookupElement) -> {
-                    addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext);
+                    addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext, usesTabs);
                 })
                 .withIcon(CodigaIcons.Codiga_default_icon);
 

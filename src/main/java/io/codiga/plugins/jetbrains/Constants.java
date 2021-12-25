@@ -10,6 +10,7 @@ public class Constants {
     public static final String LOGGER_NAME = "Codiga";
     public static final String LINE_SEPARATOR = "\n";
     public static final char CHARACTER_SPACE = ' ';
+    public static final char CHARACTER_TAB = '\t';
 
     public static final int NUMBER_OF_RECIPES_TO_KEEP_FOR_COMPLETION = 5;
     public static final int MINIMUM_LINE_LENGTH_TO_TRIGGER_AUTOCOMPLETION = 3;

@@ -106,7 +106,7 @@ public class ProjectSettingsComponent {
         JButton configureButton = new JButton(SETTINGS_BUTTON_CONFIGURE_PROJECT);
         configureButton.addActionListener( event -> {
             try {
-                String urlString = String.format("https://frontend.code-inspector.com/project/%s/preferences", selectedProjectId);
+                String urlString = String.format("https://app.codiga.io/project/%s/preferences", selectedProjectId);
                 Desktop.getDesktop().browse(new URL(urlString).toURI());
             } catch (Exception e) {
                 e.printStackTrace();

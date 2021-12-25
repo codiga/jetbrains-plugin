@@ -18,9 +18,10 @@ public final class CodePositionUtils {
      * Indent all the lines but the first. Keep the first as it is.
      * @param code - the code
      * @param indentation - number of space we should use to indent.
+     * @param usesTabs - know if editor uses tabs or spaces
      * @return - the new code.
      */
-    public static String indentOtherLines(String code, int indentation) {
+    public static String indentOtherLines(String code, int indentation, boolean usesTabs) {
         String[] codeArray = code.split(LINE_SEPARATOR);
         List<String> codeArrayUpdated = new ArrayList<String>();
         if(codeArray.length <= 1) {
@@ -30,7 +31,7 @@ public final class CodePositionUtils {
         for (int i = 1 ; i < codeArray.length ; i++){
             StringBuilder sb = new StringBuilder();
             for (int j = 0 ; j < indentation ; j++) {
-                sb.append(CHARACTER_SPACE);
+                sb.append(usesTabs ? CHARACTER_TAB : CHARACTER_SPACE);
             }
             sb.append(codeArray[i]);
             codeArrayUpdated.add(sb.toString());
@@ -39,17 +40,34 @@ public final class CodePositionUtils {
     }
 
     /**
+     * Know if the current line has tabs indentation
+     *
+     * @param lineOfCode - the line of code.
+     * @return - boolean response if it is
+     */
+    public static boolean detectIfTabs(String lineOfCode) {
+      return lineOfCode.length() > 0 && lineOfCode.charAt(0) == CHARACTER_TAB;
+    }
+
+    /**
      * Get the indentation and the number of spaces
      *
      * @param lineOfCode - the line of code.
      * @return - the number of spaces used to indent code.
      */
-    public static int getIndentation(String lineOfCode) {
-        int res = 0;
+    public static int getIndentation(String lineOfCode, boolean isTabs) {
+      int res = 0;
+      if (isTabs) {
+        for (int i = 0 ; i < lineOfCode.length() && lineOfCode.charAt(i) == CHARACTER_TAB; i++) {
+          res++;
+        }
+        return res;
+      } else {
         for (int i = 0 ; i < lineOfCode.length() && lineOfCode.charAt(i) == CHARACTER_SPACE; i++) {
             res++;
         }
         return res;
+      }
     }
 
     /**

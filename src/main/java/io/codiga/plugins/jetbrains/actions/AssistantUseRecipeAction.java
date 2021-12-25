@@ -156,10 +156,13 @@ public class AssistantUseRecipeAction extends AnAction {
         // Get the current line and get the indentation
         int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
         String currentLine = document.getText(new TextRange(document.getLineStartOffset(selectedLine), document.getLineEndOffset(selectedLine)));
-        int indentationCurrentLine = getIndentation(currentLine);
+        final boolean usesTabs = detectIfTabs(currentLine);
+        int indentationCurrentLine = usesTabs
+          ? getIndentation(currentLine, true)
+          : getIndentation(currentLine, false);
 
         // reindent the code based on the indentation of the current line.
-        String indentedCode = indentOtherLines(code, indentationCurrentLine);
+        String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs);
         String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
         String finalDescriptionWithLink = finalDescription + String.format("\n\n[%s](https://app.codiga.io/marketplace/recipe/%s/view)", "View Recipe on Codiga", recipe.id());
 

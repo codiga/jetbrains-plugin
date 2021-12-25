@@ -1,5 +1,9 @@
 package io.codiga.plugins.jetbrains.actions;
 
+import com.intellij.codeInsight.template.Expression;
+import com.intellij.codeInsight.template.impl.TextExpression;
+import com.intellij.codeInsight.template.macro.EscapeStringMacro;
+import com.intellij.formatting.Indent;
 import io.codiga.api.type.LanguageEnumeration;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

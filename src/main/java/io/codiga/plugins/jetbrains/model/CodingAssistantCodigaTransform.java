@@ -3,6 +3,7 @@ package io.codiga.plugins.jetbrains.model;
 import com.intellij.ide.macro.Macro;
 import com.intellij.ide.macro.MacroManager;
 import io.codiga.plugins.jetbrains.assistant.transformers.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,8 @@ public class CodingAssistantCodigaTransform {
       new VariableTransformerMonthTwoDigits());
     VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.DATE_CURRENT_DAY,
       new VariableTransformerDay());
+    VARIABLE_TO_TRANSFORMER.put(CodingAssistantContext.CODIGA_INDENT,
+      new VariableIndentation());
   }
 
   public CodingAssistantCodigaTransform(CodingAssistantContext CodigaTransformationContext) {
@@ -59,9 +62,10 @@ public class CodingAssistantCodigaTransform {
    * @return code string with Codiga's recipe variables transform to local if
    * any was found.
    */
-  public String findAndTransformVariables (String code) {
-    // expand macros first
+  public String findAndTransformVariables (@NotNull String code) {
     String processedCode = null;
+
+    // expand macros first
     try {
       processedCode = MacroManager.getInstance().expandMacrosInString(code,
         true,
@@ -70,10 +74,12 @@ public class CodingAssistantCodigaTransform {
       e.printStackTrace();
     }
 
+    // detect any codiga variable that is not a macro and resolve it
     List<String> detectedVariables = detectVariablesInsideCode(code);
     for (String variableName: VARIABLE_TO_TRANSFORMER.keySet()){
       if (detectedVariables.contains(variableName)){
-        processedCode = VARIABLE_TO_TRANSFORMER.get(variableName).transform(processedCode, CodigaTransformationContext);
+        processedCode = VARIABLE_TO_TRANSFORMER.get(variableName)
+          .transform(processedCode, CodigaTransformationContext);
       }
     }
 
@@ -86,7 +92,7 @@ public class CodingAssistantCodigaTransform {
    * @param code: raw code from API
    * @return list of found variables in code string
    */
-  private List detectVariablesInsideCode(String code) {
+  private List detectVariablesInsideCode(@NotNull String code) {
     List<String> supportedVariables = CodingAssistantContext.SUPPORTED_VARIABLES;
     return supportedVariables.stream()
       .filter(code::contains)
