@@ -19,7 +19,7 @@ public class VariableTransformerMonthTwoDigits implements VariableTransformer {
   public String transform(String code, CodingAssistantContext CodigaTransformationContext){
     final Calendar calendar = Calendar.getInstance();
     final Date date = calendar.getTime();
-    return code.replace(CodingAssistantContext.DATE_MONTH_NAME,
+    return code.replace(CodingAssistantContext.DATE_MONTH_TWO_DIGITS,
       new SimpleDateFormat("mm", Locale.ENGLISH).format(date.getTime()));
   }
 }

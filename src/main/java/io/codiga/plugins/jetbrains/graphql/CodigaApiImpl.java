@@ -8,6 +8,7 @@ import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.request.RequestHeaders;
+import com.intellij.openapi.components.Service;
 import io.codiga.api.*;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;

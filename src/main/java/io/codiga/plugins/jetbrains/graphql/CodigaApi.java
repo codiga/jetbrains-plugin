@@ -1,5 +1,6 @@
 package io.codiga.plugins.jetbrains.graphql;
 
+import com.intellij.openapi.components.Service;
 import io.codiga.api.*;
 import io.codiga.api.type.LanguageEnumeration;
 import org.jetbrains.annotations.NotNull;

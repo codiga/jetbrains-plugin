@@ -184,34 +184,33 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             language,
             filename);
 
-
         LOGGER.debug(String.format("found %s recipes", recipes.size()));
 
         /**
          * We take only the top three recipes (they come ranked in order from the API).
          * For each of them, add a completion item and add a routine to insert the code.
          */
-        for(GetRecipesForClientQuery.GetRecipesForClient recipe: recipes.stream().limit(NUMBER_OF_RECIPES_TO_KEEP_FOR_COMPLETION).collect(Collectors.toList())){
-            List<String> recipeKeywords = new ArrayList<>(recipe.keywords());
-            if (recipe.shortcut() != null) {
-                recipeKeywords.add(recipe.shortcut());
-            }
+        for (GetRecipesForClientQuery.GetRecipesForClient recipe : recipes.stream()
+          .limit(NUMBER_OF_RECIPES_TO_KEEP_FOR_COMPLETION).collect(Collectors.toList())) {
+          List<String> recipeKeywords = new ArrayList<>(recipe.keywords());
+          if (recipe.shortcut() != null) {
+            recipeKeywords.add(recipe.shortcut());
+          }
 
 
-            String lookup = String.join(" ", recipeKeywords);
+          String lookup = String.join(" ", recipeKeywords);
 
-            LookupElementBuilder element = LookupElementBuilder
-                .create(recipe.name())
-                .withTypeText(String.join(",", recipeKeywords))
-                .withLookupString(lookup)
-                .withInsertHandler((insertionContext, lookupElement) -> {
-                    addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext, usesTabs);
-                })
-                .withIcon(CodigaIcons.Codiga_default_icon);
+          LookupElementBuilder element = LookupElementBuilder
+            .create(recipe.name())
+            .withTypeText(String.join(",", recipeKeywords))
+            .withLookupString(lookup)
+            .withInsertHandler((insertionContext, lookupElement) -> {
+              addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext, usesTabs);
+            })
+            .withIcon(CodigaIcons.Codiga_default_icon);
 
 
-
-            result.addElement(element);
+          result.addElement(element);
         }
     }
 }

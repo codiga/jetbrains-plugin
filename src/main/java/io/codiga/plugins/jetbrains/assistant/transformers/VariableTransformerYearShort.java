@@ -19,7 +19,7 @@ public class VariableTransformerYearShort implements VariableTransformer {
   public String transform(String code, CodingAssistantContext CodigaTransformationContext){
     final Calendar calendar = Calendar.getInstance();
     final Date date = calendar.getTime();
-    return code.replace(CodingAssistantContext.DATE_CURRENT_YEAR,
+    return code.replace(CodingAssistantContext.DATE_CURRENT_YEAR_SHORT,
       new SimpleDateFormat("YY", Locale.ENGLISH).format(date.getTime()));
   }
 }

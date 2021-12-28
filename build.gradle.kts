@@ -31,7 +31,6 @@ dependencies {
     implementation("com.github.rjeschke:txtmark:0.13")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testCompile("org.mockito:mockito-core:4.2.0")
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -92,3 +91,4 @@ tasks {
         channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 }
+
