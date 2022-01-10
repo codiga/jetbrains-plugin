@@ -77,6 +77,7 @@ public class AppSettingsComponent {
         p.addToRight(buttonsPanel);
         myMainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(SETTINGS_API_TOKEN_LABEL), apiToken, 1, false)
+                .addLabeledComponent(new JBLabel("            "), new JBLabel(" Add your Codiga API keys to use your recipes in your IDE."), 1, false)
                 .addComponent(p, 0)
                 .addLabeledComponent(this.useCompletationCheckbox, new JBLabel(SETTINGS_ENABLED_COMPLETION))
                 .addSeparator(1)
