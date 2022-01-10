@@ -7,7 +7,6 @@
         <![CDATA[
             <p>
                 Codiga provides two main features:
-
                 <ul>
                     <li><strong>Coding Assistant</strong>: import, create and share reusable blocks of code</li>
                     <li><strong>Code Analysis</strong>: analysis code for 12+ languages without any configuration (Apex, C, C++, Dart, Docker, Go, Java, Javascript, Kotlin, PHP, Python, Ruby, Scala,
@@ -55,29 +54,30 @@
     <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.AppStarter" />
         <notificationGroup
                 id="Codiga API"
-                displayType="BALLOON"/>
+                displayType="BALLOON"
+        />
 
         <applicationService
                 serviceInterface="io.codiga.plugins.jetbrains.graphql.CodigaApi"
                 serviceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiImpl"
                 testServiceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiTest"
         />
-
-        <applicationService serviceImplementation="io.codiga.plugins.jetbrains.settings.application.AppSettingsState"/>
+        <applicationService
+                serviceImplementation="io.codiga.plugins.jetbrains.settings.application.AppSettingsState"/>
         <applicationConfigurable
                 parentId="tools"
                 instance="io.codiga.plugins.jetbrains.settings.application.AppSettingsConfigurable"
                 id="com.code_inspector.settings.AppSettingsConfigurable"
                 displayName="Codiga API"/>
+
         <projectService serviceImplementation="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsState"/>
         <completion.contributor
                 implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
                 language="any"
         />
-
-
         <projectConfigurable
                 parentId="tools"
                 instance="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsConfigurable"
@@ -147,9 +147,6 @@
             <keyboard-shortcut first-keystroke="control alt C" keymap="$default"/>
             <mouse-shortcut keystroke="control button3 doubleClick" keymap="$default"/>
         </action>
-
-
-
         <action id="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
                 class="io.codiga.plugins.jetbrains.actions.AssistantCreateRecipeAction"
                 text="Create Codiga Recipe" description="Use the selected code to create a recipe"

@@ -25,7 +25,6 @@ import static io.codiga.plugins.jetbrains.Constants.INVALID_PROJECT_ID;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.graphql.ApiUtils.getAnnotationsFromFileAnalysisQueryResult;
 import static io.codiga.plugins.jetbrains.parameters.AnalysisParameters.getAnalysisParameters;
-import static io.codiga.plugins.jetbrains.ui.NotificationUtils.*;
 import static io.codiga.plugins.jetbrains.ui.UIConstants.ANNOTATION_PREFIX;
 
 public class ExternalAnnotator extends com.intellij.lang.annotation.ExternalAnnotator<PsiFile, List<Annotation>> {
@@ -89,9 +88,7 @@ public class ExternalAnnotator extends com.intellij.lang.annotation.ExternalAnno
                 .getViolationsFromFileAnalysis(projectId, filename, code, parameters);
         } catch (GraphQlQueryException e) {
             LOGGER.debug("receive invalid graphql call, sending notification");
-            notififyProjectOnce(psiFile.getProject(), NOTIFICATION_API_KEYS_INCORRECT, NOTIFICATION_GROUP_API);
             queryResult = Optional.empty();
-
         }
 
         final long endAnalysisTimeMillis = System.currentTimeMillis();
