@@ -31,6 +31,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     private String fingerprint = "";
     @Tag
     private Boolean useCompletion = true;
+    @Tag
+    private Boolean showDialogApiNotification = true;
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
@@ -46,6 +48,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public Boolean getUseCompletion() {
         return this.useCompletion;
     }
+
+    public Boolean getShowDialogApiNotification() { return this.showDialogApiNotification; }
 
     public String getAccessKey() {
         return this.accessKey;
@@ -74,6 +78,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public boolean hasApiToken() {
         return getApiToken().length() > 0 ;
     }
+
+    public void setShowDialogApiNotification(Boolean b) { this.showDialogApiNotification = b;}
 
 
     @Nullable
