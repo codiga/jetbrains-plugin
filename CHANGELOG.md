@@ -15,6 +15,24 @@
 
 ### Security
 
+## [1.3.0]
+### Added
+
+ * Disable code analysis by default
+
+### Changed
+
+ * Plugin description
+ * Compatibility with new IntelliJ platforms
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
 ## [1.1.9]
 ### Added
 
