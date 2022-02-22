@@ -18,7 +18,7 @@ import static io.codiga.plugins.jetbrains.Constants.INVALID_PROJECT_ID;
 public class ProjectSettingsState implements PersistentStateComponent<ProjectSettingsState> {
 
     public Boolean isProjectAssociated = false;
-    public Boolean isEnabled = true;
+    public Boolean isEnabled = false;
     public Long projectId = INVALID_PROJECT_ID;
 
     public static ProjectSettingsState getInstance(Project p) {
