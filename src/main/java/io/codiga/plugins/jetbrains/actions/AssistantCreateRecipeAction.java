@@ -70,16 +70,16 @@ public class AssistantCreateRecipeAction extends AnAction {
 
         // Get the selected text, the language and encode the text to be used as a recipe.
         String content = editor.getSelectionModel().getSelectedText();
-        String encodedContent = Base64.getEncoder().encodeToString(content.getBytes(StandardCharsets.UTF_8));
+        // We need to replace the '+' sign by %2B, otherwise, the code encoding
+        // is not correct in the URL parameters.
+        String encodedContent = Base64.getEncoder().encodeToString(content.getBytes(StandardCharsets.UTF_8)).replaceAll("\\+", "%2B");
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
 
         // URL to go once the user clicked.
         String urlString = String.format("%s/assistant/recipe/create?code=%s&language=%s", FRONTEND_URL, encodedContent, language.rawValue());
         try {
             Desktop.getDesktop().browse(new URL(urlString).toURI());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
     }

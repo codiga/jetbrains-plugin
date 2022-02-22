@@ -1,3 +1,6 @@
+[![Code Grade](https://api.codiga.io/project/29692/status/svg)](https://app.codiga.io/public/project/29692/jetbrains-plugin/dashboard)
+[![Code Quality](https://api.codiga.io/project/29692/score/svg)](https://app.codiga.io/public/project/29692/jetbrains-plugin/dashboard)
+
 # Codiga Plugin for Jetbrains products
 
 This is the source code for the Jetbrains plugin for Codiga.
