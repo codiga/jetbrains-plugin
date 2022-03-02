@@ -1,0 +1,15 @@
+query GetRecipesForClientByShortcut($fingerprint: String, $filename: String, $term: String, $dependencies: [String!]!, $parameters: String, $language: LanguageEnumeration!){
+  getRecipesForClientByShortcut(fingerprint: $fingerprint, term: $term, filename: $filename, dependencies:$dependencies, parameters:$parameters, language:$language){
+    id
+    name
+    code
+    jetbrainsFormat
+    keywords
+    imports
+    language
+    description
+    shortcut
+  }
+}
+
+

@@ -160,6 +160,16 @@ public final class CodigaApiTest implements CodigaApi {
       return recipes;
     }
 
+    @Override
+    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+        return null;
+    }
+
+    @Override
+    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+        return null;
+    }
+
     public Optional<GetFileDataQuery.Project> getDataForFile(Long projectId, String revision, String path) {
         return Optional.empty();
     }

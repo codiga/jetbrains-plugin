@@ -1,0 +1,15 @@
+query GetRecipesForClientSemantic($term: String, $filename: String, $dependencies: [String!]!, $parameters: String, $languages: [LanguageEnumeration!], $howmany: Long!, $skip: Long!){
+  assistantRecipesSemanticSearch(term: $term, filename: $filename, dependencies:$dependencies, parameters:$parameters, languages: $languages, howmany: $howmany, skip: $skip){
+    id
+    name
+    code
+    jetbrainsFormat
+    keywords
+    imports
+    language
+    description
+    shortcut
+  }
+}
+
+

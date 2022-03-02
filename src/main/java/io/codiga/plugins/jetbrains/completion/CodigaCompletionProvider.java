@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.ThrowableRunnable;
 import icons.CodigaIcons;
+import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.api.GetRecipesForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
@@ -40,7 +41,7 @@ import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
 /**
  * Provide completion when the user type some code on one line.
  *
- * We just take completion only when the line containts only words (alphanumeric content).
+ * We just take completion only when the line constraints only words (alphanumeric content).
  * That avoids to trigger the completion all the time.
  *
  */
@@ -59,11 +60,30 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
      * @param parameters
      * @param insertionContext
      */
-    private void addRecipeInEditor(GetRecipesForClientQuery.GetRecipesForClient recipe,
+    private void addRecipeInEditor(GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe,
                                    int indentationCurrentLine,
                                    @NotNull CompletionParameters parameters,
                                    @NotNull InsertionContext insertionContext,
                                    Boolean usesTabs) {
+        addRecipeInEditorRaw(
+                recipe.jetbrainsFormat(),
+                recipe.imports(),
+                (BigDecimal)recipe.id(),
+                recipe.language(),
+                indentationCurrentLine,
+                parameters,
+                insertionContext,
+                usesTabs);
+    }
+
+    private void addRecipeInEditorRaw(@NotNull String recipeJetBrainsFormat,
+                                      @NotNull List<String> imports,
+                                      @NotNull BigDecimal recipeId,
+                                      @NotNull LanguageEnumeration language,
+                                      int indentationCurrentLine,
+                                      @NotNull CompletionParameters parameters,
+                                      @NotNull InsertionContext insertionContext,
+                                      Boolean usesTabs) {
         insertionContext.setAddCompletionChar(false);
         final Editor editor = parameters.getEditor();
         final Document document = editor.getDocument();
@@ -74,53 +94,52 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         int startOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineStart();
         final int endOffsetToRemove = insertionContext.getEditor().getCaretModel().getVisualLineEnd();
         insertionContext.getEditor().getDocument()
-          .deleteString(startOffsetToRemove + indentationCurrentLine, endOffsetToRemove );
+                .deleteString(startOffsetToRemove + indentationCurrentLine, endOffsetToRemove );
 
         // add the code and update the document.
-        String unprocessedCode = new String(Base64.getDecoder().decode(recipe.jetbrainsFormat()))
-          .replaceAll("\r\n", LINE_SEPARATOR);
+        String unprocessedCode = new String(Base64.getDecoder().decode(recipeJetBrainsFormat))
+                .replaceAll("\r\n", LINE_SEPARATOR);
         // DataContext is exposed easily in Actions, in other places like this, we need to look for it
         DataManager.getInstance().getDataContextFromFocusAsync().onSuccess(context -> {
-          final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(context);
-          // process supported variables dynamically
-          final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
-          String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
-          String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs) + "\n";
+            final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(context);
+            // process supported variables dynamically
+            final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
+            String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
+            String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs) + "\n";
 
-          /**
-           * Insert the code
-           */
-          EditorModificationUtil.insertStringAtCaret(insertionContext.getEditor(), indentedCode);
-          insertionContext.commitDocument();
+            /**
+             * Insert the code
+             */
+            EditorModificationUtil.insertStringAtCaret(insertionContext.getEditor(), indentedCode);
+            insertionContext.commitDocument();
 
-          /**
-           * Insert all imports
-           */
-          List<String> imports = recipe.imports();
-          try {
+            /**
+             * Insert all imports
+             */
+            try {
 
-              WriteCommandAction.writeCommandAction(project).run(
-                  (ThrowableRunnable<Throwable>) () -> {
-                      int firstInsertion = firstPositionToInsert(currentCode, recipe.language());
+                WriteCommandAction.writeCommandAction(project).run(
+                        (ThrowableRunnable<Throwable>) () -> {
+                            int firstInsertion = firstPositionToInsert(currentCode, language);
 
-                      for(String importStatement: imports) {
-                          if(!hasImport(currentCode, importStatement, recipe.language())) {
+                            for(String importStatement: imports) {
+                                if(!hasImport(currentCode, importStatement, language)) {
 
-                              String dependencyStatement = importStatement + LINE_SEPARATOR;
-                              document.insertString(firstInsertion, dependencyStatement);
-                          }
-                      }
-                  }
-              );
-          } catch (Throwable e) {
-              e.printStackTrace();
-              LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
-              LOGGER.error(e);
-          }
+                                    String dependencyStatement = importStatement + LINE_SEPARATOR;
+                                    document.insertString(firstInsertion, dependencyStatement);
+                                }
+                            }
+                        }
+                );
+            } catch (Throwable e) {
+                e.printStackTrace();
+                LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+                LOGGER.error(e);
+            }
 
-          // sent a callback that the recipe has been used.
-          long recipeId = ((BigDecimal) recipe.id()).longValue();
-          codigaApi.recordRecipeUse(recipeId);
+            // sent a callback that the recipe has been used.
+            long recipeIdLong = (recipeId).longValue();
+            codigaApi.recordRecipeUse(recipeIdLong);
         });
     }
 
@@ -147,7 +166,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
 
         String currentLine = "";
         if(lineEnd > lineStart + 1){
-            currentLine = editor.getDocument().getText(new TextRange(lineStart, lineEnd - 1));
+            currentLine = editor.getDocument().getText(new TextRange(lineStart, lineEnd));
         }
         final boolean usesTabs = detectIfTabs(currentLine);
         final int indentationCurrentLine = usesTabs
@@ -162,14 +181,12 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             return;
         }
 
-        if (!currentLine.chars().allMatch(c -> Character.isLetterOrDigit(c) || Character.isSpaceChar(c))) {
-            LOGGER.debug(String.format("not all characters are alphanumeric for String |%s|", currentLine));
+        int column = editor.getCaretModel().getCurrentCaret().getCaretModel().getVisualPosition().getColumn();
+
+        if (currentLine.charAt(column - 1) != '.') {
             return;
         }
-
-        // Get all recipes parameters.
-        final List<String> keywords = Arrays.asList(currentLine.split(" ")).stream().filter(p -> !p.isEmpty())
-          .collect(Collectors.toList());
+        Optional<String> keyword = getKeywordFromLine(currentLine, column - 1);
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
         List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile())
@@ -177,8 +194,8 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
           .collect(Collectors.toList());
         final String filename = virtualFile.getName();
         // Get the recipes from the API.
-        List<GetRecipesForClientQuery.GetRecipesForClient> recipes = codigaApi.getRecipesForClient(
-            keywords,
+        List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = codigaApi.getRecipesForClientByShotcurt(
+                keyword,
             dependenciesName,
             Optional.empty(),
             language,
@@ -190,20 +207,14 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
          * We take only the top three recipes (they come ranked in order from the API).
          * For each of them, add a completion item and add a routine to insert the code.
          */
-        for (GetRecipesForClientQuery.GetRecipesForClient recipe : recipes.stream()
-          .limit(NUMBER_OF_RECIPES_TO_KEEP_FOR_COMPLETION).collect(Collectors.toList())) {
-          List<String> recipeKeywords = new ArrayList<>(recipe.keywords());
-          if (recipe.shortcut() != null) {
-            recipeKeywords.add(recipe.shortcut());
-          }
-
-
-          String lookup = String.join(" ", recipeKeywords);
+        for (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe : recipes) {
 
           LookupElementBuilder element = LookupElementBuilder
             .create(recipe.name())
-            .withTypeText(String.join(",", recipeKeywords))
-            .withLookupString(lookup)
+            .withTypeText(recipe.shortcut())
+            .withCaseSensitivity(false)
+            .withPresentableText(recipe.name())
+            .withLookupString(recipe.shortcut())
             .withInsertHandler((insertionContext, lookupElement) -> {
               addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext, usesTabs);
             })

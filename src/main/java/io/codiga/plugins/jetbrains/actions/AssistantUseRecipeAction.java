@@ -3,6 +3,7 @@ package io.codiga.plugins.jetbrains.actions;
 import com.github.rjeschke.txtmark.Processor;
 import com.intellij.ui.components.JBScrollPane;
 import io.codiga.api.GetRecipesForClientQuery;
+import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
@@ -76,7 +77,7 @@ public class AssistantUseRecipeAction extends AnAction {
     private long lastRequestTimestamp = 0;
     private final List<RangeHighlighter> highlighters = new ArrayList<>();
 
-    List<GetRecipesForClientQuery.GetRecipesForClient> currentRecipes = null;
+    List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> currentRecipes = null;
 
     DependencyManagement dependencyManagement = new DependencyManagement();
 
@@ -144,7 +145,7 @@ public class AssistantUseRecipeAction extends AnAction {
             return;
         }
 
-        GetRecipesForClientQuery.GetRecipesForClient recipe = currentRecipes.get(currentRecipeIndex);
+        GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch recipe = currentRecipes.get(currentRecipeIndex);
 
         // Get the code from the recipe and remove all \r\n which are not use by IntelliJ
         String unprocessedCode = new String(Base64.getDecoder().decode(recipe.jetbrainsFormat())).replaceAll("\r\n", LINE_SEPARATOR);
@@ -164,7 +165,10 @@ public class AssistantUseRecipeAction extends AnAction {
         // reindent the code based on the indentation of the current line.
         String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs);
         String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
-        String finalDescriptionWithLink = finalDescription + String.format("\n\n[%s](https://app.codiga.io/marketplace/recipe/%s/view)", "View Recipe on Codiga", recipe.id());
+        String shortcutText = recipe.shortcut().length() == 0 ? "no shortcut" : "`"+recipe.shortcut()+"`";
+        String finalDescriptionWithLink = finalDescription +
+                String.format("\n\nShortcut: %s\n\n", shortcutText) +
+                String.format("\n\n[%s](https://app.codiga.io/hub/recipe/%s/view)", "View Recipe on Codiga", recipe.id());
 
 
         String html = Processor.process(finalDescriptionWithLink, codigaMarkdownDecorator);
@@ -237,10 +241,9 @@ public class AssistantUseRecipeAction extends AnAction {
 
         // get the keywords and get them as a list.
         String text = searchTextfield.getText();
-        java.util.List<String> keywords = Arrays.<String>asList(text.split(" "));
 
         // if there is no keywords, just reset.
-        if(keywords.isEmpty() || searchTextfield.getText().length() == 0) {
+        if(text.isEmpty()) {
             removeAddedCode(anActionEvent);
             currentRecipes = null;
             currentRecipeIndex = 0;
@@ -261,12 +264,13 @@ public class AssistantUseRecipeAction extends AnAction {
                 filename = psiFile.getVirtualFile().getName();
             }
 
-            currentRecipes = codigaApi.getRecipesForClient(
-                    keywords,
+            currentRecipes = codigaApi.getRecipesSemantic(
+                    Optional.ofNullable(text),
                     dependenciesName,
                     Optional.empty(),
                     language,
                     filename);
+
             currentRecipeIndex = 0;
             updateButtonState();
 
@@ -300,7 +304,7 @@ public class AssistantUseRecipeAction extends AnAction {
          * Record the use of the recipe.
          */
         if (currentRecipes != null && currentRecipeIndex <= currentRecipes.size()) {
-            GetRecipesForClientQuery.GetRecipesForClient insertedRecipe = currentRecipes.get(currentRecipeIndex);
+            GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch insertedRecipe = currentRecipes.get(currentRecipeIndex);
             if (insertedRecipe != null)
             {
                 long recipeId = ((BigDecimal) insertedRecipe.id()).longValue();

@@ -184,6 +184,79 @@ public final class CodigaApiImpl implements CodigaApi {
         return apiRequest.getData().orElse(ImmutableList.of());
     }
 
+    @Override
+    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+        ApiRequest<List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+        final Input<String> termParameter = term.map(Input::fromNullable).orElse(Input.absent());
+
+
+        ApolloQueryCall<GetRecipesForClientByShortcutQuery.Data> queryCall = apolloClient.query(
+                        new GetRecipesForClientByShortcutQuery(fingerprint, Input.fromNullable(filename), termParameter, dependencies, Input.absent(), language))
+                .toBuilder()
+                .requestHeaders(getHeaders())
+                .build();
+        queryCall.enqueue(
+                new ApolloCall.Callback<GetRecipesForClientByShortcutQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<GetRecipesForClientByShortcutQuery.Data> response) {
+                        if (response.getData() == null) {
+                            apiRequest.setError();
+                        } else {
+                            apiRequest.setData(response.getData().getRecipesForClientByShortcut());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        apiRequest.setError();
+                    }
+                });
+
+        return apiRequest.getData().orElse(ImmutableList.of());
+    }
+
+    @Override
+    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+        ApiRequest<List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+        final Input<String> termParameter = term.map(Input::fromNullable).orElse(Input.absent());
+
+
+        ApolloQueryCall<GetRecipesForClientSemanticQuery.Data> queryCall = apolloClient.query(
+                        new GetRecipesForClientSemanticQuery(
+                                termParameter, Input.fromNullable(filename),
+                                dependencies, Input.absent(),
+                                Input.optional(ImmutableList.of(language)),
+                                100,
+                                0))
+                .toBuilder()
+                .requestHeaders(getHeaders())
+                .build();
+        queryCall.enqueue(
+                new ApolloCall.Callback<GetRecipesForClientSemanticQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<GetRecipesForClientSemanticQuery.Data> response) {
+                        if (response.getData() == null) {
+                            apiRequest.setError();
+                        } else {
+                            apiRequest.setData(response.getData().assistantRecipesSemanticSearch());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        apiRequest.setError();
+                    }
+                });
+
+        return apiRequest.getData().orElse(ImmutableList.of());
+    }
+
     /**
      * Get all the data from the API for a specific file
      *
