@@ -4,6 +4,7 @@ import io.codiga.api.type.LanguageEnumeration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static io.codiga.plugins.jetbrains.Constants.*;
 
@@ -112,5 +113,20 @@ public final class CodePositionUtils {
             }
         }
         return start;
+    }
+
+    public static Optional<String> getKeywordFromLine(String line, int position) {
+        if (line == null) {
+            return Optional.empty();
+        }
+        int startPosition = position;
+        while (startPosition > 0 && line.charAt(startPosition) != ' ') {
+
+            startPosition = startPosition - 1;
+        }
+        if (line.charAt(startPosition) == ' ') {
+            startPosition = startPosition + 1;
+        }
+        return Optional.of(line.substring(startPosition, position + 1));
     }
 }

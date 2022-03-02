@@ -15,6 +15,17 @@
 
 ### Security
 
+## [1.3.1]
+
+### Added
+
+ * Handle getting shortcut by typing `.`
+ * Recipe search is now done semantically
+
+### Changed
+
+ * Replace URL from marketplace to hub
+
 ## [1.3.0]
 ### Added
 

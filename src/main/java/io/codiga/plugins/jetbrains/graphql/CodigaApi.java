@@ -53,6 +53,18 @@ public interface CodigaApi {
                                                                                   LanguageEnumeration language,
                                                                                   String filename);
 
+    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term,
+                                                                                  List<String> dependencies,
+                                                                                  Optional<String> parameters,
+                                                                                  LanguageEnumeration language,
+                                                                                  String filename);
+
+    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term,
+                                                                                                     List<String> dependencies,
+                                                                                                     Optional<String> parameters,
+                                                                                                     LanguageEnumeration language,
+                                                                                                     String filename);
+
     /**
      * Get all the data from the API for a specific file
      *
