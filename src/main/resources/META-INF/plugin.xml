@@ -123,6 +123,14 @@
     </extensions>
 
     <actions>
+        <action id="com.code_inspector.plugins.intellij.actions.AssistantListShortcuts"
+                class="io.codiga.plugins.jetbrains.actions.AssistantListShortcuts"
+                text="Codiga: Shortcuts" description="List all shortcuts"
+                icon="CodigaIcons.Codiga_default_icon">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <override-text place="MainMenu" text="Codiga Shortcuts"/>
+            <keyboard-shortcut first-keystroke="control alt S" keymap="$default"/>
+        </action>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction"
                 class="io.codiga.plugins.jetbrains.actions.AssistantUseRecipeAction"
                 text="Codiga: Assistant" description="Search for Codiga suggestions"
@@ -130,7 +138,6 @@
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <override-text place="MainMenu" text="Codiga Assistant"/>
             <keyboard-shortcut first-keystroke="control alt C" keymap="$default"/>
-            <mouse-shortcut keystroke="control button3 doubleClick" keymap="$default"/>
         </action>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
                 class="io.codiga.plugins.jetbrains.actions.AssistantCreateRecipeAction"

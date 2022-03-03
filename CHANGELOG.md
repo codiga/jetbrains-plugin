@@ -15,6 +15,12 @@
 
 ### Security
 
+## [1.3.2]
+
+### Added
+
+ * List of shortcuts (CMD + ALT + S)
+
 ## [1.3.1]
 
 ### Added
