@@ -2,7 +2,6 @@ package io.codiga.plugins.jetbrains.actions;
 
 import com.github.rjeschke.txtmark.Processor;
 import com.intellij.ui.components.JBScrollPane;
-import io.codiga.api.GetRecipesForClientQuery;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
@@ -45,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LINE_SEPARATOR;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasImport;
 import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
 
@@ -85,43 +85,6 @@ public class AssistantUseRecipeAction extends AnAction {
     // the user finished typing.
     java.util.Timer timer = new java.util.Timer();
 
-    /**
-     * Remove the code that was previously added when browsing a recipe.
-     * Remove the added code from the editor.
-     * @param anActionEvent
-     */
-    public void removeAddedCode(AnActionEvent anActionEvent) {
-        Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
-        if (editor == null) {
-            return;
-        }
-        Project project = anActionEvent.getProject();
-        Document document = editor.getDocument();
-
-        if (document == null || project == null) {
-            LOGGER.info("showCurrentRecipe - editor, project or document is null");
-            return;
-        }
-
-        if(codeInserted) {
-            try{
-                WriteCommandAction.writeCommandAction(project).run(
-                        (ThrowableRunnable<Throwable>) () -> {
-                            int deletedLength = 0;
-                            for(CodeInsertion codeInsertion: codeInsertions) {
-                                document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
-                                deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());
-                            }
-
-                            codeInsertions.clear();
-                            codeInserted = false;
-                        }
-                );
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * Show the current recipe. The current recipe is stored in
@@ -165,7 +128,7 @@ public class AssistantUseRecipeAction extends AnAction {
         // reindent the code based on the indentation of the current line.
         String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs);
         String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
-        String shortcutText = recipe.shortcut().length() == 0 ? "no shortcut" : "`"+recipe.shortcut()+"`";
+        String shortcutText = (recipe.shortcut() == null || recipe.shortcut().length() == 0) ? "no shortcut" : "`"+recipe.shortcut()+"`";
         String finalDescriptionWithLink = finalDescription +
                 String.format("\n\nShortcut: %s\n\n", shortcutText) +
                 String.format("\n\n[%s](https://app.codiga.io/hub/recipe/%s/view)", "View Recipe on Codiga", recipe.id());
@@ -181,70 +144,26 @@ public class AssistantUseRecipeAction extends AnAction {
         String descriptionLabelText = String.format("result %s/%s: %s", currentRecipeIndex + 1, currentRecipes.size(), recipe.name());
         jLabelResults.setText(descriptionLabelText);
 
-        // add the code and update global variables to indicate code has been inserted.
-        try {
-            WriteCommandAction.writeCommandAction(project).run(
-                    (ThrowableRunnable<Throwable>) () -> {
-                        List<String> imports = recipe.imports();
-                        int editorOffset = editor.getCaretModel().getOffset();
-                        int firstInsertion = firstPositionToInsert(currentCode, recipe.language());
-                        int lengthInsertedForImport = 0;
-
-                        for(String importStatement: imports) {
-                            if(!hasImport(currentCode, importStatement, recipe.language())) {
-
-                                String dependencyStatement = importStatement + LINE_SEPARATOR;
-
-                                codeInsertions.add(new CodeInsertion(
-                                        dependencyStatement,
-                                        firstInsertion + lengthInsertedForImport,
-                                        firstInsertion + lengthInsertedForImport + dependencyStatement.length()));
-                                lengthInsertedForImport = lengthInsertedForImport + dependencyStatement.length();
-                            }
-                        }
-
-                        int startOffset = editorOffset + lengthInsertedForImport;
-                        int endOffset = startOffset + indentedCode.length();
-                        codeInsertions.add(new CodeInsertion(indentedCode, startOffset, endOffset));
-
-                        codeInserted = true;
-
-                        for (CodeInsertion codeInsertion: codeInsertions) {
-                            document.insertString(codeInsertion.getPositionStart(), codeInsertion.getCode());
-
-                            RangeHighlighter newHighlighter = editor.getMarkupModel()
-                                    .addRangeHighlighter(codeInsertion.getPositionStart(), codeInsertion.getPositionStart() + codeInsertion.getCode().length(), 0,
-                                            new TextAttributes(JBColor.black, JBColor.WHITE, JBColor.PINK, EffectType.ROUNDED_BOX, 13),
-                                            HighlighterTargetArea.EXACT_RANGE);
-                            highlighters.add(newHighlighter);
-                        }
-                    }
-            );
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
-            LOGGER.error(e);
-        }
+        addRecipeToEditor(anActionEvent, codeInsertions, highlighters, recipe.imports(), recipe.jetbrainsFormat(), recipe.language());
     }
 
     public void updateSuggestions(AnActionEvent anActionEvent){
         // Get the language to prepare the request
         VirtualFile virtualFile = anActionEvent.getDataContext().getData(LangDataKeys.VIRTUAL_FILE);
-        PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
 
         if (virtualFile == null){
             LOGGER.error("updateSuggestions - cannot get virtualFile");
             return;
         }
 
-        LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
+        LanguageEnumeration language = getLanguageFromEditorForEvent(anActionEvent);
 
         // get the keywords and get them as a list.
         String text = searchTextfield.getText();
 
         // if there is no keywords, just reset.
         if(text.isEmpty()) {
-            removeAddedCode(anActionEvent);
+            removeAddedCode(anActionEvent, codeInsertions, highlighters);
             currentRecipes = null;
             currentRecipeIndex = 0;
             jLabelResults.setText(ENTER_SEARCH_TERM_TEXT);
@@ -255,14 +174,8 @@ public class AssistantUseRecipeAction extends AnAction {
 
         // get the list of keywords from the API
         try{
-            List<String> dependenciesName = dependencyManagement.getDependencies(psiFile).stream().map(d -> d.getName()).collect(Collectors.toList());
-
-            String filename = null;
-
-            if (psiFile.getVirtualFile() != null)
-            {
-                filename = psiFile.getVirtualFile().getName();
-            }
+            List<String> dependenciesName = getDependenciesFromEditorForEvent(anActionEvent);
+            String filename = getFilenameFromEditorForEvent(anActionEvent);
 
             currentRecipes = codigaApi.getRecipesSemantic(
                     Optional.ofNullable(text),
@@ -286,48 +199,7 @@ public class AssistantUseRecipeAction extends AnAction {
         }
     }
 
-    /**
-     * Apply the recipe. We send a callback to the API and
-     * remove all highlighted code in the editor.
-     *
-     * @param anActionEvent
-     */
-    private void applyRecipe(AnActionEvent anActionEvent){
-        Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
 
-        if (editor == null) {
-            LOGGER.warn("applyRecipe - editor is null");
-            return;
-        }
-
-        /**
-         * Record the use of the recipe.
-         */
-        if (currentRecipes != null && currentRecipeIndex <= currentRecipes.size()) {
-            GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch insertedRecipe = currentRecipes.get(currentRecipeIndex);
-            if (insertedRecipe != null)
-            {
-                long recipeId = ((BigDecimal) insertedRecipe.id()).longValue();
-                codigaApi.recordRecipeUse(recipeId);
-            } else {
-                LOGGER.warn("applyRecipe - inserted recipe is null");
-            }
-        }
-
-        // reset global variables so that current recipes are not kept in memory.
-        currentRecipes = null;
-        currentRecipeIndex = 0;
-        codeInserted = false;
-        codeInsertions.clear();
-
-        // remmove the highlighted code.
-        for (RangeHighlighter rangeHighlighter: highlighters) {
-            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
-        }
-        highlighters.clear();
-
-        windowWrapper.close();
-    }
 
     /**
      * Cancel any change done in the editor.
@@ -343,7 +215,7 @@ public class AssistantUseRecipeAction extends AnAction {
         highlighters.clear();
 
         if(currentRecipes != null && currentRecipeIndex < currentRecipes.size()) {
-            removeAddedCode(event);
+            removeAddedCode(event, codeInsertions, highlighters);
         }
         currentRecipes = null;
         currentRecipeIndex = 0;
@@ -449,7 +321,18 @@ public class AssistantUseRecipeAction extends AnAction {
          * Listener to apply the recipe when pressing enter.
          */
         searchTextfield.addActionListener(l -> {
-            applyRecipe(event);
+            if(currentRecipes != null && currentRecipeIndex <= currentRecipes.size()) {
+                GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch insertedRecipe = currentRecipes.get(currentRecipeIndex);
+                if(insertedRecipe != null){
+                    long recipeId = ((BigDecimal) insertedRecipe.id()).longValue();
+                    currentRecipes = null;
+                    currentRecipeIndex = 0;
+                    codeInserted = false;
+                    applyRecipe(event, recipeId, codeInsertions, highlighters, codigaApi);
+                    windowWrapper.close();
+                }
+            }
+
         });
 
         searchTextfield.getDocument().addDocumentListener(new DocumentListener() {
@@ -462,7 +345,7 @@ public class AssistantUseRecipeAction extends AnAction {
                     public void run() {
                         // make sure the latest request is the one updating the UI
                         if(thisRequestTimestamp == lastRequestTimestamp) {
-                            removeAddedCode(event);
+                            removeAddedCode(event, codeInsertions, highlighters);
                             updateSuggestions(event);
                         }
                     }
@@ -478,7 +361,7 @@ public class AssistantUseRecipeAction extends AnAction {
                     public void run() {
                         // make sure the latest request is the one updating the UI
                         if(thisRequestTimestamp == lastRequestTimestamp) {
-                            removeAddedCode(event);
+                            removeAddedCode(event, codeInsertions, highlighters);
                             updateSuggestions(event);
                         }
                     }
@@ -506,7 +389,17 @@ public class AssistantUseRecipeAction extends AnAction {
         okButton.setEnabled(false);
         okButton.setToolTipText("apply the code recipe");
         okButton.addActionListener( a -> {
-            applyRecipe(event);
+            if(currentRecipes != null && currentRecipeIndex <= currentRecipes.size()) {
+                GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch insertedRecipe = currentRecipes.get(currentRecipeIndex);
+                if(insertedRecipe != null){
+                    long recipeId = ((BigDecimal) insertedRecipe.id()).longValue();
+                    currentRecipes = null;
+                    currentRecipeIndex = 0;
+                    codeInserted = false;
+                    applyRecipe(event, recipeId, codeInsertions, highlighters, codigaApi);
+                    windowWrapper.close();
+                }
+            }
         });
 
         nextButton = new JButton(AllIcons.General.ArrowRight);
@@ -515,7 +408,7 @@ public class AssistantUseRecipeAction extends AnAction {
         nextButton.setToolTipText("go to next suggestion");
         nextButton.addActionListener( a -> {
             if(currentRecipes != null && currentRecipeIndex < currentRecipes.size()) {
-                removeAddedCode(event);
+                removeAddedCode(event, codeInsertions, highlighters);
                 currentRecipeIndex = currentRecipeIndex + 1;
                 showCurrentRecipe(event);
                 updateButtonState();
@@ -527,7 +420,7 @@ public class AssistantUseRecipeAction extends AnAction {
         previousButton.setEnabled(false);
         previousButton.addActionListener( a -> {
             if(currentRecipeIndex > 0) {
-                removeAddedCode(event);
+                removeAddedCode(event, codeInsertions, highlighters);
                 currentRecipeIndex = currentRecipeIndex - 1;
                 showCurrentRecipe(event);
                 updateButtonState();
