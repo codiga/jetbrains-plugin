@@ -9,6 +9,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.util.List;
 
+/**
+ * In the shortcut finder, we sort/search the shortcuts by prefix. This listener
+ * listens to the changes in the document and filter the list of element in the
+ * shortcuts list.
+ */
 public class SearchDocumentListener implements DocumentListener {
     private JBTextField jbTextField;
     private JBList jbList;
@@ -23,7 +28,6 @@ public class SearchDocumentListener implements DocumentListener {
     private void filterElements() {
         RecipeListModel model = (RecipeListModel)jbList.getModel();
         String term = jbTextField.getText().toLowerCase();
-        System.out.println("term: " + term);
         if(term.isEmpty()) {
             for (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe: allRecipes) {
                 if(!model.hasRecipe(recipe)) {

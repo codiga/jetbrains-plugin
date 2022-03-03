@@ -16,6 +16,10 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.addRecipeToEditor;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
 
+/**
+ * Listener for the list of recipes being shown. It updates the current editor with
+ * the recipe inside based on what is being shown.
+ */
 public class RecipeListSelectionListener implements ListSelectionListener {
     private JBList jbList;
     private AnActionEvent anActionEvent;

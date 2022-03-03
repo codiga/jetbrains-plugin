@@ -20,6 +20,10 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.applyRecipe;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
 
+/**
+ * Mouse listener put on the list that insert the recipe
+ * when we double click on it.
+ */
 public class RecipeListMouseListener implements MouseListener {
 
     private JBList jbList;

@@ -81,16 +81,16 @@ public class ActionUtils {
             return;
         }
 
-        for (RangeHighlighter rangeHighlighter: highlighters) {
-            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
-        }
+
 
         if(!codeInsertions.isEmpty()) {
             try{
                 WriteCommandAction.writeCommandAction(project).run(
                     (ThrowableRunnable<Throwable>) () -> {
                         int deletedLength = 0;
-
+                        for (RangeHighlighter rangeHighlighter: highlighters) {
+                            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+                        }
                         for(CodeInsertion codeInsertion: codeInsertions) {
                             document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
                             deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());

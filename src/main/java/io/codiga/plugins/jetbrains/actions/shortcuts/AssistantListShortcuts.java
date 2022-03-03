@@ -105,8 +105,8 @@ public class AssistantListShortcuts extends AnAction {
                 .setDimensionServiceKey("Codiga.Shortcut") // key to remember the dimension on the local client
                 .build();
 
-        windowWrapper.getWindow().setPreferredSize(new Dimension(800, 300));
-        windowWrapper.getWindow().setSize(new Dimension(800, 300));
+        windowWrapper.getWindow().setPreferredSize(new Dimension(780, 270));
+        windowWrapper.getWindow().setSize(new Dimension(780, 270));
 
 
         // Add listeners
