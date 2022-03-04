@@ -74,9 +74,7 @@ public class SearchDocumentListener implements DocumentListener {
             learnMoreButton.setEnabled(true);
             learnMoreButton.addActionListener(e -> {
                 try {
-
                     Desktop.getDesktop().browse(new URI(url));
-
                 } catch (IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                 }

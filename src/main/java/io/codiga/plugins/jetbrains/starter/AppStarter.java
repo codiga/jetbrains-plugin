@@ -17,7 +17,13 @@ import io.codiga.plugins.jetbrains.settings.application.AppSettingsConfigurable;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.graphql.Constants.CODING_ASSISTANT_DOCUMENTATION_URL;
 
 /**
  * Start this code after the project is initialized.
@@ -82,8 +88,8 @@ public class AppStarter implements StartupActivity {
             FileEditorManager.getInstance(project) != null &&
             FileEditorManager.getInstance(project).getSelectedEditor() != null) {
             notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
-                .createNotification("Get started with Codiga Coding Assistant", NotificationType.INFORMATION)
-                .setSubtitle("Search, import and share reusable code snippets in your IDE")
+                .createNotification("Use CMD + ALT + S for shortcuts, CMD + ALT + C for searching.", NotificationType.INFORMATION)
+                .setTitle("Codiga Coding Assistant")
                 .addAction(new AnAction("Snippets") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -108,13 +114,14 @@ public class AppStarter implements StartupActivity {
 
                     }
                 })
-                .addAction(new AnAction("Hide") {
+                .addAction(new AnAction("Doc") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                        if (notification != null) {
-                            notification.hideBalloon();
+                        try {
+                            Desktop.getDesktop().browse(new URI(CODING_ASSISTANT_DOCUMENTATION_URL));
+                        } catch (IOException | URISyntaxException e1) {
+                            e1.printStackTrace();
                         }
-
                     }
                 })
                 .addAction(new AnAction("Hide Forever") {
