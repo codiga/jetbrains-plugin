@@ -74,7 +74,13 @@ public class AppStarter implements StartupActivity {
             }
         }
 
-        if(appSettingsState.getShowDialogOnboarding()) {
+        /**
+         * Make sure one editor is being opened at the file. Otherwise, the Coding Assistant cannot get the context
+         * and will crash.
+         */
+        if(appSettingsState.getShowDialogOnboarding() &&
+            FileEditorManager.getInstance(project) != null &&
+            FileEditorManager.getInstance(project).getSelectedEditor() != null) {
             notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
                 .createNotification("Get started with Codiga Coding Assistant", NotificationType.INFORMATION)
                 .setSubtitle("Search, import and share reusable code snippets in your IDE")

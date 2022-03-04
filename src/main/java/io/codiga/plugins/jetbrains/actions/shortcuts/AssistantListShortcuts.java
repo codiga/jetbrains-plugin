@@ -59,11 +59,17 @@ public class AssistantListShortcuts extends AnAction {
 
 
         JPanel panelTop = new JPanel(); // contains search text
+        JPanel panelMiddle = new JPanel();
         JPanel panelBottom = new JPanel();
+        panelBottom.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        JButton learnMoreButton = new JButton("Learn More");
+        learnMoreButton.setEnabled(false);
+        panelBottom.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, CodigaIcons.Codiga_default_icon.getIconWidth() - 5));
+        panelBottom.add(learnMoreButton);
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = codigaApi.getRecipesForClientByShotcurt(Optional.empty(), dependenciesName, Optional.empty(), language, filename);
 
         JBList jbList = new JBList(new RecipeListModel(recipes));
-        jbList.addListSelectionListener(new RecipeListSelectionListener(jbList, event, codeInsertions, highlighters));
+        jbList.addListSelectionListener(new RecipeListSelectionListener(jbList, event, codeInsertions, highlighters, learnMoreButton));
 
 
         JLabel codigaLabel = new JLabel(CodigaIcons.Codiga_default_icon);
@@ -72,7 +78,7 @@ public class AssistantListShortcuts extends AnAction {
         JBTextField jTextField = new JBTextField(63);
         jTextField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, CodigaIcons.Codiga_default_icon.getIconWidth() + 10));
 
-        jTextField.getDocument().addDocumentListener(new SearchDocumentListener(jbList, jTextField, recipes));
+        jTextField.getDocument().addDocumentListener(new SearchDocumentListener(jbList, jTextField, learnMoreButton, recipes));
 
         jTextField.setTextToTriggerEmptyTextStatus("enter search");
         jTextField.setToolTipText("Search term for recipes");
@@ -89,24 +95,25 @@ public class AssistantListShortcuts extends AnAction {
         jbList.setEmptyText("No recipes found");
         JBScrollPane jbScrollPane = new JBScrollPane(jbList);
         jbScrollPane.setPreferredSize(new Dimension(800 - (CodigaIcons.Codiga_default_icon.getIconWidth() + 10) * 2 , 200));
-        panelBottom.add(jbScrollPane);
+        panelMiddle.add(jbScrollPane);
 
 
         JPanel jPanelMain = new JPanel();
         jPanelMain.setLayout(new BoxLayout(jPanelMain, BoxLayout.Y_AXIS));
         jPanelMain.add(panelTop);
+        jPanelMain.add(panelMiddle);
         jPanelMain.add(panelBottom);
 
 
         // Build the main window to keep it with an IntelliJ style
         windowWrapper = new WindowWrapperBuilder(WindowWrapper.Mode.FRAME, jPanelMain)
                 .setProject(event.getDataContext().getData(LangDataKeys.PROJECT))
-                .setTitle("Codiga Coding Assistant")
+                .setTitle("Codiga Coding Assistant - Shortcuts")
                 .setDimensionServiceKey("Codiga.Shortcut") // key to remember the dimension on the local client
                 .build();
 
-        windowWrapper.getWindow().setPreferredSize(new Dimension(780, 270));
-        windowWrapper.getWindow().setSize(new Dimension(780, 270));
+        windowWrapper.getWindow().setPreferredSize(new Dimension(780, 290));
+        windowWrapper.getWindow().setSize(new Dimension(780, 290));
 
 
         // Add listeners

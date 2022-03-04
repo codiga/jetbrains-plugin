@@ -5,8 +5,16 @@ import com.intellij.ui.components.JBTextField;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.plugins.jetbrains.actions.shortcuts.model.RecipeListModel;
 
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -17,16 +25,22 @@ import java.util.List;
 public class SearchDocumentListener implements DocumentListener {
     private JBTextField jbTextField;
     private JBList jbList;
+    private JButton learnMoreButton;
     private List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> allRecipes;
 
-    public SearchDocumentListener(JBList jbList, JBTextField jbTextField, List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> allRecipes){
+    public SearchDocumentListener(JBList jbList,
+                                  JBTextField jbTextField,
+                                  JButton learnMoreButton,
+                                  List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> allRecipes){
         this.jbList = jbList;
         this.jbTextField = jbTextField;
         this.allRecipes = allRecipes;
+        this.learnMoreButton = learnMoreButton;
     }
 
     private void filterElements() {
         RecipeListModel model = (RecipeListModel)jbList.getModel();
+        learnMoreButton.setEnabled(false);
         String term = jbTextField.getText().toLowerCase();
         if(term.isEmpty()) {
             for (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe: allRecipes) {
@@ -50,6 +64,26 @@ public class SearchDocumentListener implements DocumentListener {
         }
         if(jbList.getItemsCount() > 0) {
             jbList.setSelectedIndex(0);
+            GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut selectedItem = (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut) jbList.getSelectedValue();
+            long recipeId = ((BigDecimal)selectedItem.id()).longValue();
+            String url = String.format("https://app.codiga.io/hub/recipe/%s/view", recipeId);
+
+            for(ActionListener actionListener: learnMoreButton.getActionListeners()){
+                learnMoreButton.removeActionListener(actionListener);
+            }
+            learnMoreButton.setEnabled(true);
+            learnMoreButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+
+                        Desktop.getDesktop().browse(new URI(url));
+
+                    } catch (IOException | URISyntaxException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            });
         }
         model.sortList();
         jbList.repaint();
