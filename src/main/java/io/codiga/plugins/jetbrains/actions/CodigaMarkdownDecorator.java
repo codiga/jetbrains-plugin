@@ -22,4 +22,13 @@ public class CodigaMarkdownDecorator extends DefaultDecorator {
         out.append(style);
         out.append(">");
     }
+
+    @Override
+    public void openListItem(final StringBuilder out)
+    {
+
+        out.append("<li");
+        out.append(style);
+        out.append(">");
+    }
 }

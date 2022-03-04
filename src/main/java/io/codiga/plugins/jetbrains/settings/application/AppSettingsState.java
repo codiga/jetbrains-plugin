@@ -33,6 +33,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     private Boolean useCompletion = true;
     @Tag
     private Boolean showDialogApiNotification = true;
+    @Tag
+    private Boolean showDialogOnboarding = true;
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
@@ -50,6 +52,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     }
 
     public Boolean getShowDialogApiNotification() { return this.showDialogApiNotification; }
+
+    public Boolean getShowDialogOnboarding() { return this.showDialogOnboarding; }
 
     public String getAccessKey() {
         return this.accessKey;
@@ -81,6 +85,7 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     public void setShowDialogApiNotification(Boolean b) { this.showDialogApiNotification = b;}
 
+    public void setShowDialogOnboarding(Boolean b) { this.showDialogOnboarding = b;}
 
     @Nullable
     @Override
