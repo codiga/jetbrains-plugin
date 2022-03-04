@@ -39,6 +39,10 @@ import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.getIndentation
 
 public class ActionUtils {
 
+    private ActionUtils() {
+        // empty constructor to avoid building new object
+    }
+
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     public final static LanguageEnumeration getLanguageFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {

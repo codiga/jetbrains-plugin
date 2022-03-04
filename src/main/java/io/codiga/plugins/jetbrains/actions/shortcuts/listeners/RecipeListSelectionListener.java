@@ -32,11 +32,11 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
  * the recipe inside based on what is being shown.
  */
 public class RecipeListSelectionListener implements ListSelectionListener {
-    private JBList jbList;
-    private AnActionEvent anActionEvent;
-    private List<CodeInsertion> codeInsertions;
-    private List<RangeHighlighter> highlighters;
-    private JButton learnMoreButton;
+    private final JBList jbList;
+    private final AnActionEvent anActionEvent;
+    private final List<CodeInsertion> codeInsertions;
+    private final List<RangeHighlighter> highlighters;
+    private final JButton learnMoreButton;
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -73,9 +73,7 @@ public class RecipeListSelectionListener implements ListSelectionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-
                     Desktop.getDesktop().browse(new URI(url));
-
                 } catch (IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                 }

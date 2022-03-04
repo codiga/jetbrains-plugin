@@ -20,12 +20,12 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
 
 public class SearchKeyListener implements KeyListener {
 
-    private JBList jbList;
-    private AnActionEvent anActionEvent;
-    private List<CodeInsertion> codeInsertions;
-    private List<RangeHighlighter> highlighters;
-    private WindowWrapper windowWrapper;
-    private CodigaApi codigaApi;
+    private final JBList jbList;
+    private final AnActionEvent anActionEvent;
+    private final List<CodeInsertion> codeInsertions;
+    private final List<RangeHighlighter> highlighters;
+    private final WindowWrapper windowWrapper;
+    private final CodigaApi codigaApi;
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -45,7 +45,7 @@ public class SearchKeyListener implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
+        // empty because of implements an interface
     }
 
     @Override
@@ -88,6 +88,6 @@ public class SearchKeyListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        // empty because of implements an interface
     }
 }

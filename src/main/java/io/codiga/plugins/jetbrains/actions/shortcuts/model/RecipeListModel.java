@@ -35,12 +35,12 @@ public class RecipeListModel implements ListModel {
 
     @Override
     public void addListDataListener(ListDataListener l) {
-
+        // empty because of implements an interface
     }
 
     @Override
     public void removeListDataListener(ListDataListener l) {
-
+        // empty because of implements an interface
     }
 
 
@@ -58,11 +58,6 @@ public class RecipeListModel implements ListModel {
     }
 
     public void sortList() {
-        recipes.sort(new Comparator<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut>() {
-            @Override
-            public int compare(GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut o1, GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut o2) {
-                return o1.shortcut().compareTo(o2.shortcut());
-            }
-        });
+        recipes.sort(Comparator.comparing(GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut::shortcut));
     }
 }

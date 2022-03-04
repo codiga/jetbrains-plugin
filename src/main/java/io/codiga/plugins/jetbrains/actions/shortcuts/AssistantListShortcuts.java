@@ -39,23 +39,20 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 public class AssistantListShortcuts extends AnAction {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private List<CodeInsertion> codeInsertions;
-    private List<RangeHighlighter> highlighters;
+
 
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
     // UI elements
     private WindowWrapper windowWrapper; // Window Wrapper that looks like IntelliJ
 
-
-
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         LanguageEnumeration language = getLanguageFromEditorForEvent(event);
         String filename = getFilenameFromEditorForEvent(event);
         List<String> dependenciesName = getDependenciesFromEditorForEvent(event);
-        highlighters = new ArrayList<>();
-        codeInsertions = new ArrayList<CodeInsertion>();
+        List<RangeHighlighter> highlighters = new ArrayList<>();
+        List<CodeInsertion> codeInsertions = new ArrayList<CodeInsertion>();
 
 
         JPanel panelTop = new JPanel(); // contains search text

@@ -23,10 +23,10 @@ import java.util.List;
  * shortcuts list.
  */
 public class SearchDocumentListener implements DocumentListener {
-    private JBTextField jbTextField;
-    private JBList jbList;
-    private JButton learnMoreButton;
-    private List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> allRecipes;
+    private final JBTextField jbTextField;
+    private final JBList jbList;
+    private final JButton learnMoreButton;
+    private final List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> allRecipes;
 
     public SearchDocumentListener(JBList jbList,
                                   JBTextField jbTextField,
@@ -84,7 +84,6 @@ public class SearchDocumentListener implements DocumentListener {
         }
         model.sortList();
         jbList.repaint();
-
     }
 
     @Override
@@ -99,6 +98,6 @@ public class SearchDocumentListener implements DocumentListener {
 
     @Override
     public void changedUpdate(DocumentEvent e) {
-
+        // empty because of implements an interface
     }
 }
