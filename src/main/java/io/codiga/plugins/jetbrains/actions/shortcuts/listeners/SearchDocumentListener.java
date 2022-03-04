@@ -72,16 +72,13 @@ public class SearchDocumentListener implements DocumentListener {
                 learnMoreButton.removeActionListener(actionListener);
             }
             learnMoreButton.setEnabled(true);
-            learnMoreButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
+            learnMoreButton.addActionListener(e -> {
+                try {
 
-                        Desktop.getDesktop().browse(new URI(url));
+                    Desktop.getDesktop().browse(new URI(url));
 
-                    } catch (IOException | URISyntaxException e1) {
-                        e1.printStackTrace();
-                    }
+                } catch (IOException | URISyntaxException e1) {
+                    e1.printStackTrace();
                 }
             });
         }
