@@ -16,7 +16,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ThrowableRunnable;
-import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
@@ -26,7 +25,6 @@ import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
 import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,8 +52,7 @@ public class ActionUtils {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
         String filename = null;
 
-        if (psiFile.getVirtualFile() != null)
-        {
+        if (psiFile.getVirtualFile() != null) {
             filename = psiFile.getVirtualFile().getName();
         }
         return filename;
@@ -84,8 +81,6 @@ public class ActionUtils {
             LOGGER.info("showCurrentRecipe - editor, project or document is null");
             return;
         }
-
-
 
         if(!codeInsertions.isEmpty()) {
             try{
@@ -130,9 +125,7 @@ public class ActionUtils {
         int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
         String currentLine = document.getText(new TextRange(document.getLineStartOffset(selectedLine), document.getLineEndOffset(selectedLine)));
         final boolean usesTabs = detectIfTabs(currentLine);
-        int indentationCurrentLine = usesTabs
-            ? getIndentation(currentLine, true)
-            : getIndentation(currentLine, false);
+        int indentationCurrentLine = getIndentation(currentLine, usesTabs);
 
         String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs);
 
@@ -144,15 +137,13 @@ public class ActionUtils {
                     int firstInsertion = firstPositionToInsert(currentCode, recipeLanguage);
                     int lengthInsertedForImport = 0;
 
-                    for(String importStatement: recipeImports) {
-                        if(!hasImport(currentCode, importStatement, recipeLanguage)) {
-
+                    for (String importStatement : recipeImports) {
+                        if (!hasImport(currentCode, importStatement, recipeLanguage)) {
                             String dependencyStatement = importStatement + LINE_SEPARATOR;
-
                             codeInsertions.add(new CodeInsertion(
-                                dependencyStatement,
-                                firstInsertion + lengthInsertedForImport,
-                                firstInsertion + lengthInsertedForImport + dependencyStatement.length()));
+                                    dependencyStatement,
+                                    firstInsertion + lengthInsertedForImport,
+                                    firstInsertion + lengthInsertedForImport + dependencyStatement.length()));
                             lengthInsertedForImport = lengthInsertedForImport + dependencyStatement.length();
                         }
                     }
@@ -189,27 +180,19 @@ public class ActionUtils {
                                    Long recipeId,
                                    List<CodeInsertion> codeInsertions,
                                    List<RangeHighlighter> highlighters,
-                                   CodigaApi codigaApi){
+                                   CodigaApi codigaApi) {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
-
         if (editor == null) {
             LOGGER.warn("applyRecipe - editor is null");
             return;
         }
-
-
         codigaApi.recordRecipeUse(recipeId);
-
-
         codeInsertions.clear();
-
-        // remmove the highlighted code.
-        for (RangeHighlighter rangeHighlighter: highlighters) {
+        // remove the highlighted code.
+        for (RangeHighlighter rangeHighlighter : highlighters) {
             editor.getMarkupModel().removeHighlighter(rangeHighlighter);
         }
         highlighters.clear();
-
     }
-
 
 }

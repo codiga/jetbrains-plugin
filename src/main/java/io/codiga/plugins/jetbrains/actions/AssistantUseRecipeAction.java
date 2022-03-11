@@ -1,31 +1,28 @@
 package io.codiga.plugins.jetbrains.actions;
 
 import com.github.rjeschke.txtmark.Processor;
-import com.intellij.ui.components.JBScrollPane;
-import io.codiga.api.GetRecipesForClientSemanticQuery;
-import io.codiga.api.type.LanguageEnumeration;
-import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
-import io.codiga.plugins.jetbrains.graphql.CodigaApi;
-import io.codiga.plugins.jetbrains.model.CodeInsertion;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.*;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.ui.WindowWrapperBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ThrowableRunnable;
 import icons.CodigaIcons;
-import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.api.GetRecipesForClientSemanticQuery;
+import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
+import io.codiga.plugins.jetbrains.graphql.CodigaApi;
+import io.codiga.plugins.jetbrains.model.CodeInsertion;
 import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
 import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
 import org.jetbrains.annotations.NotNull;
@@ -36,16 +33,15 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
-import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static io.codiga.plugins.jetbrains.Constants.LINE_SEPARATOR;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
-import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasImport;
 import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
 
 /**
@@ -62,7 +58,7 @@ public class AssistantUseRecipeAction extends AnAction {
     // UI elements
     private JTextField searchTextfield;
     private WindowWrapper windowWrapper; // Window Wrapper that looks like IntelliJ
-    private JLabel jLabelResults = new JLabel(ENTER_SEARCH_TERM_TEXT);
+    private final JLabel jLabelResults = new JLabel(ENTER_SEARCH_TERM_TEXT);
     private JButton nextButton = null;
     private JButton previousButton = null;
     private JButton okButton = null;
@@ -79,8 +75,6 @@ public class AssistantUseRecipeAction extends AnAction {
 
     List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> currentRecipes = null;
 
-    DependencyManagement dependencyManagement = new DependencyManagement();
-
     // used to get the list of recipes, trigger the recipes 500 ms after
     // the user finished typing.
     java.util.Timer timer = new java.util.Timer();
@@ -93,15 +87,16 @@ public class AssistantUseRecipeAction extends AnAction {
      */
     public void showCurrentRecipe(AnActionEvent anActionEvent) {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
-        Project project = anActionEvent.getProject();
-        Document document = editor.getDocument();
-        String currentCode = document.getText();
-
-        if (editor == null || project == null || document == null) {
-            LOGGER.info("showCurrentRecipe - editor, project or document is null");
+        if (Objects.isNull(editor)) {
+            LOGGER.info("showCurrentRecipe - editor is null");
             return;
         }
-
+        Project project = anActionEvent.getProject();
+        Document document = editor.getDocument();
+        if (Objects.isNull(project) || Objects.isNull(document)) {
+            LOGGER.info("showCurrentRecipe - project or document is null");
+            return;
+        }
         // make sure there are enough elements in the array.
         if (currentRecipeIndex >= currentRecipes.size()) {
             LOGGER.warn("showCurrentRecipe - incorrect recipe index");
@@ -121,12 +116,9 @@ public class AssistantUseRecipeAction extends AnAction {
         int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
         String currentLine = document.getText(new TextRange(document.getLineStartOffset(selectedLine), document.getLineEndOffset(selectedLine)));
         final boolean usesTabs = detectIfTabs(currentLine);
-        int indentationCurrentLine = usesTabs
-          ? getIndentation(currentLine, true)
-          : getIndentation(currentLine, false);
+        int indentationCurrentLine = getIndentation(currentLine, usesTabs);
 
         // reindent the code based on the indentation of the current line.
-        String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs);
         String finalDescription = recipe.description().length() == 0 ? "no description" : recipe.description();
         String shortcutText = (recipe.shortcut() == null || recipe.shortcut().length() == 0) ? "no shortcut" : "`"+recipe.shortcut()+"`";
         String finalDescriptionWithLink = finalDescription +
@@ -138,9 +130,7 @@ public class AssistantUseRecipeAction extends AnAction {
         jEditorPane.setContentType("text/html");
         jEditorPane.setText(html);
 
-
         // Update the label in the box with the description.
-
         String descriptionLabelText = String.format("result %s/%s: %s", currentRecipeIndex + 1, currentRecipes.size(), recipe.name());
         jLabelResults.setText(descriptionLabelText);
 
@@ -151,7 +141,7 @@ public class AssistantUseRecipeAction extends AnAction {
         // Get the language to prepare the request
         VirtualFile virtualFile = anActionEvent.getDataContext().getData(LangDataKeys.VIRTUAL_FILE);
 
-        if (virtualFile == null){
+        if (virtualFile == null) {
             LOGGER.error("updateSuggestions - cannot get virtualFile");
             return;
         }
@@ -162,7 +152,7 @@ public class AssistantUseRecipeAction extends AnAction {
         String text = searchTextfield.getText();
 
         // if there is no keywords, just reset.
-        if(text.isEmpty()) {
+        if (text.isEmpty()) {
             removeAddedCode(anActionEvent, codeInsertions, highlighters);
             currentRecipes = null;
             currentRecipeIndex = 0;
@@ -187,7 +177,7 @@ public class AssistantUseRecipeAction extends AnAction {
             currentRecipeIndex = 0;
             updateButtonState();
 
-            if(currentRecipes.isEmpty()) {
+            if (currentRecipes.isEmpty()) {
                 LOGGER.info("updateSuggestions - no suggestion");
                 jLabelResults.setText("no result");
             } else {
@@ -208,13 +198,13 @@ public class AssistantUseRecipeAction extends AnAction {
     private void cancelChanges(@NotNull AnActionEvent event) {
         Editor editor = event.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
 
-        // remmove the highlighted code.
+        // remove the highlighted code.
         for (RangeHighlighter rangeHighlighter: highlighters) {
             editor.getMarkupModel().removeHighlighter(rangeHighlighter);
         }
         highlighters.clear();
 
-        if(currentRecipes != null && currentRecipeIndex < currentRecipes.size()) {
+        if (currentRecipes != null && currentRecipeIndex < currentRecipes.size()) {
             removeAddedCode(event, codeInsertions, highlighters);
         }
         currentRecipes = null;
@@ -227,7 +217,7 @@ public class AssistantUseRecipeAction extends AnAction {
      * making them active or inactive based on the recipe index.
      */
     public void updateButtonState() {
-        if(currentRecipes == null || currentRecipes.isEmpty()) {
+        if (currentRecipes == null || currentRecipes.isEmpty()) {
             nextButton.setEnabled(false);
             previousButton.setEnabled(false);
             okButton.setEnabled(false);
@@ -238,19 +228,17 @@ public class AssistantUseRecipeAction extends AnAction {
         okButton.setEnabled(true);
 
         // detect if we are at the beginning of the recipe selection.
-        if(previousButton != null && currentRecipeIndex == 0){
+        if (previousButton != null && currentRecipeIndex == 0) {
             previousButton.setEnabled(false);
-            if (currentRecipeIndex < currentRecipes.size() - 1)
-            {
+            if (currentRecipeIndex < currentRecipes.size() - 1) {
                 nextButton.setEnabled(true);
             }
             return;
         }
 
         // detect if we are at the end of the recipe selection.
-        if(nextButton != null && currentRecipeIndex == (currentRecipes.size() - 1)){
-            if (currentRecipeIndex > 0)
-            {
+        if (nextButton != null && currentRecipeIndex == (currentRecipes.size() - 1)) {
+            if (currentRecipeIndex > 0) {
                 previousButton.setEnabled(true);
             }
             nextButton.setEnabled(false);
@@ -321,9 +309,9 @@ public class AssistantUseRecipeAction extends AnAction {
          * Listener to apply the recipe when pressing enter.
          */
         searchTextfield.addActionListener(l -> {
-            if(currentRecipes != null && currentRecipeIndex <= currentRecipes.size()) {
+            if (currentRecipes != null && currentRecipeIndex <= currentRecipes.size()) {
                 GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch insertedRecipe = currentRecipes.get(currentRecipeIndex);
-                if(insertedRecipe != null){
+                if (insertedRecipe != null) {
                     long recipeId = ((BigDecimal) insertedRecipe.id()).longValue();
                     currentRecipes = null;
                     currentRecipeIndex = 0;
@@ -344,7 +332,7 @@ public class AssistantUseRecipeAction extends AnAction {
                     @Override
                     public void run() {
                         // make sure the latest request is the one updating the UI
-                        if(thisRequestTimestamp == lastRequestTimestamp) {
+                        if (thisRequestTimestamp == lastRequestTimestamp) {
                             removeAddedCode(event, codeInsertions, highlighters);
                             updateSuggestions(event);
                         }
@@ -360,7 +348,7 @@ public class AssistantUseRecipeAction extends AnAction {
                     @Override
                     public void run() {
                         // make sure the latest request is the one updating the UI
-                        if(thisRequestTimestamp == lastRequestTimestamp) {
+                        if (thisRequestTimestamp == lastRequestTimestamp) {
                             removeAddedCode(event, codeInsertions, highlighters);
                             updateSuggestions(event);
                         }

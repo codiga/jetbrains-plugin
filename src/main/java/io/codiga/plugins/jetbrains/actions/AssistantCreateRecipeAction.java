@@ -1,9 +1,5 @@
 package io.codiga.plugins.jetbrains.actions;
 
-import com.intellij.codeInsight.template.Expression;
-import com.intellij.codeInsight.template.impl.TextExpression;
-import com.intellij.codeInsight.template.macro.EscapeStringMacro;
-import com.intellij.formatting.Indent;
 import io.codiga.api.type.LanguageEnumeration;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -57,14 +53,12 @@ public class AssistantCreateRecipeAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
 
-        /**
-         * Get the file and editor that is being active.
-         */
+        // Get the file and editor that is being active.
         VirtualFile virtualFile = anActionEvent.getDataContext().getData(LangDataKeys.VIRTUAL_FILE);
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
 
         // If no file or editor, just return
-        if (virtualFile == null || editor == null){
+        if (virtualFile == null || editor == null) {
             return;
         }
 

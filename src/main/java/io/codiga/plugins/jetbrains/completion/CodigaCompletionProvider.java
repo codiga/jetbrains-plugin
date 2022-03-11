@@ -6,7 +6,6 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -20,13 +19,13 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.ThrowableRunnable;
 import icons.CodigaIcons;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
-import io.codiga.api.GetRecipesForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
 import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
+import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +41,7 @@ import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
  * Provide completion when the user type some code on one line.
  *
  * We just take completion only when the line constraints only words (alphanumeric content).
- * That avoids to trigger the completion all the time.
+ * That avoids triggering the completion all the time.
  *
  */
 public class CodigaCompletionProvider extends CompletionProvider<CompletionParameters> {
@@ -107,17 +106,12 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
             String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs) + "\n";
 
-            /**
-             * Insert the code
-             */
+            // Insert the code
             EditorModificationUtil.insertStringAtCaret(insertionContext.getEditor(), indentedCode);
             insertionContext.commitDocument();
 
-            /**
-             * Insert all imports
-             */
+             // Insert all imports
             try {
-
                 WriteCommandAction.writeCommandAction(project).run(
                         (ThrowableRunnable<Throwable>) () -> {
                             int firstInsertion = firstPositionToInsert(currentCode, language);
@@ -155,7 +149,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                                   @NotNull CompletionResultSet result) {
         LOGGER.debug("Triggering completion");
 
-        if(!AppSettingsState.getInstance().getUseCompletion()) {
+        if (!AppSettingsState.getInstance().getUseCompletion()) {
             LOGGER.debug("completion deactivated");
             return;
         }
@@ -165,18 +159,16 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         final int lineEnd = editor.getCaretModel().getVisualLineEnd();
 
         String currentLine = "";
-        if(lineEnd > lineStart + 1){
+        if (lineEnd > lineStart + 1) {
             currentLine = editor.getDocument().getText(new TextRange(lineStart, lineEnd));
         }
         final boolean usesTabs = detectIfTabs(currentLine);
-        final int indentationCurrentLine = usesTabs
-          ? getIndentation(currentLine, true)
-          : getIndentation(currentLine, false);
+        final int indentationCurrentLine = getIndentation(currentLine, usesTabs);
 
         // clean tab indentation to correctly look for completion results
         currentLine = currentLine.replace("\t", "");
 
-        if (currentLine.length() < MINIMUM_LINE_LENGTH_TO_TRIGGER_AUTOCOMPLETION){
+        if (currentLine.length() < MINIMUM_LINE_LENGTH_TO_TRIGGER_AUTOCOMPLETION) {
             LOGGER.debug(String.format("string too small |%s|", currentLine));
             return;
         }
@@ -190,7 +182,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
         List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile())
-          .stream().map(d -> d.getName())
+          .stream().map(Dependency::getName)
           .collect(Collectors.toList());
         final String filename = virtualFile.getName();
         // Get the recipes from the API.
@@ -203,7 +195,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
 
         LOGGER.debug(String.format("found %s recipes", recipes.size()));
 
-        /**
+        /*
          * We take only the top three recipes (they come ranked in order from the API).
          * For each of them, add a completion item and add a routine to insert the code.
          */
@@ -215,11 +207,9 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             .withCaseSensitivity(false)
             .withPresentableText(recipe.name())
             .withLookupString(recipe.shortcut())
-            .withInsertHandler((insertionContext, lookupElement) -> {
-              addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext, usesTabs);
-            })
+            .withInsertHandler((insertionContext, lookupElement) ->
+                    addRecipeInEditor(recipe, indentationCurrentLine, parameters, insertionContext, usesTabs))
             .withIcon(CodigaIcons.Codiga_default_icon);
-
 
           result.addElement(element);
         }
