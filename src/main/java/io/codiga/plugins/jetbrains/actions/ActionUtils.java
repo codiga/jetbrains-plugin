@@ -17,6 +17,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ThrowableRunnable;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.actions.use_recipe.CodeInsertionContext;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
@@ -45,15 +46,35 @@ public class ActionUtils {
 
     public final static LanguageEnumeration getLanguageFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         VirtualFile virtualFile = anActionEvent.getDataContext().getData(LangDataKeys.VIRTUAL_FILE);
+        if (virtualFile == null) {
+            return LanguageEnumeration.UNKNOWN;
+        }
         return(LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath()));
     }
 
     public final static String getFilenameFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
+
+        if (psiFile == null || psiFile.getVirtualFile() == null) {
+            return null;
+        }
+
+        return psiFile.getName();
+    }
+
+    public final static String getRelativeFilenamePathFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
+        PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
         String filename = null;
 
         if (psiFile.getVirtualFile() != null) {
-            filename = psiFile.getVirtualFile().getName();
+            String canonicalPath = psiFile.getVirtualFile().getCanonicalPath();
+            String projectPath = psiFile.getProject().getBasePath();
+
+            String relativePath = canonicalPath.replace(projectPath, "");
+            if(relativePath.startsWith("/")) {
+                relativePath = relativePath.substring(1);
+            }
+            return relativePath;
         }
         return filename;
     }
@@ -104,6 +125,55 @@ public class ActionUtils {
         }
     }
 
+    /**
+     * Remove the code that was previously added when browsing a recipe.
+     * Remove the added code from the editor.
+     * @param anActionEvent
+     */
+    public static void removeAddedCode(AnActionEvent anActionEvent, CodeInsertionContext context) {
+        Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
+
+        if (editor == null) {
+            return;
+        }
+        Project project = anActionEvent.getProject();
+        Document document = editor.getDocument();
+
+        if (project == null) {
+            LOGGER.info("showCurrentRecipe - editor, project or document is null");
+            return;
+        }
+
+        if(!context.getCodeInsertions().isEmpty()) {
+            try{
+                WriteCommandAction.writeCommandAction(project).run(
+                    (ThrowableRunnable<Throwable>) () -> {
+                        int deletedLength = 0;
+                        for (RangeHighlighter rangeHighlighter: context.getHighlighters()) {
+                            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+                        }
+                        for(CodeInsertion codeInsertion: context.getCodeInsertions()) {
+                            document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
+                            deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());
+                        }
+
+                        context.clearInsertions();
+                    }
+                );
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public static void addRecipeToEditor(AnActionEvent anActionEvent,
+                                         CodeInsertionContext codeInsertionContext,
+                                         List<String> recipeImports,
+                                         String recipeCodeJetBrainsFormat,
+                                         LanguageEnumeration recipeLanguage) {
+        addRecipeToEditor(anActionEvent, codeInsertionContext.getCodeInsertions(), codeInsertionContext.getHighlighters(), recipeImports, recipeCodeJetBrainsFormat, recipeLanguage);
+    }
 
     public static void addRecipeToEditor(AnActionEvent anActionEvent,
                                          List<CodeInsertion> codeInsertions,
@@ -193,6 +263,30 @@ public class ActionUtils {
             editor.getMarkupModel().removeHighlighter(rangeHighlighter);
         }
         highlighters.clear();
+    }
+
+    /**
+     * Apply the recipe. We send a callback to the API and
+     * remove all highlighted code in the editor.
+     *
+     * @param anActionEvent
+     */
+    public static void applyRecipe(AnActionEvent anActionEvent,
+                                   Long recipeId,
+                                   CodeInsertionContext codeInsertionContext,
+                                   CodigaApi codigaApi) {
+        Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
+        if (editor == null) {
+            LOGGER.warn("applyRecipe - editor is null");
+            return;
+        }
+        codigaApi.recordRecipeUse(recipeId);
+        codeInsertionContext.getCodeInsertions().clear();
+        // remove the highlighted code.
+        for (RangeHighlighter rangeHighlighter : codeInsertionContext.getHighlighters()) {
+            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+        }
+        codeInsertionContext.clearAll();
     }
 
 }

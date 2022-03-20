@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.actions;
+package io.codiga.plugins.jetbrains.actions.create_recipe;
 
 import io.codiga.api.type.LanguageEnumeration;
 import com.intellij.openapi.actionSystem.AnAction;
