@@ -3,7 +3,7 @@ package io.codiga.plugins.jetbrains.git;
 import io.codiga.plugins.jetbrains.model.FileLinePair;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import com.intellij.openapi.diff.impl.patch.TextFilePatch;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

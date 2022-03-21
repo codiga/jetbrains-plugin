@@ -288,7 +288,7 @@ public class AssistantUseRecipeAction extends AnAction {
          *
          */
 
-        ModalityState modalityState = ModalityState.stateForComponent(editor.getComponent());
+        ModalityState modalityState = ModalityState.stateForComponent(editor.getComponent().getRootPane());
         System.out.println(modalityState);
 
 
@@ -300,6 +300,7 @@ public class AssistantUseRecipeAction extends AnAction {
                 }
             }
         });
+
 
         popup.invoke(new ChooseByNamePopupComponent.Callback() {
 
