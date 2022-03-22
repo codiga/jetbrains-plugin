@@ -39,6 +39,10 @@ We sometimes derive from it and that's okay.
 
 See instructions [here](https://www.apollographql.com/docs/android/essentials/get-started-java/)
 
+```shell
+./gradlew :downloadApolloSchema --endpoint='https://api.codiga.io/graphql' --schema=schema.json
+```
+
 ## Relevant documentation
 
  - [IntelliJ Plugin documentation](https://plugins.jetbrains.com/docs/intellij/basics.html)

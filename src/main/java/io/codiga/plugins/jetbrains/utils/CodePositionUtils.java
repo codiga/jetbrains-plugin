@@ -116,6 +116,7 @@ public final class CodePositionUtils {
     }
 
     public static Optional<String> getKeywordFromLine(String line, int position) {
+
         if (line == null) {
             return Optional.empty();
         }
@@ -124,7 +125,7 @@ public final class CodePositionUtils {
 
             startPosition = startPosition - 1;
         }
-        if (line.charAt(startPosition) == ' ') {
+        if (startPosition > 0 && line.charAt(startPosition) == ' ') {
             startPosition = startPosition + 1;
         }
         return Optional.of(line.substring(startPosition, position + 1));

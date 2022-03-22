@@ -29,14 +29,11 @@ public class RecipeChooseByNameItemProvider implements ChooseByNameItemProvider 
 
     @Override
     public @NotNull List<String> filterNames(@NotNull ChooseByNameViewModel chooseByNameViewModel, String @NotNull [] strings, @NotNull String s) {
-        System.out.println("filter names");
         return null;
     }
 
     @Override
     public boolean filterElements(@NotNull ChooseByNameViewModel chooseByNameViewModel, @NotNull String s, boolean b, @NotNull ProgressIndicator progressIndicator, @NotNull Processor<Object> processor) {
-        System.out.println("filterElements");
-        System.out.println(String.format("search |%s|", s));
 
         String toSearch = s.isEmpty() ? null : s;
 
@@ -60,7 +57,6 @@ public class RecipeChooseByNameItemProvider implements ChooseByNameItemProvider 
             language,
             filename);
 
-        System.out.println(newRecipes.size());
 
         newRecipes.forEach(r -> processor.process(r));
 

@@ -12,11 +12,11 @@ public class VariableTransformerMonthTwoDigits implements VariableTransformer {
    * Get month name (two digits only)
    *
    * @param code
-   * @param CodigaTransformationContext
+   * @param codigaTransformationContext
    * @return code with replaced value
    */
   @Override
-  public String transform(String code, CodingAssistantContext CodigaTransformationContext){
+  public String transform(String code, CodingAssistantContext codigaTransformationContext){
     final Calendar calendar = Calendar.getInstance();
     final Date date = calendar.getTime();
     return code.replace(CodingAssistantContext.DATE_MONTH_TWO_DIGITS,

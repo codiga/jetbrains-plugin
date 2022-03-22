@@ -5,9 +5,9 @@ import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
 public interface VariableTransformer {
   /**
    * @param code
-   * @param CodigaTransformationContext
+   * @param codigaTransformationContext
    * @return string with equivalent values between Codiga's recipe variables
    * and local expected result.
    */
-  public String transform(String code, CodingAssistantContext CodigaTransformationContext);
+  public String transform(String code, CodingAssistantContext codigaTransformationContext);
 }

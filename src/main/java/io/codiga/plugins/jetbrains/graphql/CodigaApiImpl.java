@@ -16,7 +16,9 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.codiga.api.type.AnalysisResultStatus.DONE;
@@ -216,6 +218,45 @@ public final class CodigaApiImpl implements CodigaApi {
                 });
 
         return apiRequest.getData().orElse(ImmutableList.of());
+    }
+
+    @Override
+    public Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language) {
+        ApiRequest<Optional<Long>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+
+
+        ApolloQueryCall<GetRecipesForClientByShortcutLastTimestampQuery.Data> queryCall = apolloClient.query(
+                new GetRecipesForClientByShortcutLastTimestampQuery(fingerprint, dependencies, language))
+            .toBuilder()
+            .requestHeaders(getHeaders())
+            .build();
+        queryCall.enqueue(
+            new ApolloCall.Callback<GetRecipesForClientByShortcutLastTimestampQuery.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<GetRecipesForClientByShortcutLastTimestampQuery.Data> response) {
+                    if (response.getData() == null) {
+                        apiRequest.setError();
+                    } else {
+                        Object responseObject = response.getData().getRecipesForClientByShortcutLastTimestamp();
+                        if (responseObject != null) {
+                            Long longValue = ((BigDecimal)responseObject).longValue();
+                            apiRequest.setData(Optional.of(longValue));
+                        } else {
+                            apiRequest.setData(Optional.empty());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    apiRequest.setError();
+                }
+            });
+
+        return apiRequest.getData().orElse(Optional.empty());
     }
 
     @Override

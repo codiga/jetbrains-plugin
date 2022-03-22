@@ -84,7 +84,6 @@ public class RecipeChooseByNameModel implements ChooseByNameModel {
                 GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch recipe = (GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch) value;
                 long recipeId = ((BigDecimal)recipe.id()).longValue();
                 if(isSelected && (!codeInsertionContext.getCurrentRecipeId().isPresent() || codeInsertionContext.getCurrentRecipeId().get().longValue() != recipeId)){
-                    System.out.println(String.format("selected recipe: %s", recipe.name()));
                     removeAddedCode(anActionEvent, codeInsertionContext);
                     addRecipeToEditor(anActionEvent,
                         codeInsertionContext,
@@ -109,7 +108,6 @@ public class RecipeChooseByNameModel implements ChooseByNameModel {
 
     @Override
     public Object @NotNull [] getElementsByName(@NotNull String s, boolean b, @NotNull String s1) {
-        System.out.println("getElementsByName");
         return new Object[0];
     }
 

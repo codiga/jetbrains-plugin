@@ -55,7 +55,7 @@ public final class AnalysisParametersJavascript {
      */
     public static Optional<String> getAnalysisParameters(PsiFile psiFile) {
         JavascriptDependency javascriptDependency = new JavascriptDependency();
-        List<Dependency> dependencies = javascriptDependency.getDependencies(psiFile);
+        List<Dependency> dependencies = javascriptDependency.getDependencies(psiFile.getProject());
         return getParametersFromDependencies(dependencies);
     }
 }

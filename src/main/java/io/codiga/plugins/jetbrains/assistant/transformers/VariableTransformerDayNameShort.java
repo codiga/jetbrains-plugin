@@ -12,11 +12,11 @@ public class VariableTransformerDayNameShort implements VariableTransformer {
    * Get the name of weekday shortened
    *
    * @param code
-   * @param CodigaTransformationContext
+   * @param codigaTransformationContext
    * @return code with replaced value
    */
   @Override
-  public String transform(String code, CodingAssistantContext CodigaTransformationContext){
+  public String transform(String code, CodingAssistantContext codigaTransformationContext){
     final Calendar calendar = Calendar.getInstance();
     final Date date = calendar.getTime();
     return code.replace(CodingAssistantContext.DATE_DAY_NAME_SHORT,

@@ -30,6 +30,7 @@ public class CodePositionUtilsTest extends TestBase {
   public void testGetKeywordFromLine() {
     assertEquals(CodePositionUtils.getKeywordFromLine("bla bli blo.", 11), Optional.of("blo."));
     assertEquals(CodePositionUtils.getKeywordFromLine("bla bli blo.", 2), Optional.of("bla"));
+    assertEquals(CodePositionUtils.getKeywordFromLine(".bla.", 4), Optional.of(".bla."));
     assertEquals(CodePositionUtils.getKeywordFromLine(null, 11), Optional.empty());
   }
 }

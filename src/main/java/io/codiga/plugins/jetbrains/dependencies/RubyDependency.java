@@ -27,7 +27,6 @@ public class RubyDependency extends AbstractDependency{
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
             while ((line = bufferedReader.readLine()) != null){
-                System.out.println(line);
                 // if there is a comment, do not use
                 if (line.contains("#")) {
                     continue;

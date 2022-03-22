@@ -166,6 +166,11 @@ public final class CodigaApiTest implements CodigaApi {
     }
 
     @Override
+    public Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language) {
+        return Optional.empty();
+    }
+
+    @Override
     public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
         return null;
     }

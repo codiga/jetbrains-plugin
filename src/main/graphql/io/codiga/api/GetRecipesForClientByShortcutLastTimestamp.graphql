@@ -1,0 +1,5 @@
+query GetRecipesForClientByShortcutLastTimestamp($fingerprint: String, $dependencies: [String!]!, $language: LanguageEnumeration!){
+  getRecipesForClientByShortcutLastTimestamp(fingerprint: $fingerprint, dependencies:$dependencies, language:$language)
+}
+
+

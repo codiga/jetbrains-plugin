@@ -42,4 +42,11 @@ public class ShortcutCacheKey {
     public int hashCode() {
         return Objects.hash(language, filename, dependencies);
     }
+
+
+    public List<String> getDependencies() { return this.dependencies; };
+
+    public LanguageEnumeration getLanguage() { return this.language; };
+
+    public String getFilename() { return this.filename; };
 }

@@ -2,6 +2,7 @@ package io.codiga.plugins.jetbrains.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -13,6 +14,7 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ThrowableRunnable;
@@ -52,6 +54,10 @@ public class ActionUtils {
         return(LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath()));
     }
 
+    public final static LanguageEnumeration getLanguageFromEditorForVirtualFile(@NotNull VirtualFile virtualFile) {
+        return(LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath()));
+    }
+
     public final static String getFilenameFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
 
@@ -64,25 +70,25 @@ public class ActionUtils {
 
     public final static String getRelativeFilenamePathFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
-        String filename = null;
+        return getRelativeFilenamePathFromEditorForVirtualFile(psiFile.getProject(), psiFile.getVirtualFile());
+    }
 
-        if (psiFile.getVirtualFile() != null) {
-            String canonicalPath = psiFile.getVirtualFile().getCanonicalPath();
-            String projectPath = psiFile.getProject().getBasePath();
+    public final static String getRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+        String canonicalPath = virtualFile.getCanonicalPath();
+        String projectPath = project.getBasePath();
 
-            String relativePath = canonicalPath.replace(projectPath, "");
-            if(relativePath.startsWith("/")) {
-                relativePath = relativePath.substring(1);
-            }
-            return relativePath;
+        String relativePath = canonicalPath.replace(projectPath, "");
+        if(relativePath.startsWith("/")) {
+            relativePath = relativePath.substring(1);
         }
-        return filename;
+        return relativePath;
+
     }
 
     public final static List<String> getDependenciesFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
         DependencyManagement dependencyManagement = new DependencyManagement();
-        return dependencyManagement.getDependencies(psiFile).stream().map(d -> d.getName()).collect(Collectors.toList());
+        return dependencyManagement.getDependencies(psiFile.getProject(), psiFile.getVirtualFile()).stream().map(d -> d.getName()).collect(Collectors.toList());
     }
 
     /**
@@ -145,24 +151,26 @@ public class ActionUtils {
         }
 
         if(!context.getCodeInsertions().isEmpty()) {
-            try{
-                WriteCommandAction.writeCommandAction(project).run(
-                    (ThrowableRunnable<Throwable>) () -> {
-                        int deletedLength = 0;
-                        for (RangeHighlighter rangeHighlighter: context.getHighlighters()) {
-                            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
-                        }
-                        for(CodeInsertion codeInsertion: context.getCodeInsertions()) {
-                            document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
-                            deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());
-                        }
+            ApplicationManager.getApplication().invokeLater(() -> {
+                try {
+                    WriteCommandAction.writeCommandAction(project).run(
+                        (ThrowableRunnable<Throwable>) () -> {
+                            int deletedLength = 0;
+                            for (RangeHighlighter rangeHighlighter : context.getHighlighters()) {
+                                editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+                            }
+                            for (CodeInsertion codeInsertion : context.getCodeInsertions()) {
+                                document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
+                                deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());
+                            }
 
-                        context.clearInsertions();
-                    }
-                );
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+                            context.clearInsertions();
+                        }
+                    );
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 
@@ -182,6 +190,7 @@ public class ActionUtils {
                                          String recipeCodeJetBrainsFormat,
                                          LanguageEnumeration recipeLanguage) {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
+        PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
         Project project = anActionEvent.getProject();
         Document document = editor.getDocument();
         String currentCode = document.getText();
@@ -199,45 +208,48 @@ public class ActionUtils {
 
         String indentedCode = indentOtherLines(code, indentationCurrentLine, usesTabs);
 
-        // add the code and update global variables to indicate code has been inserted.
-        try {
-            WriteCommandAction.writeCommandAction(project).run(
-                (ThrowableRunnable<Throwable>) () -> {
-                    int editorOffset = editor.getCaretModel().getOffset();
-                    int firstInsertion = firstPositionToInsert(currentCode, recipeLanguage);
-                    int lengthInsertedForImport = 0;
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // add the code and update global variables to indicate code has been inserted.
+            try {
+                WriteCommandAction.writeCommandAction(project, psiFile).run(
+                    (ThrowableRunnable<Throwable>) () -> {
+                        int editorOffset = editor.getCaretModel().getOffset();
+                        int firstInsertion = firstPositionToInsert(currentCode, recipeLanguage);
+                        int lengthInsertedForImport = 0;
 
-                    for (String importStatement : recipeImports) {
-                        if (!hasImport(currentCode, importStatement, recipeLanguage)) {
-                            String dependencyStatement = importStatement + LINE_SEPARATOR;
-                            codeInsertions.add(new CodeInsertion(
+                        for (String importStatement : recipeImports) {
+                            if (!hasImport(currentCode, importStatement, recipeLanguage)) {
+                                String dependencyStatement = importStatement + LINE_SEPARATOR;
+                                codeInsertions.add(new CodeInsertion(
                                     dependencyStatement,
                                     firstInsertion + lengthInsertedForImport,
                                     firstInsertion + lengthInsertedForImport + dependencyStatement.length()));
-                            lengthInsertedForImport = lengthInsertedForImport + dependencyStatement.length();
+                                lengthInsertedForImport = lengthInsertedForImport + dependencyStatement.length();
+                            }
+                        }
+
+                        int startOffset = editorOffset + lengthInsertedForImport;
+                        int endOffset = startOffset + indentedCode.length();
+                        codeInsertions.add(new CodeInsertion(indentedCode, startOffset, endOffset));
+
+                        for (CodeInsertion codeInsertion: codeInsertions) {
+                            document.insertString(codeInsertion.getPositionStart(), codeInsertion.getCode());
+
+                            RangeHighlighter newHighlighter = editor.getMarkupModel()
+                                .addRangeHighlighter(codeInsertion.getPositionStart(), codeInsertion.getPositionStart() + codeInsertion.getCode().length(), 0,
+                                    new TextAttributes(JBColor.black, JBColor.WHITE, JBColor.PINK, EffectType.ROUNDED_BOX, 13),
+                                    HighlighterTargetArea.EXACT_RANGE);
+                            highlighters.add(newHighlighter);
                         }
                     }
+                );
+            } catch (Throwable e) {
+                e.printStackTrace();
+                LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+                LOGGER.error(e);
+            }
+        });
 
-                    int startOffset = editorOffset + lengthInsertedForImport;
-                    int endOffset = startOffset + indentedCode.length();
-                    codeInsertions.add(new CodeInsertion(indentedCode, startOffset, endOffset));
-
-                    for (CodeInsertion codeInsertion: codeInsertions) {
-                        document.insertString(codeInsertion.getPositionStart(), codeInsertion.getCode());
-
-                        RangeHighlighter newHighlighter = editor.getMarkupModel()
-                            .addRangeHighlighter(codeInsertion.getPositionStart(), codeInsertion.getPositionStart() + codeInsertion.getCode().length(), 0,
-                                new TextAttributes(JBColor.black, JBColor.WHITE, JBColor.PINK, EffectType.ROUNDED_BOX, 13),
-                                HighlighterTargetArea.EXACT_RANGE);
-                        highlighters.add(newHighlighter);
-                    }
-                }
-            );
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
-            LOGGER.error(e);
-        }
     }
 
     /**
@@ -268,6 +280,8 @@ public class ActionUtils {
     /**
      * Apply the recipe. We send a callback to the API and
      * remove all highlighted code in the editor.
+     *
+     * TODO: remove this part
      *
      * @param anActionEvent
      */

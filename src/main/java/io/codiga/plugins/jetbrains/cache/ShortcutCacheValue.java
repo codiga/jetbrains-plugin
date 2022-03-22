@@ -17,9 +17,9 @@ public class ShortcutCacheValue {
      */
     private Long UPDATE_PERIOD_MILLISECONDS = 10000L;
 
-    public ShortcutCacheValue(List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes) {
+    public ShortcutCacheValue(List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes, long timestampServer) {
         this.recipes = recipes;
-        this.lastTimestampFromServer = System.currentTimeMillis();
+        this.lastTimestampFromServer = timestampServer;
         this.lastUpdateTimestamp = System.currentTimeMillis();
     }
 
@@ -39,5 +39,13 @@ public class ShortcutCacheValue {
             return true;
         }
         return false;
+    }
+
+    public long getLastTimestampFromServer() {
+        return this.lastTimestampFromServer;
+    }
+
+    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipes() {
+        return this.recipes;
     }
 }

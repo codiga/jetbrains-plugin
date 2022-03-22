@@ -59,6 +59,8 @@ public interface CodigaApi {
                                                                                   LanguageEnumeration language,
                                                                                   String filename);
 
+    public Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language);
+
     public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term,
                                                                                                      List<String> dependencies,
                                                                                                      Optional<String> parameters,
