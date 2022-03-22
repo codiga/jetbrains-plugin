@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.actions.use_recipe;
+package io.codiga.plugins.jetbrains.actions;
 
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import io.codiga.plugins.jetbrains.model.CodeInsertion;

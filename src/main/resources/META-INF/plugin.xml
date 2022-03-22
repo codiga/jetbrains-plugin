@@ -124,7 +124,7 @@
 
     <actions>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantListShortcuts"
-                class="io.codiga.plugins.jetbrains.actions.shortcuts.AssistantListShortcuts"
+                class="io.codiga.plugins.jetbrains.actions.shortcuts.AssistantListShortcutsAction"
                 text="Codiga: Shortcuts" description="List all shortcuts"
                 icon="CodigaIcons.Codiga_default_icon">
             <add-to-group group-id="ToolsMenu" anchor="first"/>

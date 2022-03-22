@@ -14,12 +14,10 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ThrowableRunnable;
 import io.codiga.api.type.LanguageEnumeration;
-import io.codiga.plugins.jetbrains.actions.use_recipe.CodeInsertionContext;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
@@ -36,7 +34,7 @@ import static io.codiga.plugins.jetbrains.Constants.LINE_SEPARATOR;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasImport;
 import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
-import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.getIndentation;
+import static io.codiga.plugins.jetbrains.utils.RecipeUtils.addRecipeInEditor;
 
 public class ActionUtils {
 
@@ -74,9 +72,9 @@ public class ActionUtils {
     }
 
     public final static String getRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        String canonicalPath = virtualFile.getCanonicalPath();
-        String projectPath = project.getBasePath();
-
+        String canonicalPath = virtualFile.getPresentableUrl();
+        String projectPath = project.getPresentableUrl();
+        
         String relativePath = canonicalPath.replace(projectPath, "");
         if(relativePath.startsWith("/")) {
             relativePath = relativePath.substring(1);
@@ -138,15 +136,9 @@ public class ActionUtils {
      */
     public static void removeAddedCode(AnActionEvent anActionEvent, CodeInsertionContext context) {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
-
-        if (editor == null) {
-            return;
-        }
-        Project project = anActionEvent.getProject();
-        Document document = editor.getDocument();
+        Project project = editor.getProject();
 
         if (project == null) {
-            LOGGER.info("showCurrentRecipe - editor, project or document is null");
             return;
         }
 
@@ -155,16 +147,7 @@ public class ActionUtils {
                 try {
                     WriteCommandAction.writeCommandAction(project).run(
                         (ThrowableRunnable<Throwable>) () -> {
-                            int deletedLength = 0;
-                            for (RangeHighlighter rangeHighlighter : context.getHighlighters()) {
-                                editor.getMarkupModel().removeHighlighter(rangeHighlighter);
-                            }
-                            for (CodeInsertion codeInsertion : context.getCodeInsertions()) {
-                                document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
-                                deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());
-                            }
-
-                            context.clearInsertions();
+                            removeAddedCodeFunction(editor, context);
                         }
                     );
                 } catch (Throwable e) {
@@ -172,6 +155,21 @@ public class ActionUtils {
                 }
             });
         }
+    }
+
+    public static void removeAddedCodeFunction(Editor editor, CodeInsertionContext context) {
+        Document document = editor.getDocument();
+
+        int deletedLength = 0;
+        for (RangeHighlighter rangeHighlighter : context.getHighlighters()) {
+            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+        }
+        for (CodeInsertion codeInsertion : context.getCodeInsertions()) {
+            document.deleteString(codeInsertion.getPositionStart() - deletedLength, codeInsertion.getPositionEnd() - deletedLength);
+            deletedLength = deletedLength + (codeInsertion.getPositionEnd() - codeInsertion.getPositionStart());
+        }
+
+        context.clearInsertions();
     }
 
 
@@ -286,21 +284,82 @@ public class ActionUtils {
      * @param anActionEvent
      */
     public static void applyRecipe(AnActionEvent anActionEvent,
+                                   String recipeName,
+                                   String recipeJetbrainsFormat,
                                    Long recipeId,
+                                   List<String> imports,
+                                   LanguageEnumeration language,
                                    CodeInsertionContext codeInsertionContext,
                                    CodigaApi codigaApi) {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
+
         if (editor == null) {
             LOGGER.warn("applyRecipe - editor is null");
             return;
         }
-        codigaApi.recordRecipeUse(recipeId);
-        codeInsertionContext.getCodeInsertions().clear();
-        // remove the highlighted code.
-        for (RangeHighlighter rangeHighlighter : codeInsertionContext.getHighlighters()) {
-            editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+        Project project = editor.getProject();
+
+
+        /**
+         * Remove the code that was added before
+         */
+        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WriteCommandAction.writeCommandAction(project).run(
+                        (ThrowableRunnable<Throwable>) () -> {
+
+                            removeAddedCodeFunction(editor, codeInsertionContext);
+                            codeInsertionContext.clearAll();
+                        }
+                    );
+                }catch (Throwable e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // add the code and update global variables to indicate code has been inserted.
+            try {
+                WriteCommandAction.writeCommandAction(project).run(
+                    (ThrowableRunnable<Throwable>) () -> {
+
+                        addRecipeInEditor(
+                            editor,
+                            recipeName,
+                            recipeJetbrainsFormat,
+                            recipeId,
+                            imports,
+                            language,
+                            0,
+                            false,
+                            codigaApi);
+                    }
+                );
+            } catch (Throwable e) {
+                e.printStackTrace();
+                LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+                LOGGER.error(e);
+            }
+        });
+
+
+    }
+
+    public static boolean isActionActive(AnActionEvent anActionEvent) {
+        Project project = anActionEvent.getProject();
+        Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR);
+
+        if(project == null || editor == null) {
+            return false;
         }
-        codeInsertionContext.clearAll();
+
+        if (getLanguageFromEditorForEvent(anActionEvent) == LanguageEnumeration.UNKNOWN) {
+            return false;
+        }
+        return true;
     }
 
 }

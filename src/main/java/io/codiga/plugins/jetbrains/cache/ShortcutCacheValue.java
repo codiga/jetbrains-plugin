@@ -1,10 +1,8 @@
 package io.codiga.plugins.jetbrains.cache;
 
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
-import io.codiga.api.type.LanguageEnumeration;
 
 import java.util.List;
-import java.util.Objects;
 
 
 public class ShortcutCacheValue {
@@ -15,7 +13,12 @@ public class ShortcutCacheValue {
     /**
      * Update at which we refresh the cache.
      */
-    private Long UPDATE_PERIOD_MILLISECONDS = 10000L;
+    private Long UPDATE_PERIOD_MILLISECONDS = 10000L; // 10 seconds
+
+    /**
+     * We delete a value if not used for this period of time.
+     */
+    private Long DELETE_PERIOD_MILLISECONDS = 600000L; // 10 minutes
 
     public ShortcutCacheValue(List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes, long timestampServer) {
         this.recipes = recipes;
@@ -36,6 +39,19 @@ public class ShortcutCacheValue {
         Long currentTimestamp = System.currentTimeMillis();
         Long difference = currentTimestamp - this.lastUpdateTimestamp;
         if (difference > UPDATE_PERIOD_MILLISECONDS) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return true if the value has not been used
+     * @return
+     */
+    public boolean shouldBeDeleted() {
+        Long currentTimestamp = System.currentTimeMillis();
+        Long difference = currentTimestamp - this.lastUpdateTimestamp;
+        if (difference > DELETE_PERIOD_MILLISECONDS) {
             return true;
         }
         return false;

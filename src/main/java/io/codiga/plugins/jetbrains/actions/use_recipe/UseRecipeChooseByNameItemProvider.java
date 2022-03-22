@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Processor;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,13 +17,13 @@ import java.util.Optional;
 
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 
-public class RecipeChooseByNameItemProvider implements ChooseByNameItemProvider {
+public class UseRecipeChooseByNameItemProvider implements ChooseByNameItemProvider {
 
     private final AnActionEvent anActionEvent;
     private final CodeInsertionContext codeInsertionContext;
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
-    public RecipeChooseByNameItemProvider(AnActionEvent anActionEvent, CodeInsertionContext codeInsertionContext) {
+    public UseRecipeChooseByNameItemProvider(AnActionEvent anActionEvent, CodeInsertionContext codeInsertionContext) {
         this.anActionEvent = anActionEvent;
         this.codeInsertionContext = codeInsertionContext;
     }

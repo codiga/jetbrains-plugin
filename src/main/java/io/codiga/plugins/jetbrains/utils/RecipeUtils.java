@@ -1,0 +1,102 @@
+package io.codiga.plugins.jetbrains.utils;
+
+import com.intellij.codeInsight.template.Template;
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
+import com.intellij.codeInsight.template.impl.Variable;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
+import com.intellij.util.ThrowableRunnable;
+import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.assistant.user_variables.UserVariables;
+import io.codiga.plugins.jetbrains.graphql.CodigaApi;
+import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
+import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Base64;
+import java.util.List;
+
+import static io.codiga.plugins.jetbrains.Constants.LINE_SEPARATOR;
+import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasImport;
+import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.firstPositionToInsert;
+
+public class RecipeUtils {
+    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
+
+
+    public static void addRecipeInEditor(@NotNull Editor editor,
+                                         @NotNull String recipeName,
+                                         @NotNull String jetBrainsFormat,
+                                         @NotNull Long recipeId,
+                                         @NotNull List<String> imports,
+                                         @NotNull LanguageEnumeration language,
+                                         int indentationCurrentLine,
+                                         boolean removeCurrentLine,
+                                         @NotNull CodigaApi codigaApi) {
+
+
+        final Document document = editor.getDocument();
+        final String currentCode = document.getText();
+        final Project project = editor.getProject();
+
+        if (removeCurrentLine) {
+            // remove the code on the line
+            int startOffsetToRemove = editor.getCaretModel().getVisualLineStart();
+            final int endOffsetToRemove = editor.getCaretModel().getVisualLineEnd();
+            editor.getDocument()
+                .deleteString(startOffsetToRemove + indentationCurrentLine, endOffsetToRemove );
+        }
+
+
+        // add the code and update the document.
+        String unprocessedCode = new String(Base64.getDecoder().decode(jetBrainsFormat))
+            .replaceAll("\r\n", LINE_SEPARATOR);
+        // DataContext is exposed easily in Actions, in other places like this, we need to look for it
+        DataManager.getInstance().getDataContextFromFocusAsync().onSuccess(context -> {
+            final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(context);
+            // process supported variables dynamically
+            final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
+            String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
+
+            Template template = TemplateManagerImpl.getInstance(project).createTemplate(recipeName, recipeName, code);
+            template.setToIndent(true);
+            template.setToReformat(true);
+
+            List<Variable> variables = UserVariables.getInstance().getVariablesFromCode(unprocessedCode);
+            for (Variable variable: variables){
+                template.addVariable(variable);
+            }
+
+            TemplateManagerImpl.getInstance(project).runTemplate(editor, template);
+
+            // Insert all imports
+            try {
+                WriteCommandAction.writeCommandAction(project).run(
+                    (ThrowableRunnable<Throwable>) () -> {
+                        int firstInsertion = firstPositionToInsert(currentCode, language);
+
+                        for(String importStatement: imports) {
+                            if(!hasImport(currentCode, importStatement, language)) {
+
+                                String dependencyStatement = importStatement + LINE_SEPARATOR;
+                                document.insertString(firstInsertion, dependencyStatement);
+                            }
+                        }
+                    }
+                );
+            } catch (Throwable e) {
+                e.printStackTrace();
+                LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+                LOGGER.error(e);
+            }
+
+            // sent a callback that the recipe has been used.
+            codigaApi.recordRecipeUse(recipeId);
+        });
+    }
+}

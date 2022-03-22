@@ -4,16 +4,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import io.codiga.api.GetFileAnalysisQuery;
-import io.codiga.api.GetFileDataQuery;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
-import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
-import io.codiga.plugins.jetbrains.graphql.GraphQlQueryException;
-import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,6 +100,27 @@ public final class ShortcutCache {
             }
         } catch (NullPointerException npe) {
             return ImmutableList.of();
+        }
+    }
+
+    /**
+     * Garbage collect the cache and remove keys that have not been
+     * used for a long time.
+     */
+    public void garbageCollect() {
+        List<ShortcutCacheKey> keysToRemove = new ArrayList<>();
+
+        // Get the keys to remove
+        for (ShortcutCacheKey key: cache.keySet()){
+            ShortcutCacheValue value = cache.get(key);
+            if (value.shouldBeDeleted()) {
+                keysToRemove.add(key);
+            }
+        }
+
+        // Remove from the mp
+        for(ShortcutCacheKey key: keysToRemove) {
+            cache.remove(key);
         }
     }
 

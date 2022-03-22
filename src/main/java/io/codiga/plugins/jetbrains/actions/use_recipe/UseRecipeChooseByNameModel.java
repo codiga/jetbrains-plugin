@@ -1,43 +1,31 @@
 package io.codiga.plugins.jetbrains.actions.use_recipe;
 
 import com.intellij.ide.util.gotoByName.ChooseByNameModel;
-import com.intellij.ide.util.gotoByName.SimpleChooseByNameModel;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
-import com.intellij.psi.PsiElement;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
-import io.codiga.api.type.LanguageEnumeration;
-import io.codiga.plugins.jetbrains.graphql.CodigaApi;
+import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.addRecipeToEditor;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
 
-public class RecipeChooseByNameModel implements ChooseByNameModel {
+public class UseRecipeChooseByNameModel implements ChooseByNameModel {
 
     private final AnActionEvent anActionEvent;
     private final CodeInsertionContext codeInsertionContext;
     private List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> recipes = new ArrayList<>();
 
 
-    public RecipeChooseByNameModel(AnActionEvent anActionEvent, CodeInsertionContext codeInsertionContext) {
+    public UseRecipeChooseByNameModel(AnActionEvent anActionEvent, CodeInsertionContext codeInsertionContext) {
         this.anActionEvent = anActionEvent;
         this.codeInsertionContext = codeInsertionContext;
     }
@@ -83,7 +71,7 @@ public class RecipeChooseByNameModel implements ChooseByNameModel {
 
                 GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch recipe = (GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch) value;
                 long recipeId = ((BigDecimal)recipe.id()).longValue();
-                if(isSelected && (!codeInsertionContext.getCurrentRecipeId().isPresent() || codeInsertionContext.getCurrentRecipeId().get().longValue() != recipeId)){
+                if(isSelected && (!codeInsertionContext.getCurrentRecipeId().isPresent() || codeInsertionContext.getCurrentRecipeId().get() != recipeId)){
                     removeAddedCode(anActionEvent, codeInsertionContext);
                     addRecipeToEditor(anActionEvent,
                         codeInsertionContext,

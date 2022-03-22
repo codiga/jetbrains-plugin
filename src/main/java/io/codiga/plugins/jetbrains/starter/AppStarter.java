@@ -1,6 +1,5 @@
 package io.codiga.plugins.jetbrains.starter;
 
-import com.intellij.execution.Platform;
 import com.intellij.ide.DataManager;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroupManager;
@@ -21,7 +20,6 @@ import io.codiga.plugins.jetbrains.cache.ShortcutCache;
 import io.codiga.plugins.jetbrains.cache.ShortcutCacheKey;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
-import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsConfigurable;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
@@ -169,8 +167,9 @@ public class AppStarter implements StartupActivity {
                         ShortcutCache.getInstance().refreshCacheKey(shortcutCacheKey);
                     }
                 }
+                ShortcutCache.getInstance().garbageCollect();
 
             }
-        }, 1, 3L , SECONDS);
+        }, 0, 3L , SECONDS);
     }
 }

@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.actions.use_recipe;
+package io.codiga.plugins.jetbrains.actions.shortcuts;
 
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopupComponent;
@@ -9,7 +9,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import io.codiga.api.GetRecipesForClientSemanticQuery;
+import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import org.jetbrains.annotations.NotNull;
@@ -22,12 +22,11 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 /**
  * This action is used to use a recipe. It is invoked by the user when in an editor.
  */
-public class AssistantUseRecipeAction extends AnAction {
+public class AssistantListShortcutsAction extends AnAction {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
-
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
@@ -40,8 +39,8 @@ public class AssistantUseRecipeAction extends AnAction {
         CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
         ChooseByNamePopup popup = ChooseByNamePopup.createPopup(
             event.getProject(),
-            new UseRecipeChooseByNameModel(event, codeInsertionContext),
-            new UseRecipeChooseByNameItemProvider(event, codeInsertionContext));
+            new ShortcutChooseByNameModel(event, codeInsertionContext),
+            new ShortcutChooseByNameItemProvider(event, codeInsertionContext));
 
         popup.setAdText("Enter your search query to find snippets");
         popup.setSearchInAnyPlace(true);
@@ -57,23 +56,23 @@ public class AssistantUseRecipeAction extends AnAction {
             @Override
             public void elementChosen(Object element) {
 
-                if (element instanceof GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch) {
-                    GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch recipe = (GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch) element;
+                if (element instanceof GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut) {
+                    GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe = (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut) element;
 
-                    applyRecipe(
-                        event,
+                    applyRecipe(event,
                         recipe.name(),
                         recipe.jetbrainsFormat(),
                         ((BigDecimal)recipe.id()).longValue(),
                         recipe.imports(),
                         recipe.language(),
-                        codeInsertionContext, codigaApi);
+                        codeInsertionContext,
+                        codigaApi);
+
                 }
 
                 codeInsertionContext.clearAll();
             }
         }, ModalityState.current(), false);
-
     }
 
     @Override
