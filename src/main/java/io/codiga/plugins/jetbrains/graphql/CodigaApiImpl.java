@@ -8,17 +8,15 @@ import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.request.RequestHeaders;
-import com.intellij.openapi.components.Service;
+import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.diagnostic.Logger;
 import io.codiga.api.*;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
-import com.google.common.collect.ImmutableList;
-import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.codiga.api.type.AnalysisResultStatus.DONE;
@@ -241,11 +239,11 @@ public final class CodigaApiImpl implements CodigaApi {
                         apiRequest.setError();
                     } else {
                         Object responseObject = response.getData().getRecipesForClientByShortcutLastTimestamp();
-                        if (responseObject != null) {
+                        if (responseObject == null) {
+                            apiRequest.setData(Optional.empty());
+                        } else {
                             Long longValue = ((BigDecimal)responseObject).longValue();
                             apiRequest.setData(Optional.of(longValue));
-                        } else {
-                            apiRequest.setData(Optional.empty());
                         }
                     }
                 }

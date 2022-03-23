@@ -4,13 +4,12 @@ import io.codiga.api.type.LanguageEnumeration;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 
 public class ShortcutCacheKey {
-    private LanguageEnumeration language;
-    private String filename;
-    private List<String> dependencies;
+    private final LanguageEnumeration language;
+    private final String filename;
+    private final List<String> dependencies;
 
     public ShortcutCacheKey(LanguageEnumeration language, String filename, List<String> dependencies) {
         this.language = language;

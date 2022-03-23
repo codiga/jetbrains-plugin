@@ -25,8 +25,10 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.utils.CodeImportUtils.hasImport;
 import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.firstPositionToInsert;
 
-public class RecipeUtils {
+public final class RecipeUtils {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
+
+    private RecipeUtils() {};
 
 
     public static void addRecipeInEditor(@NotNull Editor editor,

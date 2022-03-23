@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UserVariables {
+public final class UserVariables {
 
-    private Pattern pattern = Pattern.compile(UserVariablesConstants.REGEXP);
-
-    private UserVariables() {};
+    private static final Pattern pattern = Pattern.compile(UserVariablesConstants.REGEXP);
 
     private static UserVariables _INSTANCE = new UserVariables();
+
+    private UserVariables() {};
 
     public static UserVariables getInstance() {return _INSTANCE;}
 

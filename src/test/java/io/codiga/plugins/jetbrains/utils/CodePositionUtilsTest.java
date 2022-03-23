@@ -33,4 +33,15 @@ public class CodePositionUtilsTest extends TestBase {
     assertEquals(CodePositionUtils.getKeywordFromLine(".bla.", 4), Optional.of(".bla."));
     assertEquals(CodePositionUtils.getKeywordFromLine(null, 11), Optional.empty());
   }
+
+
+  @Test
+  public void testShouldAutocomplete() {
+    assertEquals(CodePositionUtils.shouldAutocomplete(".", 0), true);
+    assertEquals(CodePositionUtils.shouldAutocomplete("        blo.", 11), true);
+    assertEquals(CodePositionUtils.shouldAutocomplete("        blo", 10), false);
+    assertEquals(CodePositionUtils.shouldAutocomplete("    )   blo.", 11), false);
+    assertEquals(CodePositionUtils.shouldAutocomplete("    b   blo.", 11), false);
+    assertEquals(CodePositionUtils.shouldAutocomplete("      .", 6), true);
+  }
 }

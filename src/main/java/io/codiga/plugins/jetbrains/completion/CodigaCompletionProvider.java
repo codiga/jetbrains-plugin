@@ -83,6 +83,9 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
 
         int column = editor.getCaretModel().getCurrentCaret().getCaretModel().getVisualPosition().getColumn();
 
+        if(!shouldAutocomplete(currentLine, column - 1)) {
+            return;
+        }
 
         Optional<String> keyword = getKeywordFromLine(currentLine, column - 1);
 
@@ -91,8 +94,14 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             return;
         }
 
-        if(!keyword.get().startsWith(".") && !keyword.get().startsWith("/")) {
-            return;
+        if(keyword.get().equalsIgnoreCase(".") || keyword.get().equalsIgnoreCase("/")) {
+            keyword = Optional.empty();
+        } else {
+            if(keyword.get().length() > 1 && (keyword.get().startsWith(".") || keyword.get().startsWith("/"))) {
+                String newKeyword = keyword.get().substring(1);
+                System.out.println(newKeyword);
+                keyword = Optional.of(newKeyword);
+            }
         }
 
 
@@ -112,6 +121,9 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
          * For each of them, add a completion item and add a routine to insert the code.
          */
         for (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe : recipes) {
+            if(keyword.isPresent() && ! recipe.shortcut().startsWith(keyword.get())) {
+                continue;
+            }
 
           LookupElementBuilder element = LookupElementBuilder
             .create(recipe.name())

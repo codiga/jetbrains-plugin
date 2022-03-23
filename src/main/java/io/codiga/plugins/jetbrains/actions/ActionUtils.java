@@ -74,7 +74,7 @@ public class ActionUtils {
     public final static String getRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         String canonicalPath = virtualFile.getPresentableUrl();
         String projectPath = project.getPresentableUrl();
-        
+
         String relativePath = canonicalPath.replace(projectPath, "");
         if(relativePath.startsWith("/")) {
             relativePath = relativePath.substring(1);
@@ -356,10 +356,7 @@ public class ActionUtils {
             return false;
         }
 
-        if (getLanguageFromEditorForEvent(anActionEvent) == LanguageEnumeration.UNKNOWN) {
-            return false;
-        }
-        return true;
+        return getLanguageFromEditorForEvent(anActionEvent) == LanguageEnumeration.UNKNOWN;
     }
 
 }

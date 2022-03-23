@@ -8,17 +8,17 @@ import java.util.List;
 public class ShortcutCacheValue {
     private Long lastTimestampFromServer;
     private Long lastUpdateTimestamp;
-    private List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes;
+    private final List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes;
 
     /**
      * Update at which we refresh the cache.
      */
-    private Long UPDATE_PERIOD_MILLISECONDS = 10000L; // 10 seconds
+    private final static Long UPDATE_PERIOD_MILLISECONDS = 10000L; // 10 seconds
 
     /**
      * We delete a value if not used for this period of time.
      */
-    private Long DELETE_PERIOD_MILLISECONDS = 600000L; // 10 minutes
+    private final static Long DELETE_PERIOD_MILLISECONDS = 600000L; // 10 minutes
 
     public ShortcutCacheValue(List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes, long timestampServer) {
         this.recipes = recipes;
