@@ -24,6 +24,8 @@ import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.CodeInsertion;
 import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
 import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Base64;
@@ -66,16 +68,25 @@ public class ActionUtils {
         return psiFile.getName();
     }
 
-    public final static String getRelativeFilenamePathFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
+    public final static String getUnixRelativeFilenamePathFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
-        return getRelativeFilenamePathFromEditorForVirtualFile(psiFile.getProject(), psiFile.getVirtualFile());
+        return getUnitRelativeFilenamePathFromEditorForVirtualFile(psiFile.getProject(), psiFile.getVirtualFile());
     }
 
-    public final static String getRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        String canonicalPath = virtualFile.getPresentableUrl();
-        String projectPath = project.getPresentableUrl();
+    public final static String getUnitRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+        String canonicalPath = virtualFile.getPath();
+        String projectPath = project.getBasePath();
 
         String relativePath = canonicalPath.replace(projectPath, "");
+
+        /**
+         * If the system is Windows, we convert the Windows-like path
+         * to a UNIX path to look up dependencies
+         */
+        if(SystemUtils.IS_OS_WINDOWS) {
+            relativePath = FilenameUtils.separatorsToUnix(relativePath);
+        }
+
         if(relativePath.startsWith("/")) {
             relativePath = relativePath.substring(1);
         }

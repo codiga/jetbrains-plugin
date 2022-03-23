@@ -40,7 +40,7 @@ public class UseRecipeChooseByNameItemProvider implements ChooseByNameItemProvid
 
         }
 
-        String filename = getRelativeFilenamePathFromEditorForEvent(anActionEvent);
+        String filename = getUnixRelativeFilenamePathFromEditorForEvent(anActionEvent);
         List<String> dependenciesName = getDependenciesFromEditorForEvent(anActionEvent);
         LanguageEnumeration language = getLanguageFromEditorForEvent(anActionEvent);
 

@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
-import static io.codiga.plugins.jetbrains.actions.ActionUtils.getRelativeFilenamePathFromEditorForVirtualFile;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
 import static io.codiga.plugins.jetbrains.utils.RecipeUtils.addRecipeInEditor;
 
@@ -113,12 +113,13 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
 
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
+
         List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile())
           .stream().map(Dependency::getName)
           .collect(Collectors.toList());
 
-        String filename = getRelativeFilenamePathFromEditorForVirtualFile(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile());
-
+        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile());
+System.out.println(filename);
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = ShortcutCache.getInstance().getRecipesShortcut(new ShortcutCacheKey(language, filename, dependenciesName));
 
 

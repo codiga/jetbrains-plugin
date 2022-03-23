@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
-import static io.codiga.plugins.jetbrains.actions.ActionUtils.getRelativeFilenamePathFromEditorForVirtualFile;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.graphql.Constants.CODING_ASSISTANT_DOCUMENTATION_URL;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -160,7 +160,7 @@ public class AppStarter implements StartupActivity {
                         if (fileEditor.getFile() == null) {
                             continue;
                         }
-                        String filename = getRelativeFilenamePathFromEditorForVirtualFile(project, fileEditor.getFile());
+                        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, fileEditor.getFile());
                         java.util.List<String> dependencies = DependencyManagement.getInstance().getDependencies(project, fileEditor.getFile()).stream().map(v -> v.getName()).collect(Collectors.toList());
                         LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(fileEditor.getFile());
                         ShortcutCacheKey shortcutCacheKey = new ShortcutCacheKey(languageEnumeration, filename, dependencies);
