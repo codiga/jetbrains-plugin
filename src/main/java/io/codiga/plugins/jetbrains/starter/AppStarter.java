@@ -170,6 +170,6 @@ public class AppStarter implements StartupActivity {
                 ShortcutCache.getInstance().garbageCollect();
 
             }
-        }, 0, 3L , SECONDS);
+        }, 0, 1L , SECONDS);
     }
 }

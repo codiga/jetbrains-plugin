@@ -14,33 +14,43 @@ It is available on the [Jetbrains marketplace](https://plugins.jetbrains.com/plu
 and you can install it directly within any Jetbrains product (IntelliJ, PHPStorm, PYCharm, etc).
 
 
-
 ## Quick Start
+
+Install the extension and type `.` in your IDE to list all available snippets for your current environment (language, file, libraries).
+
+Accept a snippet using either Enter ↩ or Tab ↹. Go through the snippet variables using the Tab key.
+
+![Create Recipe](images/shortcut.gif "Using a shortcut")
+
+## Semantic Search
+
+Press CTRL + ALT + C (or choose the menu option "Tools" → "Coding Assistant") to launch a request 
+to Codiga and find snippets based on your keywords.
+
+![Create Recipe](images/coding-assistant.gif "Coding Assistant")
+
+## List all shortcuts
+
+Press CTRL + ALT + S (or choose the menu option "Tools" → "Shortcuts") to list
+all keywords for your environment.
+
+![Create Recipe](images/shortcut-list.gif "List of all shortcuts")
+
+## Creating and sharing snippets
+
+![Create Recipe](images/create-recipe.gif "Creating Recipe")
+
+1. Select the code in your editor
+2. Right click on "Create Codiga Recipe"
+
+
+
+## Install
 
 Go in the plugin section of your Jetbrains product and look for "Codiga" on the marketplace.
 
 ![Codiga Jetbrains plugin](images/plugin-description.png "Codiga PlugIn")
 
-
-### Use the Coding Assistant
-
-![Coding Assistant](images/coding-assistant.gif "Coding Assistant in Action")
-
-You can trigger the coding assistant by either
-
- - Use the shortcut control + alt + C
- - Use the menu item as shown below
-
-
-![Coding Assistant Menu](images/codiga-assistant-menu.png "Coding Assistant Menu")
-
-
-### Creating and sharing reusable code blocks
-
-![Create Recipe](images/create-recipe.gif "Creating Recipe")
-
- 1. Select the code in your editor
- 2. Right click on "Create Codiga Recipe"
 
 
 

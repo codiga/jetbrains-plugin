@@ -119,7 +119,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
           .collect(Collectors.toList());
 
         String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile());
-System.out.println(filename);
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = ShortcutCache.getInstance().getRecipesShortcut(new ShortcutCacheKey(language, filename, dependenciesName));
 
 
@@ -136,7 +135,7 @@ System.out.println(filename);
             .create(recipe.name())
             .withTypeText(recipe.name())
             .withCaseSensitivity(false)
-            .withPresentableText(recipe.shortcut())
+            .withPresentableText(String.format("%s ⇌", recipe.shortcut()))
             .withLookupString(recipe.shortcut())
             .withInsertHandler((insertionContext, lookupElement) ->
                     addRecipeInEditor(
