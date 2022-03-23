@@ -12,8 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.addRecipeToEditor;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
@@ -22,7 +20,6 @@ public class UseRecipeChooseByNameModel implements ChooseByNameModel {
 
     private final AnActionEvent anActionEvent;
     private final CodeInsertionContext codeInsertionContext;
-    private List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> recipes = new ArrayList<>();
 
 
     public UseRecipeChooseByNameModel(AnActionEvent anActionEvent, CodeInsertionContext codeInsertionContext) {
@@ -59,7 +56,7 @@ public class UseRecipeChooseByNameModel implements ChooseByNameModel {
 
     @Override
     public void saveInitialCheckBoxState(boolean b) {
-
+        // empty method
     }
 
     @Override

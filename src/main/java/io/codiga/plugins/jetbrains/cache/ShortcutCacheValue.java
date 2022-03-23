@@ -6,7 +6,7 @@ import java.util.List;
 
 
 public class ShortcutCacheValue {
-    private Long lastTimestampFromServer;
+    private final Long lastTimestampFromServer;
     private Long lastUpdateTimestamp;
     private final List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes;
 
@@ -38,10 +38,7 @@ public class ShortcutCacheValue {
     public boolean needsUpdate() {
         Long currentTimestamp = System.currentTimeMillis();
         Long difference = currentTimestamp - this.lastUpdateTimestamp;
-        if (difference > UPDATE_PERIOD_MILLISECONDS) {
-            return true;
-        }
-        return false;
+        return difference > UPDATE_PERIOD_MILLISECONDS;
     }
 
     /**
@@ -51,10 +48,7 @@ public class ShortcutCacheValue {
     public boolean shouldBeDeleted() {
         Long currentTimestamp = System.currentTimeMillis();
         Long difference = currentTimestamp - this.lastUpdateTimestamp;
-        if (difference > DELETE_PERIOD_MILLISECONDS) {
-            return true;
-        }
-        return false;
+        return difference > DELETE_PERIOD_MILLISECONDS;
     }
 
     public long getLastTimestampFromServer() {

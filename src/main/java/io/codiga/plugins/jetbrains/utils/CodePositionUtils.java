@@ -159,9 +159,7 @@ public final class CodePositionUtils {
                 spaceMet = true;
                 continue;
             }
-
-            return false;
-
+            break;
         }
         return true;
     }

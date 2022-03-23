@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CodeInsertionContext {
-    private List<CodeInsertion> codeInsertions = new ArrayList<>();
+    private final List<CodeInsertion> codeInsertions = new ArrayList<>();
     private final List<RangeHighlighter> highlighters = new ArrayList<>();
     private Optional<Long> currentRecipeId = Optional.empty();
 

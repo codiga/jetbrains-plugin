@@ -41,7 +41,7 @@ public class AssistantUseRecipeAction extends AnAction {
         ChooseByNamePopup popup = ChooseByNamePopup.createPopup(
             event.getProject(),
             new UseRecipeChooseByNameModel(event, codeInsertionContext),
-            new UseRecipeChooseByNameItemProvider(event, codeInsertionContext));
+            new UseRecipeChooseByNameItemProvider(event));
 
         popup.setAdText("Enter your search query to find snippets");
         popup.setSearchInAnyPlace(true);

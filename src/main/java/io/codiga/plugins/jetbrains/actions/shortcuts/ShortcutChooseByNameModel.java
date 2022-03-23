@@ -4,7 +4,6 @@ import com.intellij.ide.util.gotoByName.ChooseByNameModel;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.util.NlsContexts;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
-import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
@@ -13,8 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.addRecipeToEditor;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
@@ -23,8 +20,6 @@ public class ShortcutChooseByNameModel implements ChooseByNameModel {
 
     private final AnActionEvent anActionEvent;
     private final CodeInsertionContext codeInsertionContext;
-    private List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> recipes = new ArrayList<>();
-
 
     public ShortcutChooseByNameModel(AnActionEvent anActionEvent, CodeInsertionContext codeInsertionContext) {
         this.anActionEvent = anActionEvent;
@@ -59,7 +54,7 @@ public class ShortcutChooseByNameModel implements ChooseByNameModel {
 
     @Override
     public void saveInitialCheckBoxState(boolean b) {
-
+        // empty method
     }
 
     @Override

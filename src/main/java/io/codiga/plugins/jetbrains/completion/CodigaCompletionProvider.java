@@ -127,9 +127,9 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
 
           LookupElementBuilder element = LookupElementBuilder
             .create(recipe.name())
-            .withTypeText(recipe.shortcut())
+            .withTypeText(recipe.name())
             .withCaseSensitivity(false)
-            .withPresentableText(recipe.name())
+            .withPresentableText(recipe.shortcut())
             .withLookupString(recipe.shortcut())
             .withInsertHandler((insertionContext, lookupElement) ->
                     addRecipeInEditor(

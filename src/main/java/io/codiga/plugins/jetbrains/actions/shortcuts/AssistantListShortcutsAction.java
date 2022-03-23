@@ -40,7 +40,7 @@ public class AssistantListShortcutsAction extends AnAction {
         ChooseByNamePopup popup = ChooseByNamePopup.createPopup(
             event.getProject(),
             new ShortcutChooseByNameModel(event, codeInsertionContext),
-            new ShortcutChooseByNameItemProvider(event, codeInsertionContext));
+            new ShortcutChooseByNameItemProvider(event));
 
         popup.setAdText("Enter your search query to find snippets");
         popup.setSearchInAnyPlace(true);
