@@ -149,17 +149,18 @@ public final class CodePositionUtils {
             char c = line.charAt(pos);
             pos = pos - 1;
 
-            if(Character.isAlphabetic(c) || Character.isDigit(c) || c == '.' || c == '/') {
-                if (spaceMet) {
-                    return false;
-                }
-                continue;
-            }
             if(c == ' ') {
                 spaceMet = true;
                 continue;
             }
-            break;
+
+            if(Character.isAlphabetic(c) || Character.isDigit(c) || c == '.' || c == '/') {
+                if (spaceMet) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
         return true;
     }

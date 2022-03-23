@@ -94,12 +94,18 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             return;
         }
 
+        /**
+         * If the text entered is only a dot or slash, put no keyword so that we search all shortcuts
+         */
         if(keyword.get().equalsIgnoreCase(".") || keyword.get().equalsIgnoreCase("/")) {
             keyword = Optional.empty();
         } else {
+            /**
+             * If the keyword is longer than one character and starts with a dot, remove the dot so that
+             * we filter by the correct prefix.
+             */
             if(keyword.get().length() > 1 && (keyword.get().startsWith(".") || keyword.get().startsWith("/"))) {
                 String newKeyword = keyword.get().substring(1);
-                System.out.println(newKeyword);
                 keyword = Optional.of(newKeyword);
             }
         }
