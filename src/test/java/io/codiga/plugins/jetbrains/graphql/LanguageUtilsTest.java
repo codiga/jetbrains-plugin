@@ -4,7 +4,7 @@ package io.codiga.plugins.jetbrains.graphql;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.git.CodigaGitUtilsTest;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

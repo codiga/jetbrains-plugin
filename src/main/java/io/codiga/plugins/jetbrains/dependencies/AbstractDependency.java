@@ -1,5 +1,6 @@
 package io.codiga.plugins.jetbrains.dependencies;
 
+import com.intellij.openapi.project.Project;
 import io.codiga.plugins.jetbrains.model.Dependency;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.diagnostic.Logger;
@@ -24,11 +25,11 @@ public abstract class AbstractDependency {
 
     /**
      * Find the package file in the files hierarchy of the project.
-     * @param psiFile
+     * @param project - the project we are editing
      * @return
      */
-    Optional<VirtualFile> getDependencyFile(PsiFile psiFile) {
-        List<VirtualFile> rootFiles = Arrays.stream(ProjectRootManager.getInstance(psiFile.getProject())
+    Optional<VirtualFile> getDependencyFile(Project project) {
+        List<VirtualFile> rootFiles = Arrays.stream(ProjectRootManager.getInstance(project)
                         .getContentRoots())
                 .flatMap(v -> Arrays.stream(VfsUtil.getChildren(v)))
                 .collect(Collectors.toList());
@@ -38,8 +39,8 @@ public abstract class AbstractDependency {
         return packageFileOptional;
     }
 
-    public List<Dependency> getDependencies(PsiFile psiFile) {
-        Optional<VirtualFile> dependencyFile = this.getDependencyFile(psiFile);
+    public List<Dependency> getDependencies(Project project) {
+        Optional<VirtualFile> dependencyFile = this.getDependencyFile(project);
         if(!dependencyFile.isPresent()) {
             return ImmutableList.of();
         }

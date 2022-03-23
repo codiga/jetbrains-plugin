@@ -5,7 +5,7 @@ import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

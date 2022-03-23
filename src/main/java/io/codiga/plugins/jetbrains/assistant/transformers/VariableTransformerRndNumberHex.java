@@ -9,11 +9,11 @@ public class VariableTransformerRndNumberHex implements VariableTransformer {
    * Generate a 6 digit random number in hexadecimal
    *
    * @param code
-   * @param CodigaTransformationContext
+   * @param codigaTransformationContext
    * @return code with replaced value
    */
   @Override
-  public String transform(String code, CodingAssistantContext CodigaTransformationContext){
+  public String transform(String code, CodingAssistantContext codigaTransformationContext){
     final Random rnd = new Random();
     final int number = rnd.nextInt(999999);
     final String hex = Integer.toHexString(number);

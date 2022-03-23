@@ -1,6 +1,9 @@
 package io.codiga.plugins.jetbrains.dependencies;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.cache.ShortcutCache;
 import io.codiga.plugins.jetbrains.model.Dependency;
 import com.google.common.collect.ImmutableList;
 import com.intellij.psi.PsiFile;
@@ -20,23 +23,29 @@ public class DependencyManagement {
     RubyDependency rubyDependency = new RubyDependency();
     PhpDependency phpDependency = new PhpDependency();
 
+    private static DependencyManagement _INSTANCE = new DependencyManagement();
+
+    public static DependencyManagement getInstance() {
+        return _INSTANCE;
+    }
+
     /**
      * Get all the dependencies for a particular file.
-     * @param psiFile
+     * @param project - the project being edited
      * @return
      */
-    public List<Dependency> getDependencies(PsiFile psiFile) {
-        LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(psiFile.getVirtualFile().getCanonicalPath());
+    public List<Dependency> getDependencies(Project project, VirtualFile virtualFile) {
+        LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
         switch (language) {
             case JAVASCRIPT:
             case TYPESCRIPT:
-                return javascriptDependency.getDependencies(psiFile);
+                return javascriptDependency.getDependencies(project);
             case PYTHON:
-                return pythonDependency.getDependencies(psiFile);
+                return pythonDependency.getDependencies(project);
             case RUBY:
-                return rubyDependency.getDependencies(psiFile);
+                return rubyDependency.getDependencies(project);
             case PHP:
-                return phpDependency.getDependencies(psiFile);
+                return phpDependency.getDependencies(project);
             default:
                 return ImmutableList.of();
         }

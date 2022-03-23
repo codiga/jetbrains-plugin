@@ -18,6 +18,7 @@ plugins {
 group = properties("pluginGroup")
 version = properties("pluginVersion")
 
+
 // Configure project's dependencies
 repositories {
     jcenter()

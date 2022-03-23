@@ -8,10 +8,17 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.startup.StartupActivity;
+import com.intellij.util.concurrency.AppExecutorUtil;
+import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.cache.ShortcutCache;
+import io.codiga.plugins.jetbrains.cache.ShortcutCacheKey;
+import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsConfigurable;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
@@ -21,9 +28,13 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.graphql.Constants.CODING_ASSISTANT_DOCUMENTATION_URL;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Start this code after the project is initialized.
@@ -88,7 +99,7 @@ public class AppStarter implements StartupActivity {
             FileEditorManager.getInstance(project) != null &&
             FileEditorManager.getInstance(project).getSelectedEditor() != null) {
             notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
-                .createNotification("Use CMD + ALT + S for shortcuts, CMD + ALT + C for searching.", NotificationType.INFORMATION)
+                .createNotification("Just type . or press CMD + ALT + S for shortcuts, CMD + ALT + C for searching snippets", NotificationType.INFORMATION)
                 .setTitle("Codiga Coding Assistant")
                 .addAction(new AnAction("Snippets") {
                     @Override
@@ -137,5 +148,28 @@ public class AppStarter implements StartupActivity {
             Notifications.Bus.notify(notification, project);
         }
 
+        /**
+         * Start the cache refresher.
+         */
+        AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                for(Project project: ProjectManager.getInstance().getOpenProjects()) {
+
+                    for(FileEditor fileEditor: FileEditorManager.getInstance(project).getAllEditors()) {
+                        if (fileEditor.getFile() == null) {
+                            continue;
+                        }
+                        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, fileEditor.getFile());
+                        java.util.List<String> dependencies = DependencyManagement.getInstance().getDependencies(project, fileEditor.getFile()).stream().map(v -> v.getName()).collect(Collectors.toList());
+                        LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(fileEditor.getFile());
+                        ShortcutCacheKey shortcutCacheKey = new ShortcutCacheKey(languageEnumeration, filename, dependencies);
+                        ShortcutCache.getInstance().refreshCacheKey(shortcutCacheKey);
+                    }
+                }
+                ShortcutCache.getInstance().garbageCollect();
+
+            }
+        }, 0, 1L , SECONDS);
     }
 }

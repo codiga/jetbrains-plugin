@@ -18,7 +18,6 @@ public class RubyDependencyTest extends TestBase {
     public void testParseRequirements1() throws IOException {
         FileInputStream fileInputStream = getInputStream("gemfile-example1");
         List<Dependency> dependencies = rubyDependency.getDependenciesFromInputStream(fileInputStream);
-        dependencies.forEach(d -> System.out.println(d.getName()));
         Assertions.assertFalse(dependencies.isEmpty());
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("sqlite3")));
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("rails")));
@@ -31,7 +30,6 @@ public class RubyDependencyTest extends TestBase {
     public void testParseRequirements2() throws IOException {
         FileInputStream fileInputStream = getInputStream("gemfile-example2");
         List<Dependency> dependencies = rubyDependency.getDependenciesFromInputStream(fileInputStream);
-        dependencies.forEach(d -> System.out.println(d.getName()));
         Assertions.assertFalse(dependencies.isEmpty());
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("nokogiri")));
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("rails")));
@@ -44,7 +42,6 @@ public class RubyDependencyTest extends TestBase {
     public void testParseRequirements3() throws IOException {
         FileInputStream fileInputStream = getInputStream("gemfile-example3");
         List<Dependency> dependencies = rubyDependency.getDependenciesFromInputStream(fileInputStream);
-        dependencies.forEach(d -> System.out.println(d.getName()));
         Assertions.assertFalse(dependencies.isEmpty());
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("sass-rails")));
         Assertions.assertTrue(dependencies.stream().anyMatch(d -> d.getName().equalsIgnoreCase("rspec-rails")));
@@ -56,7 +53,6 @@ public class RubyDependencyTest extends TestBase {
     public void testParseRequirementsInvalid() throws IOException {
         FileInputStream fileInputStream = getInputStream("gemfile-invalid");
         List<Dependency> dependencies = rubyDependency.getDependenciesFromInputStream(fileInputStream);
-        dependencies.forEach(d -> System.out.println(d.getName()));
         Assertions.assertTrue(dependencies.isEmpty());
         fileInputStream.close();
     }

@@ -6,19 +6,33 @@
     <description>
         <![CDATA[
             <p>
-                Codiga is a smart Coding Assistant that let's you create, share and reuse code snippets for
-                15+ languages, including Python, JavaScript, TypeScript, Java, Kotlin, C, C++, Rust.
+                Search, create and share code snippets for 15+ languages.
             </p>
+
+            <h3>
+                Quick Start
+            </h3>
             <ul>
-                <li>Find <a href="https://app.codiga.io/hub">public snippets</a> to reuse within IntelliJ (menu <em>Tools &gt; Codiga Assistant</em> or use the shortcut <em>ALT + CMD + C</em>)</li>
-                <li>Create public or private snippets (recipes) from your IDE</li>
-                <li>Share private snippets with your team</li>
-                <li>Organize snippets into cookbooks</li>
+                <li>Type a dot (just a .) in your editor to list all snippets available with a shortcut</li>
+                <li>Type CTRL + ALT + C to search for snippets based on keywords</li>
+                <li>Type CTRL + ALT + S to list all snippets with a shortcuts</li>
+                <li>Create public or private snippets from your IDE by selecting code, right-click and select "Create Codiga Recipe"</li>
             </ul>
 
-            <p>
-                More information
-            </p>
+            <h3>
+                All features
+            </h3>
+            <ul>
+                <li>Search for code snippets based on keywords (CTRL + ALT + C)</li>
+                <li>List all code snippets with a shortcut (CTRL + ALT + S)</li>
+                <li>Use a snippet directly using a shortcut in your editor (type the shortcut of the snippet, IDE fetch snippets when a dot (.) is entered)</li>
+                <li>Create snippets with your team (select code, right click and select "Create Codiga Recipe"</li>
+                <li>Share snippets with your team</li>
+            </ul>
+
+            <h3>
+                More Information
+            </h3>
             <ul>
                 <li><a href="https://www.codiga.io">Codiga</a></li>
                 <li><a href="https://app.codiga.io/hub">Codiga Snippets Hub</a></li>
@@ -124,7 +138,7 @@
 
     <actions>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantListShortcuts"
-                class="io.codiga.plugins.jetbrains.actions.shortcuts.AssistantListShortcuts"
+                class="io.codiga.plugins.jetbrains.actions.shortcuts.AssistantListShortcutsAction"
                 text="Codiga: Shortcuts" description="List all shortcuts"
                 icon="CodigaIcons.Codiga_default_icon">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
@@ -132,7 +146,7 @@
             <keyboard-shortcut first-keystroke="control alt S" keymap="$default"/>
         </action>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction"
-                class="io.codiga.plugins.jetbrains.actions.AssistantUseRecipeAction"
+                class="io.codiga.plugins.jetbrains.actions.use_recipe.AssistantUseRecipeAction"
                 text="Codiga: Assistant" description="Search for Codiga suggestions"
                 icon="CodigaIcons.Codiga_default_icon">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
@@ -140,7 +154,7 @@
             <keyboard-shortcut first-keystroke="control alt C" keymap="$default"/>
         </action>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
-                class="io.codiga.plugins.jetbrains.actions.AssistantCreateRecipeAction"
+                class="io.codiga.plugins.jetbrains.actions.create_recipe.AssistantCreateRecipeAction"
                 text="Create Codiga Recipe" description="Use the selected code to create a recipe"
                 icon="CodigaIcons.Codiga_default_icon">
 

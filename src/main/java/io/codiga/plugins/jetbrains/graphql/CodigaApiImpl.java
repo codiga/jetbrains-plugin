@@ -8,14 +8,14 @@ import com.apollographql.apollo.api.Input;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.request.RequestHeaders;
-import com.intellij.openapi.components.Service;
+import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.diagnostic.Logger;
 import io.codiga.api.*;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
-import com.google.common.collect.ImmutableList;
-import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -216,6 +216,45 @@ public final class CodigaApiImpl implements CodigaApi {
                 });
 
         return apiRequest.getData().orElse(ImmutableList.of());
+    }
+
+    @Override
+    public Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language) {
+        ApiRequest<Optional<Long>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+
+
+        ApolloQueryCall<GetRecipesForClientByShortcutLastTimestampQuery.Data> queryCall = apolloClient.query(
+                new GetRecipesForClientByShortcutLastTimestampQuery(fingerprint, dependencies, language))
+            .toBuilder()
+            .requestHeaders(getHeaders())
+            .build();
+        queryCall.enqueue(
+            new ApolloCall.Callback<GetRecipesForClientByShortcutLastTimestampQuery.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<GetRecipesForClientByShortcutLastTimestampQuery.Data> response) {
+                    if (response.getData() == null) {
+                        apiRequest.setError();
+                    } else {
+                        Object responseObject = response.getData().getRecipesForClientByShortcutLastTimestamp();
+                        if (responseObject == null) {
+                            apiRequest.setData(Optional.empty());
+                        } else {
+                            Long longValue = ((BigDecimal)responseObject).longValue();
+                            apiRequest.setData(Optional.of(longValue));
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    apiRequest.setError();
+                }
+            });
+
+        return apiRequest.getData().orElse(Optional.empty());
     }
 
     @Override

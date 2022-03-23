@@ -116,6 +116,7 @@ public final class CodePositionUtils {
     }
 
     public static Optional<String> getKeywordFromLine(String line, int position) {
+
         if (line == null) {
             return Optional.empty();
         }
@@ -124,9 +125,43 @@ public final class CodePositionUtils {
 
             startPosition = startPosition - 1;
         }
-        if (line.charAt(startPosition) == ' ') {
+        if (startPosition > 0 && line.charAt(startPosition) == ' ') {
             startPosition = startPosition + 1;
         }
         return Optional.of(line.substring(startPosition, position + 1));
+    }
+
+    /**
+     * We should only auto-complete if we start with a point but not if there was a previous word before.
+     * @param line
+     * @param position
+     * @return
+     */
+    public static boolean shouldAutocomplete(String line, int position) {
+        int pos = position;
+        boolean spaceMet = false;
+
+        if (line.charAt(position) != '/' && line.charAt(position) != '.') {
+            return false;
+        }
+
+        while(pos > 0){
+            char c = line.charAt(pos);
+            pos = pos - 1;
+
+            if(c == ' ') {
+                spaceMet = true;
+                continue;
+            }
+
+            if(Character.isAlphabetic(c) || Character.isDigit(c) || c == '.' || c == '/') {
+                if (spaceMet) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 }

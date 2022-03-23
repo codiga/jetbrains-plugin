@@ -13,26 +13,26 @@ public class VariableIndentation implements VariableTransformer {
    * by the user to use spaces or tabs for indentation
    *
    * @param code
-   * @param CodigaTransformationContext
+   * @param codigaTransformationContext
    * @return code with replaced value
    */
   @Override
-  public String transform(String code, CodingAssistantContext CodigaTransformationContext) {
+  public String transform(String code, CodingAssistantContext codigaTransformationContext) {
     String processedCode = code;
 
-    if (processedCode.contains(CodigaTransformationContext.CODIGA_INDENT)) {
+    if (processedCode.contains(CodingAssistantContext.CODIGA_INDENT)) {
       /*
        * Get the current PsiFile instance instead of generating a new one, the snippet insertion/completion is called
        * from the same file where it needs to be inserted, so we are going to get all the details of the file, like file
        * type, tab and indent sizes because there are multiple FileTypes per extension where each one of these have
        * different values.
        */
-      PsiFile currentFile = CodigaTransformationContext.dataContext.getData(LangDataKeys.PSI_FILE);
+      PsiFile currentFile = codigaTransformationContext.dataContext.getData(LangDataKeys.PSI_FILE);
 
       // We want to know if the user set to use tabs or spaces in the file where the snippet is going to be inserted
       if (CodeStyle.getIndentOptions(currentFile).USE_TAB_CHARACTER) {
         // Replace indent variables with `\t`
-        processedCode = processedCode.replace(CodigaTransformationContext.CODIGA_INDENT, "\t");
+        processedCode = processedCode.replace(CodingAssistantContext.CODIGA_INDENT, "\t");
         /*
          * Create a new virtual file in memory with the same type of the current file where the insert was called,
          * interesting enough, for tabs we need to insert a `\t` in place of the indent variable, but they transcode only
@@ -42,7 +42,7 @@ public class VariableIndentation implements VariableTransformer {
          * of the file back here.
          */
         PsiFile currentFileInMemory = PsiFileFactory
-          .getInstance(CodigaTransformationContext.dataContext.getData(LangDataKeys.PROJECT))
+          .getInstance(codigaTransformationContext.dataContext.getData(LangDataKeys.PROJECT))
           .createFileFromText("codiga_var_trans", currentFile.getFileType(), processedCode);
 
         // Get the recipe code with `\t` transcode ready for insertion
@@ -53,7 +53,7 @@ public class VariableIndentation implements VariableTransformer {
         // Dynamically generate an empty string (full of whitespaces) to represent space indentation
         String indentSizeAsWhitespace = String.format("%-" + indentSize + "s", "");
         // Replace indent variable with space indentation
-        processedCode = processedCode.replace(CodigaTransformationContext.CODIGA_INDENT, indentSizeAsWhitespace);
+        processedCode = processedCode.replace(CodingAssistantContext.CODIGA_INDENT, indentSizeAsWhitespace);
       }
     }
     return processedCode;

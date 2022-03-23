@@ -3,6 +3,7 @@ package io.codiga.plugins.jetbrains.model;
 import com.intellij.ide.macro.Macro;
 import com.intellij.ide.macro.MacroManager;
 import io.codiga.plugins.jetbrains.assistant.transformers.*;
+import io.codiga.plugins.jetbrains.assistant.user_variables.UserVariables;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CodingAssistantCodigaTransform {
-  private final CodingAssistantContext CodigaTransformationContext;
+  private final CodingAssistantContext codigaTransformationContext;
   private static Map<String, VariableTransformer> VARIABLE_TO_TRANSFORMER;
   static {
     VARIABLE_TO_TRANSFORMER = new HashMap();
@@ -50,7 +51,7 @@ public class CodingAssistantCodigaTransform {
   }
 
   public CodingAssistantCodigaTransform(CodingAssistantContext CodigaTransformationContext) {
-    this.CodigaTransformationContext = CodigaTransformationContext;
+    this.codigaTransformationContext = CodigaTransformationContext;
   }
 
   /**
@@ -71,7 +72,7 @@ public class CodingAssistantCodigaTransform {
     try {
       processedCode = MacroManager.getInstance().expandMacrosInString(code,
         true,
-        CodigaTransformationContext.dataContext);
+        codigaTransformationContext.dataContext);
     } catch (Macro.ExecutionCancelledException e) {
       e.printStackTrace();
     }
@@ -81,11 +82,11 @@ public class CodingAssistantCodigaTransform {
     for (String variableName: VARIABLE_TO_TRANSFORMER.keySet()){
       if (detectedVariables.contains(variableName)){
         processedCode = VARIABLE_TO_TRANSFORMER.get(variableName)
-          .transform(processedCode, CodigaTransformationContext);
+          .transform(processedCode, codigaTransformationContext);
       }
     }
 
-    return processedCode;
+    return UserVariables.getInstance().transformCode(processedCode);
   }
 
   /**

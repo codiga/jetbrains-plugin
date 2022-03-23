@@ -13,11 +13,11 @@ public class VariableTransformerSecondsUnix implements VariableTransformer {
    * Generate representation of current seconds timestamp in Unix format
    *
    * @param code
-   * @param CodigaTransformationContext
+   * @param codigaTransformationContext
    * @return code with replaced value
    */
   @Override
-  public String transform(String code, CodingAssistantContext CodigaTransformationContext){
+  public String transform(String code, CodingAssistantContext codigaTransformationContext){
     long seconds = Instant.now().getEpochSecond();
     return code.replace(CodingAssistantContext.DATE_CURRENT_SECONDS_UNIX,
       String.format("%d", seconds));

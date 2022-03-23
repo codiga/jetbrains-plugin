@@ -9,11 +9,11 @@ public class VariableTransformerUUID implements VariableTransformer {
    * Generate a UUID v4 string
    *
    * @param code
-   * @param CodigaTransformationContext
+   * @param codigaTransformationContext
    * @return code with replaced value
    */
   @Override
-  public String transform(String code, CodingAssistantContext CodigaTransformationContext){
+  public String transform(String code, CodingAssistantContext codigaTransformationContext){
     final String uuid = UUID.randomUUID().toString();
     return code.replace(CodingAssistantContext.RANDOM_UUID, uuid);
   }
