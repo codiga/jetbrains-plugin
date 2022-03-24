@@ -135,7 +135,10 @@
                 implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
 <!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
     </extensions>
-
+    <projectListeners>
+        <listener class="io.codiga.plugins.jetbrains.cache.CacheRefreshEditorListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
     <actions>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantListShortcuts"
                 class="io.codiga.plugins.jetbrains.actions.shortcuts.AssistantListShortcutsAction"
