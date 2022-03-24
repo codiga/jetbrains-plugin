@@ -46,6 +46,10 @@ public final class RecipeUtils {
         final String currentCode = document.getText();
         final Project project = editor.getProject();
 
+        if (project == null) {
+            return;
+        }
+
         if (removeCurrentLine) {
             // remove the code on the line
             int startOffsetToRemove = editor.getCaretModel().getVisualLineStart();
@@ -65,7 +69,8 @@ public final class RecipeUtils {
             final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
             String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
 
-            Template template = TemplateManagerImpl.getInstance(project).createTemplate(recipeName, recipeName, code);
+            // For mysterious reasons, we need to add a newline to the code to not take the next line.
+            Template template = TemplateManagerImpl.getInstance(project).createTemplate(recipeName, recipeName, code + "\n");
             template.setToIndent(true);
             template.setToReformat(true);
 

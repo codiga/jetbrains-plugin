@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Objects;
 
 
+/**
+ * Shortcut for a cache key that is composed of
+ *  - language
+ *  - filename path relative to the project AND UNIX style
+ *  - list of dependencies being used.
+ */
 public class ShortcutCacheKey {
     private final LanguageEnumeration language;
     private final String filename;

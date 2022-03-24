@@ -4,7 +4,14 @@ import io.codiga.api.GetRecipesForClientByShortcutQuery;
 
 import java.util.List;
 
-
+/**
+ * The cache value contains the list of recipes but also
+ * - the last timestamp on the server for all recipes for the associated key
+ *   if the timestamp on the server did not change, we do not update
+ *   the list of recipes
+ * - last time we updated the list - we only update periodically and not every time
+ *   we attempt to refresh the cache.
+ */
 public class ShortcutCacheValue {
     private final Long lastTimestampFromServer;
     private Long lastUpdateTimestamp;

@@ -19,6 +19,21 @@ public class UserVariablesTest extends TestBase {
     assertEquals(UserVariables.getInstance().getVariablesFromCode(code).get(0).getDefaultValueString(), "blabla");
   }
 
+
+  @Test
+  public void testVariableDetectionMoreCharacters() {
+    String code = "public class &[USER_INPUT:42:./\\] blibli";
+    assertEquals(UserVariables.getInstance().getVariablesFromCode(code).size(), 1);
+    assertEquals(UserVariables.getInstance().getVariablesFromCode(code).get(0).getName(), "42");
+    assertEquals(UserVariables.getInstance().getVariablesFromCode(code).get(0).getDefaultValueString(), "./\\");
+  }
+
+  @Test
+  public void testVariableDetectionInvalidPosition() {
+    String code = "public class &[USER_INPUT:abc:foobar] blibli";
+    assertEquals(UserVariables.getInstance().getVariablesFromCode(code).size(), 0);
+  }
+
   @Test
   public void testVariableDetectionWithMultipleVariables() {
     String code = "public class &[USER_INPUT:42:blabla] blibli \n \n &[USER_INPUT:51:blo] \n &[USER_INPUT:0]";

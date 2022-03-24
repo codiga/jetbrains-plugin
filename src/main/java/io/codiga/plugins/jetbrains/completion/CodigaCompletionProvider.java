@@ -80,16 +80,15 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         // clean tab indentation to correctly look for completion results
         currentLine = currentLine.replace("\t", "");
 
-
         int column = editor.getCaretModel().getCurrentCaret().getCaretModel().getVisualPosition().getColumn();
 
+        // we are not attempting to always autocomplete, especially if the user is attempting to invoke a method
         if(!shouldAutocomplete(currentLine, column - 1)) {
             return;
         }
 
+        // Attempt to get the keyword and if not present, just exit.
         Optional<String> keyword = getKeywordFromLine(currentLine, column - 1);
-
-
         if(!keyword.isPresent()) {
             return;
         }
@@ -122,10 +121,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = ShortcutCache.getInstance().getRecipesShortcut(new ShortcutCacheKey(language, filename, dependenciesName));
 
 
-        /*
-         * We take only the top three recipes (they come ranked in order from the API).
-         * For each of them, add a completion item and add a routine to insert the code.
-         */
         for (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe : recipes) {
             if(keyword.isPresent() && ! recipe.shortcut().startsWith(keyword.get())) {
                 continue;

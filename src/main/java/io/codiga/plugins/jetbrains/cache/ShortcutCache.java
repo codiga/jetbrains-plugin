@@ -1,6 +1,5 @@
 package io.codiga.plugins.jetbrains.cache;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -14,12 +13,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
-
+/**
+ * This is the shortcut cache that contains all the recipes that have
+ * a shortcut. It stores all the recipes for all the files being
+ * opened in the editor.
+ */
 public final class ShortcutCache {
+    // Uses a concurrent hashmap to avoid threading issues.
     ConcurrentHashMap<ShortcutCacheKey, ShortcutCacheValue> cache;
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+
     private static ShortcutCache _INSTANCE = new ShortcutCache();
 
     private ShortcutCache() {
@@ -31,14 +36,8 @@ public final class ShortcutCache {
     }
 
 
-    @VisibleForTesting
-    public ConcurrentHashMap<ShortcutCacheKey, ShortcutCacheValue> getCache() {
-        return this.cache;
-    }
-
-
     /**
-     * Update values for a key
+     * Update values for a key by pulling the API.
      *  - check the time on the server for the latest update
      *  - if there is already a cache value,
      *    - update only if the timestamp from the server is different
@@ -75,6 +74,10 @@ public final class ShortcutCache {
         }
     }
 
+    /**
+     * Refresh a cache key in the cache if and only if it needs to be updated.
+     * @param shortcutCacheKey
+     */
     public void refreshCacheKey(final ShortcutCacheKey shortcutCacheKey) {
         try {
             if (cache.containsKey(shortcutCacheKey)) {
@@ -91,6 +94,12 @@ public final class ShortcutCache {
         }
     }
 
+    /**
+     * Just query the cache and gets the value that it contains.
+     * This method never queries the API.
+     * @param shortcutCacheKey - the key we are querying
+     * @return - the list of recipes if any
+     */
     public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesShortcut(ShortcutCacheKey shortcutCacheKey) {
         try{
             if (cache.containsKey(shortcutCacheKey)) {

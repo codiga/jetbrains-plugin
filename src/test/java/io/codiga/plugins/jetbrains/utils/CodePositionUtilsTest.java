@@ -39,7 +39,7 @@ public class CodePositionUtilsTest extends TestBase {
   public void testShouldAutocomplete() {
     assertEquals(CodePositionUtils.shouldAutocomplete(".", 0), true);
     assertEquals(CodePositionUtils.shouldAutocomplete("        blo.", 11), true);
-    assertEquals(CodePositionUtils.shouldAutocomplete("        blo", 10), false);
+    assertEquals(CodePositionUtils.shouldAutocomplete("        blo", 10), true);
     assertEquals(CodePositionUtils.shouldAutocomplete("    )   blo.", 11), false);
     assertEquals(CodePositionUtils.shouldAutocomplete("    b   blo.", 11), false);
     assertEquals(CodePositionUtils.shouldAutocomplete("      .", 6), true);

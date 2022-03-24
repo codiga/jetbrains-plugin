@@ -141,10 +141,6 @@ public final class CodePositionUtils {
         int pos = position;
         boolean spaceMet = false;
 
-        if (line.charAt(position) != '/' && line.charAt(position) != '.') {
-            return false;
-        }
-
         while(pos > 0){
             char c = line.charAt(pos);
             pos = pos - 1;

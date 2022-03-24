@@ -15,6 +15,13 @@
 
 ### Security
 
+## [1.4.0]
+
+### Added
+
+* Change the Coding Assistant UI
+* Code Snippets are now being cached, improving user experience and speed.
+
 ## [1.3.2]
 
 ### Added
