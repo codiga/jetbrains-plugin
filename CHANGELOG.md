@@ -16,59 +16,27 @@
 ### Security
 
 ## [1.4.0]
-
 ### Added
 
-* Change the Coding Assistant UI
-* Code Snippets are now being cached, improving user experience and speed.
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.4.0]
 
 ## [1.3.2]
 
-### Added
-
- * List of shortcuts (CMD + ALT + S)
-
 ## [1.3.1]
 
-### Added
-
- * Handle getting shortcut by typing `.`
- * Recipe search is now done semantically
-
-### Changed
-
- * Replace URL from marketplace to hub
-
 ## [1.3.0]
-### Added
-
- * Disable code analysis by default
-
-### Changed
-
- * Plugin description
- * Compatibility with new IntelliJ platforms
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## [1.1.9]
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## [1.1.8]
 
