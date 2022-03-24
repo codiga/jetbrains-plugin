@@ -3,6 +3,7 @@ package io.codiga.plugins.jetbrains.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.StartOnlyMatcher;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -23,6 +24,7 @@ import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,6 +62,8 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                                   @NotNull ProcessingContext context,
                                   @NotNull CompletionResultSet result) {
         LOGGER.debug("Triggering completion");
+
+        List<LookupElementBuilder> elements = new ArrayList<>();
 
         if (!AppSettingsState.getInstance().getUseCompletion()) {
             LOGGER.debug("completion deactivated");
@@ -145,7 +149,11 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                         codigaApi))
             .withIcon(CodigaIcons.Codiga_default_icon);
 
-          result.addElement(element);
+
+            elements.add(element);
         }
+
+        // Match only based on prefix.
+        result.withPrefixMatcher(new StartOnlyMatcher(result.getPrefixMatcher())).addAllElements(elements);
     }
 }

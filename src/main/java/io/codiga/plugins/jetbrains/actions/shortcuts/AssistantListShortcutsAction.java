@@ -36,6 +36,7 @@ public class AssistantListShortcutsAction extends AnAction {
             return;
         }
 
+
         CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
         ChooseByNamePopup popup = ChooseByNamePopup.createPopup(
             event.getProject(),
