@@ -47,7 +47,6 @@ public class AssistantListShortcutsAction extends AnAction {
         popup.setSearchInAnyPlace(true);
         popup.setShowListForEmptyPattern(true);
 
-
         popup.invoke(new ChooseByNamePopupComponent.Callback() {
             @Override
             public void onClose() {

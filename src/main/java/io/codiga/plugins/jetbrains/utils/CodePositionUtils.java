@@ -116,19 +116,23 @@ public final class CodePositionUtils {
     }
 
     public static Optional<String> getKeywordFromLine(String line, int position) {
+        try {
+            if (line == null) {
+                return Optional.empty();
+            }
+            int startPosition = position;
+            while (startPosition > 0 && line.charAt(startPosition) != ' ') {
 
-        if (line == null) {
+                startPosition = startPosition - 1;
+            }
+            if (startPosition > 0 && line.charAt(startPosition) == ' ') {
+                startPosition = startPosition + 1;
+            }
+            return Optional.of(line.substring(startPosition, position + 1));
+
+        } catch (StringIndexOutOfBoundsException e){
             return Optional.empty();
         }
-        int startPosition = position;
-        while (startPosition > 0 && line.charAt(startPosition) != ' ') {
-
-            startPosition = startPosition - 1;
-        }
-        if (startPosition > 0 && line.charAt(startPosition) == ' ') {
-            startPosition = startPosition + 1;
-        }
-        return Optional.of(line.substring(startPosition, position + 1));
     }
 
     /**
@@ -138,26 +142,30 @@ public final class CodePositionUtils {
      * @return
      */
     public static boolean shouldAutocomplete(String line, int position) {
-        int pos = position;
-        boolean spaceMet = false;
+        try{
+            int pos = position;
+            boolean spaceMet = false;
 
-        while(pos > 0){
-            char c = line.charAt(pos);
-            pos = pos - 1;
+            while(pos > 0){
+                char c = line.charAt(pos);
+                pos = pos - 1;
 
-            if(c == ' ') {
-                spaceMet = true;
-                continue;
-            }
+                if(c == ' ') {
+                    spaceMet = true;
+                    continue;
+                }
 
-            if(Character.isAlphabetic(c) || Character.isDigit(c) || c == '.' || c == '/') {
-                if (spaceMet) {
+                if(Character.isAlphabetic(c) || Character.isDigit(c) || c == '.' || c == '/') {
+                    if (spaceMet) {
+                        return false;
+                    }
+                } else {
                     return false;
                 }
-            } else {
-                return false;
             }
+            return true;
+        } catch (StringIndexOutOfBoundsException e){
+            return false;
         }
-        return true;
     }
 }
