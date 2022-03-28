@@ -17,11 +17,6 @@
 
 ## [1.4.2]
 ### Added
- - Support for custom error reporting
-
-
-## [1.4.1]
-### Added
 
 ### Changed
 
@@ -32,6 +27,10 @@
 ### Fixed
 
 ### Security
+
+## [1.4.2]
+
+## [1.4.1]
 
 ## [1.4.0]
 
