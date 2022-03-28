@@ -1,6 +1,6 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# Code Inspector IntelliJ PlugIn Changelog
+# Code Inspector JetBrains PlugIn Changelog
 
 ## [Unreleased]
 ### Added
@@ -14,6 +14,11 @@
 ### Fixed
 
 ### Security
+
+## [1.4.2]
+### Added
+ - Support for custom error reporting
+
 
 ## [1.4.1]
 ### Added

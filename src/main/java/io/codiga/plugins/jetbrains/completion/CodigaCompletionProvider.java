@@ -49,8 +49,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
     CodigaCompletionProvider() {
     }
 
-
-
     /**
      * Add the completion: call the API to get all completions and surface them
      * @param parameters
@@ -112,7 +110,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                 keyword = Optional.of(newKeyword);
             }
         }
-
 
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());

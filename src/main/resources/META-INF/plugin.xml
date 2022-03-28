@@ -82,6 +82,7 @@
                 instance="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsConfigurable"
                 id="io.codiga.settings.ProjectSettingsConfigurable"
                 displayName="Codiga Project"/>
+        <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
         <externalAnnotator
                 language="JSON"
                 implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>

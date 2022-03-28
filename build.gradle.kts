@@ -26,10 +26,26 @@ repositories {
 }
 
 
+
 dependencies {
+    // GraphQL API
     implementation("com.apollographql.apollo:apollo-runtime:2.5.11")
+
+    // OS detection
     implementation("org.apache.commons:commons-lang3:3.12.0")
+
+    // markdown support
     implementation("com.github.rjeschke:txtmark:0.13")
+
+    // For rollbar support
+    implementation("com.rollbar:rollbar-java:1.8.1") {
+        exclude(group="org.slf4j", module="slf4j-api")
+    }
+    implementation("org.slf4j:slf4j-log4j12:1.7.36") {
+        exclude(group="org.slf4j", module="slf4j-api")
+    }
+
+    // testing
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
