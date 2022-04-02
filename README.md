@@ -45,29 +45,27 @@ all keywords for your environment.
 
 
 
-## Install
+## Installation
 
-Go in the plugin section of your Jetbrains product and look for "Codiga" on the marketplace.
+Go to the plugins section of your Jetbrains product and search for "Codiga" on the marketplace.
 
 ![Codiga Jetbrains plugin](images/plugin-description.png "Codiga PlugIn")
 
 
-
-
 ### Code Analysis
 
-Codiga analyses your code and surfaces any issue. It works for 12+ languages. Codiga annotates directly You can select to learn more
-about each violation, see them on Code Inspector or just ignore it.
+Codiga analyzes your code and surfaces any issue. It works for 12+ languages. Codiga directly annotates all issues in your IDE. 
+You can select to learn more about each violation, see them on Code Inspector or just ignore them.
 
 ![Action Available](images/actions-available.png)
 
-You can select to disable the code analysis directly in the project preference, as shown below.
+Enable or disable the Code Analysis in the project preferences as shown below.
 
 ![Disable Code Analysis](images/disable-code-analysis.gif)
 
 ## Connecting your Codiga Account
 
-You can connect your Codiga account in order to 
+You can connect your Codiga account and benefit from all the Codiga features: 
 
  1. use the code recipes and cookbooks you define and subscribe to
  2. use all your code analysis preferences on Codiga
@@ -84,8 +82,7 @@ Then, enter your API token in the Jetbrains plugin configuration, as shown below
 
 Once the token is added, click on "Apply" and then "Test API connection".
 
-
-# Implementation concerns
+# Implementation Details
 
 ## Dependencies
 
@@ -98,4 +95,4 @@ This project is under the GPL-3. See the LICENSE file for more information.
 
 ## Contact
 
-If you have any bugreport, submit an issue directly on the [GitHub issue tracker](https://github.com/codiga/jetbrains-plugin/issues).
+To report a bug, submit an issue directly on the [GitHub issue tracker](https://github.com/codiga/jetbrains-plugin/issues).
