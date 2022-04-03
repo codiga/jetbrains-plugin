@@ -3,17 +3,10 @@
 # Code Inspector JetBrains PlugIn Changelog
 
 ## [Unreleased]
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
-### Security
+ - Fix `NullPointerException` when attempting to create recipe with no selected text.
 
 ## [1.4.2]
 ### Added
