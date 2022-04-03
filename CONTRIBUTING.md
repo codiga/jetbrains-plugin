@@ -2,13 +2,13 @@
 
 ## Issues
 
-If you find a bug, please report the bug in the GitHub issue tracker.
+If you find a bug, please report it in the GitHub issue tracker.
 
 ## Pull Requests
 
 If you would like to contribute to the plugin, please
 send a Pull Request on GitHub. The Pull Request will be analyzed
-by Code Inspector and also by one of the Code Inspector engineer.
+by Code Inspector and reviewed by a Codiga engineer.
 
 
 ## DOs and DON'Ts
@@ -25,7 +25,7 @@ by Code Inspector and also by one of the Code Inspector engineer.
 ### DON'T:
 
 * Send PRs for style changes.
-* Surprise us with big pull requests. Instead, file an issue and start a discussion so we can agree on a direction before you invest a large amount of time.
+* Send big PRs. Instead, file an issue and start a discussion so that we can agree on a direction before you invest a large amount of time.
 * Commit code that you didn't write. If you find code that you think is a good fit, file an issue and start a discussion before proceeding.
 * Submit PRs that alter licensing related files or headers. If you believe there's a problem with them, file an issue and we'll be happy to discuss it.
 
