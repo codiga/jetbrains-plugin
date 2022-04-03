@@ -1,18 +1,20 @@
 package io.codiga.plugins.jetbrains.actions.create_recipe;
 
-import io.codiga.api.type.LanguageEnumeration;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBLabel;
+import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -64,6 +66,34 @@ public class AssistantCreateRecipeAction extends AnAction {
 
         // Get the selected text, the language and encode the text to be used as a recipe.
         String content = editor.getSelectionModel().getSelectedText();
+
+        /**
+         * If content is null, we show a dialog that invites to selext text.
+         */
+        if (content == null) {
+            DialogWrapper dialogWrapper = new DialogWrapper(editor.getProject(), false) {
+                @Override
+                protected @Nullable JComponent createCenterPanel() {
+                    return null;
+                }
+            };
+            JBLabel jbLabel = new JBLabel("Please select text to create recipe");
+            jbLabel.setBorder(new EmptyBorder(20, 20, 20, 20));
+            dialogWrapper.setResizable(false);
+            JButton jButton = new JButton("OK");
+            dialogWrapper.getContentPane().setLayout(new BorderLayout());
+            dialogWrapper.getContentPane().add(jbLabel, BorderLayout.CENTER);
+            dialogWrapper.getContentPane().add(jButton, BorderLayout.SOUTH);
+            jButton.addActionListener(e -> dialogWrapper.close(0));
+            dialogWrapper.setTitle("Codiga Recipe Creation");
+
+            dialogWrapper.setOKActionEnabled(true);
+            dialogWrapper.pack();
+
+            dialogWrapper.show();
+            return;
+        }
+
         // We need to replace the '+' sign by %2B, otherwise, the code encoding
         // is not correct in the URL parameters.
         String encodedContent = Base64.getEncoder().encodeToString(content.getBytes(StandardCharsets.UTF_8)).replaceAll("\\+", "%2B");
