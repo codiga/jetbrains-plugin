@@ -58,7 +58,12 @@ public final class LanguageUtils {
     }
 
     public static LanguageEnumeration getLanguageFromFilename(final String filename) {
-        final String extension = FilenameUtils.getExtension(filename);
+        String extension;
+        try {
+            extension = FilenameUtils.getExtension(filename);
+        } catch (IllegalArgumentException iae) {
+            return LanguageEnumeration.UNKNOWN;
+        }
 
         if (filename.toLowerCase(java.util.Locale.getDefault()).startsWith("docker")) {
             return LanguageEnumeration.DOCKER;
