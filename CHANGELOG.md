@@ -15,8 +15,20 @@
 
 ### Security
 
-## [1.4.3]
+## [1.4.4]
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
 ### Fixed
+
+### Security
+
+## [1.4.3]
 
 ## [1.4.2]
 
