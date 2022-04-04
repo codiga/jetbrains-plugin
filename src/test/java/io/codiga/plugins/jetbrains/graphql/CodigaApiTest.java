@@ -1,11 +1,12 @@
 package io.codiga.plugins.jetbrains.graphql;
 
-import com.apollographql.apollo.api.ResponseField;
-import io.codiga.api.*;
-import io.codiga.api.type.LanguageEnumeration;
 import com.google.common.collect.ImmutableList;
+import io.codiga.api.GetProjectsQuery;
+import io.codiga.api.GetRecipesForClientByShortcutQuery;
+import io.codiga.api.GetRecipesForClientQuery;
+import io.codiga.api.GetRecipesForClientSemanticQuery;
+import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.testutils.Constants;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,47 +174,6 @@ public final class CodigaApiTest implements CodigaApi {
     @Override
     public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
         return null;
-    }
-
-    public Optional<GetFileDataQuery.Project> getDataForFile(Long projectId, String revision, String path) {
-        return Optional.empty();
-    }
-
-    /**
-     * Add a violation to ignore through the API.
-     * @param projectId - the project identifier on Codiga
-     * @param rule - the rule to ignore
-     * @param tool - the tool used to detect this issue
-     * @param language - the language of the violation
-     * @param filename - the filename. If this is a prefix-based or project-based ignore, that should be empty.
-     * @param prefix - the prefix. If this is a file-based or project-based, that should be empty.
-     * @param description - the description of the violation to ignore.
-     * @return the results of the API call.
-     */
-    public Optional<AddViolationToIgnoreMutation.AddViolationToIgnore> addViolationToIgnore(
-        @NotNull Long projectId, @NotNull String rule, @NotNull String tool,
-        @NotNull LanguageEnumeration language, @NotNull Optional<String> filename, @NotNull Optional<String> prefix,
-        @NotNull String description) {
-        return Optional.empty();
-    }
-
-    /**
-     * Remove an ignored violation from the API.
-     * @param projectId - the project identifier on Codiga
-     * @param rule - the rule to ignore
-     * @param tool - the tool used to detect this issue
-     * @param language - the language of the violation
-     * @param filename - the filename. If this is a prefix-based or project-based ignore, that should be empty.
-     * @param prefix - the prefix. If this is a file-based or project-based, that should be empty.
-     * @return - a string (which is not really relevant)
-     */
-    public Optional<String> removeViolationToIgnore(Long projectId, String rule, String tool, LanguageEnumeration language, Optional<String> filename, Optional<String> prefix) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<GetFileAnalysisQuery.GetFileAnalysis> getFileAnalysis(String filename, String code, LanguageEnumeration language, Optional<Long> projectId, Optional<String> parameters) {
-        return Optional.empty();
     }
 
     @Override

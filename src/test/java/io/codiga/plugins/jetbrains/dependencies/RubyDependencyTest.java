@@ -3,7 +3,7 @@ package io.codiga.plugins.jetbrains.dependencies;
 import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
