@@ -50,7 +50,6 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
-    <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.AppStarter" />
@@ -70,70 +69,13 @@
                 parentId="tools"
                 instance="io.codiga.plugins.jetbrains.settings.application.AppSettingsConfigurable"
                 id="com.code_inspector.settings.AppSettingsConfigurable"
-                displayName="Codiga API"/>
+                displayName="Codiga"/>
 
-        <projectService serviceImplementation="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsState"/>
         <completion.contributor
                 implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
                 language="any"
         />
-        <projectConfigurable
-                parentId="tools"
-                instance="io.codiga.plugins.jetbrains.settings.project.ProjectSettingsConfigurable"
-                id="io.codiga.settings.ProjectSettingsConfigurable"
-                displayName="Codiga Project"/>
         <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
-        <externalAnnotator
-                language="JSON"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="Apex"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="TEXT"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="Scala"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="kotlin"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="yaml"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="JSX Harmony"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="ECMAScript 6"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="JavaScript"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="TypeScript"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="ruby"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="go"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="PHP"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="C"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="Python"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="Shell Script"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
-        <externalAnnotator
-                language="JAVA"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.ExternalAnnotator"/>
 <!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
     </extensions>
     <projectListeners>

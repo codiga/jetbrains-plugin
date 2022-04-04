@@ -1,10 +1,9 @@
 package io.codiga.plugins.jetbrains.dependencies;
 
-import io.codiga.plugins.jetbrains.git.CodigaGitUtilsTest;
 import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +15,7 @@ import java.util.List;
 
 public class JavascriptDependencyTest extends TestBase {
     JavascriptDependency javascriptDependency = new JavascriptDependency();
-    private static Logger LOGGER = LoggerFactory.getLogger(CodigaGitUtilsTest.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(JavascriptDependencyTest.class);
 
     @Test
     public void testParsePackageFrontendJsonValid() throws IOException {
