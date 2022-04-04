@@ -1,12 +1,14 @@
 package io.codiga.plugins.jetbrains.errorreporter;
 
 import com.intellij.ide.DataManager;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 
 import static com.rollbar.notifier.config.ConfigBuilder.withAccessToken;
+import static io.codiga.plugins.jetbrains.Constants.PLUGIN_ID;
 
 /**
  * Custom error reporter to send exceptions to rollbar.
@@ -60,7 +63,14 @@ public class CodigaErrorReporter extends ErrorReportSubmitter {
                                     .build());
 
                     for(IdeaLoggingEvent e: events) {
-                        rollbar.error(e.getThrowableText());
+                        String pluginVersion = "unknown";
+                        try {
+                            pluginVersion = PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID)).getVersion();
+                        }
+                        catch (NullPointerException npe) {
+                            pluginVersion = "errorWhenTryingToGetVersion";
+                        }
+                        rollbar.error("Version: " + pluginVersion + "\n" + e.getThrowableText());
                     }
                     rollbar.close(true);
                     ApplicationManager.getApplication().invokeLater(() -> {

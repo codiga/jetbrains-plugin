@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableList;
 public class Constants {
     public final static String FRONTEND_URL = "https://app.codiga.io";
 
+    public final static String PLUGIN_ID = "io.codiga.plugins.jetbrains-plugin";
+
     public static Long INVALID_PROJECT_ID = 0L;
     public static final String LOGGER_NAME = "Codiga";
     public static final String LINE_SEPARATOR = "\n";
