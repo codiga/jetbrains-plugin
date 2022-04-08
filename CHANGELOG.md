@@ -16,12 +16,6 @@
 ### Security
 
 ## [1.5.1]
-
-### Fixed
-
- - NullPointerException when inserting a recipe.
-
-## [1.4.4]
 ### Added
 
 ### Changed
@@ -33,6 +27,10 @@
 ### Fixed
 
 ### Security
+
+## [1.5.1]
+
+## [1.4.4]
 
 ## [1.4.3]
 
