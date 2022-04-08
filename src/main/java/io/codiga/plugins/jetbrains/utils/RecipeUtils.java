@@ -64,9 +64,14 @@ public final class RecipeUtils {
             .replaceAll("\r\n", LINE_SEPARATOR);
         // DataContext is exposed easily in Actions, in other places like this, we need to look for it
         DataManager.getInstance().getDataContextFromFocusAsync().onSuccess(context -> {
-            final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(context);
+            final CodingAssistantContext codigaTransformationContext = new CodingAssistantContext(context);
+
+            if (!codigaTransformationContext.isValid()) {
+                return;
+            }
+
             // process supported variables dynamically
-            final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
+            final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(codigaTransformationContext);
             String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
 
             // For mysterious reasons, we need to add a newline to the code to not take the next line.

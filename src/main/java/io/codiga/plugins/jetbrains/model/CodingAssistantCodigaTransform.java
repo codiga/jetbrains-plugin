@@ -72,7 +72,7 @@ public class CodingAssistantCodigaTransform {
     try {
       processedCode = MacroManager.getInstance().expandMacrosInString(code,
         true,
-        codigaTransformationContext.dataContext);
+        codigaTransformationContext.getDataContext());
     } catch (Macro.ExecutionCancelledException e) {
       e.printStackTrace();
     }

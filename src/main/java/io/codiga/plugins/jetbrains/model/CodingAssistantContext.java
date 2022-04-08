@@ -1,6 +1,5 @@
 package io.codiga.plugins.jetbrains.model;
 
-import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -38,12 +37,38 @@ final public class CodingAssistantContext {
     DATE_CURRENT_MINUTE, DATE_CURRENT_SECOND, DATE_CURRENT_DAY,
     DATE_MONTH_TWO_DIGITS, CODIGA_INDENT);
 
-  public final VirtualFile virtualFile;
-  public final DataContext dataContext;
+  private final VirtualFile virtualFile;
+  private final DataContext dataContext;
 
   public CodingAssistantContext(DataContext dataContext) {
     this.virtualFile = dataContext.getData(LangDataKeys.VIRTUAL_FILE);
     this.dataContext = dataContext;
+  }
+
+  /**
+   * During all transformations, we need to access different keys that
+   * may be null. Before proceeding, we check that all required values
+   * are present.
+   *
+   * @return true is all values required for the transformation are present.
+   */
+  public boolean isValid() {
+    if (dataContext.getData(LangDataKeys.PSI_FILE) == null) {
+      return false;
+    }
+
+    if (dataContext.getData(LangDataKeys.PROJECT) == null) {
+      return false;
+    }
+    return true;
+  }
+
+  public DataContext getDataContext() {
+    return this.dataContext;
+  }
+
+  public VirtualFile getVirtualFile() {
+    return this.virtualFile;
   }
 
 }
