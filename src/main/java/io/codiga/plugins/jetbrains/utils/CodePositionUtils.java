@@ -92,27 +92,50 @@ public final class CodePositionUtils {
             }
 
         }
-        if (languageEnumeration == LanguageEnumeration.JAVA) {
+        if (languageEnumeration == LanguageEnumeration.JAVA || languageEnumeration == LanguageEnumeration.SCALA) {
 
+            boolean inComment = false;
             for (String line: codeArray) {
+                final String lineWithoutSpace = line.replaceAll(" ", "");
+
                 if (line.startsWith(JAVA_PACKAGE_KEYWORD)) {
-                    start = line.length() + 1;
-                } else {
-                    break;
+                    start = start + line.length() + 1;
+                    continue;
                 }
-            }
-        }
-        if (languageEnumeration == LanguageEnumeration.SCALA) {
 
-            for (String line: codeArray) {
-                if (line.startsWith(SCALA_PACKAGE_KEYWORD)) {
-                    start = line.length() + 1;
-                } else {
-                    break;
+                /**
+                 * We do not want to add code on top of a comment
+                 */
+                if (lineWithoutSpace.startsWith("/*")) {
+                    start = start + line.length() + 1;
+                    inComment = true;
+                    continue;
                 }
+                if (lineWithoutSpace.startsWith("*/") && inComment) {
+                    inComment = false;
+                    start = start + line.length() + 1;
+                    continue;
+                }
+                if (lineWithoutSpace.startsWith("//")) {
+                    inComment = false;
+                    start = start + line.length() + 1;
+                    continue;
+                }
+
+                if (inComment) {
+                    start = start + line.length() + 1;
+                    continue;
+                }
+
+                break;
             }
         }
-        return start;
+
+        if (start < code.length()) {
+            return start;
+        } else {
+            return 0;
+        }
     }
 
     public static Optional<String> getKeywordFromLine(String line, int position) {
