@@ -1,14 +1,13 @@
-package io.codiga.plugins.jetbrains.actions.use_recipe;
+package io.codiga.plugins.jetbrains.actions.shortcuts;
 
-import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
-import com.intellij.ide.util.gotoByName.ChooseByNameViewModel;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Processor;
-import io.codiga.api.GetRecipesForClientSemanticQuery;
+import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
+import io.codiga.plugins.jetbrains.ui.SearchPopup;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -16,26 +15,21 @@ import java.util.Optional;
 
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 
-public class UseRecipeChooseByNameItemProvider implements ChooseByNameItemProvider {
+public class ShortcutSearchItemProvider implements SearchPopup.SearchItemProvider {
 
     private final AnActionEvent anActionEvent;
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
-    public UseRecipeChooseByNameItemProvider(AnActionEvent anActionEvent) {
+    public ShortcutSearchItemProvider(AnActionEvent anActionEvent) {
         this.anActionEvent = anActionEvent;
     }
 
     @Override
-    public @NotNull List<String> filterNames(@NotNull ChooseByNameViewModel chooseByNameViewModel, String @NotNull [] strings, @NotNull String s) {
-        return null;
-    }
-
-    @Override
-    public boolean filterElements(@NotNull ChooseByNameViewModel chooseByNameViewModel, @NotNull String s, boolean b, @NotNull ProgressIndicator progressIndicator, @NotNull Processor<Object> processor) {
+    public void filterElements(@NotNull SearchPopup.Model model, @NotNull String s, @NotNull ProgressIndicator progressIndicator, @NotNull Processor<Object> processor) {
 
         String toSearch = s.isEmpty() ? null : s;
 
-        if(!progressIndicator.isRunning()) {
+        if (!progressIndicator.isRunning()) {
             progressIndicator.start();
 
         }
@@ -45,23 +39,22 @@ public class UseRecipeChooseByNameItemProvider implements ChooseByNameItemProvid
         LanguageEnumeration language = getLanguageFromEditorForEvent(anActionEvent);
 
         if (language == LanguageEnumeration.UNKNOWN) {
-            return false;
+            return;
         }
 
-        List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> newRecipes = codigaApi.getRecipesSemantic(
+        List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> newRecipes = codigaApi.getRecipesForClientByShotcurt(
             Optional.ofNullable(toSearch),
             dependenciesName,
             Optional.empty(),
             language,
-            filename);
+            filename
+        );
 
+        newRecipes.forEach(processor::process);
 
-        newRecipes.forEach(r -> processor.process(r));
-
-        if(progressIndicator.isRunning() && !progressIndicator.isCanceled()) {
+        if (progressIndicator.isRunning() && !progressIndicator.isCanceled()) {
             progressIndicator.stop();
         }
 
-        return false;
     }
 }
