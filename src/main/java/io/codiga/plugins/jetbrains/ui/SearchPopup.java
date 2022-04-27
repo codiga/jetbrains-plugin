@@ -167,6 +167,8 @@ public class SearchPopup implements Disposable {
                     case KeyEvent.VK_TAB:
                         close(true);
                         break;
+                    default:
+                        // do nothing
                 }
             }
         });
@@ -395,7 +397,7 @@ public class SearchPopup implements Disposable {
         scheduleIncrementalListUpdate(elements);
         addElementsByPattern(pattern, elements, progressIndicator);
 
-        if (elements.size() == 0) {
+        if (elements.isEmpty()) {
             list.setVisible(false);
             notFoundPanel.setVisible(true);
         } else {
@@ -525,7 +527,7 @@ public class SearchPopup implements Disposable {
         ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
         String activeToolWindowId = toolWindowManager.getActiveToolWindowId();
         ToolWindow toolWindow = activeToolWindowId == null ? null : toolWindowManager.getToolWindow(activeToolWindowId);
-        JComponent toolWindowComponent = toolWindow != null ? toolWindow.getComponent() : null;
+        JComponent toolWindowComponent = toolWindow == null ? null : toolWindow.getComponent();
         return toolWindowComponent != null &&
                 toolWindowComponent.getClientProperty(TEMPORARILY_FOCUSABLE_COMPONENT_KEY) != null &&
                 SwingUtilities.isDescendingFrom(component, toolWindowComponent);
@@ -557,17 +559,13 @@ public class SearchPopup implements Disposable {
 
         if (window instanceof JFrame) {
             layeredPane = ((JFrame)window).getLayeredPane();
-        }
-        else if (window instanceof JDialog) {
+        } else if (window instanceof JDialog) {
             layeredPane = ((JDialog)window).getLayeredPane();
-        }
-        else if (window instanceof JWindow) {
+        } else if (window instanceof JWindow) {
             layeredPane = ((JWindow)window).getLayeredPane();
-        }
-        else {
+        } else {
             throw new IllegalStateException("cannot find parent window: project=" + project +
-                    (project != null ? "; open=" + project.isOpen() : "") +
-                    "; window=" + window);
+                    (project == null ? "" : "; open=" + project.isOpen()) + "; window=" + window);
         }
         return layeredPane;
     }
@@ -642,13 +640,9 @@ public class SearchPopup implements Disposable {
     }
 
     public abstract static class Callback {
-        public Callback() {
-        }
-
         public abstract void elementChosen(Object var1);
 
-        public void onClose() {
-        }
+        public abstract void onClose();
     }
 
     public interface Model {
@@ -658,7 +652,7 @@ public class SearchPopup implements Disposable {
             return IdeBundle.message("label.choosebyname.no.matches.found");
         }
 
-        public @NotNull ListCellRenderer getListCellRenderer();
+        @NotNull ListCellRenderer getListCellRenderer();
     }
 
     static class SmartPointerListModel<T> extends AbstractListModel<T> implements ModelDiff.Model<T> {
