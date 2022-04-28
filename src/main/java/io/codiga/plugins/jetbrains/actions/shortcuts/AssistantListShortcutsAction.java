@@ -1,17 +1,15 @@
 package io.codiga.plugins.jetbrains.actions.shortcuts;
 
-import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
-import com.intellij.ide.util.gotoByName.ChooseByNamePopupComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
+import io.codiga.plugins.jetbrains.ui.SearchPopup;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -38,16 +36,12 @@ public class AssistantListShortcutsAction extends AnAction {
 
 
         CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
-        ChooseByNamePopup popup = ChooseByNamePopup.createPopup(
-            event.getProject(),
-            new ShortcutChooseByNameModel(event, codeInsertionContext),
-            new ShortcutChooseByNameItemProvider(event));
-
-        popup.setAdText("Enter your search query to find snippets");
-        popup.setSearchInAnyPlace(true);
-        popup.setShowListForEmptyPattern(true);
-
-        popup.invoke(new ChooseByNamePopupComponent.Callback() {
+        SearchPopup popup = new SearchPopup(
+                event.getProject(),
+                new ShortcutChooseByNameModel(event, codeInsertionContext),
+                new ShortcutSearchItemProvider(event)
+        );
+        popup.invoke(new SearchPopup.Callback() {
             @Override
             public void onClose() {
                 removeAddedCode(event, codeInsertionContext);
@@ -60,19 +54,19 @@ public class AssistantListShortcutsAction extends AnAction {
                     GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe = (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut) element;
 
                     applyRecipe(event,
-                        recipe.name(),
-                        recipe.jetbrainsFormat(),
-                        ((BigDecimal)recipe.id()).longValue(),
-                        recipe.imports(),
-                        recipe.language(),
-                        codeInsertionContext,
-                        codigaApi);
+                            recipe.name(),
+                            recipe.jetbrainsFormat(),
+                            ((BigDecimal)recipe.id()).longValue(),
+                            recipe.imports(),
+                            recipe.language(),
+                            codeInsertionContext,
+                            codigaApi);
 
                 }
 
                 codeInsertionContext.clearAll();
             }
-        }, ModalityState.current(), false);
+        });
     }
 
     @Override
