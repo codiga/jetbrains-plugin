@@ -9,8 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.math.BigDecimal;
 
-import static io.codiga.plugins.jetbrains.actions.ActionUtils.addRecipeToEditor;
-import static io.codiga.plugins.jetbrains.actions.ActionUtils.removeAddedCode;
+import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 
 public class UseRecipeSearchModel implements SearchPopup.Model {
 

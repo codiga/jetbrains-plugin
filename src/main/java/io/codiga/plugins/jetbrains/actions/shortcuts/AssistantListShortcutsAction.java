@@ -49,7 +49,6 @@ public class AssistantListShortcutsAction extends AnAction {
 
             @Override
             public void elementChosen(Object element) {
-
                 if (element instanceof GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut) {
                     GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe = (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut) element;
 

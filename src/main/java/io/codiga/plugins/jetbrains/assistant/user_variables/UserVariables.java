@@ -1,17 +1,22 @@
 package io.codiga.plugins.jetbrains.assistant.user_variables;
 
 import com.intellij.codeInsight.template.impl.Variable;
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+
 public final class UserVariables {
 
     private static final Pattern pattern = Pattern.compile(UserVariablesConstants.REGEXP);
 
     private static UserVariables _INSTANCE = new UserVariables();
+
+    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     private UserVariables() {};
 
@@ -31,8 +36,9 @@ public final class UserVariables {
                  * Variable name and value are present.
                  */
                 if (variableName != null && variableValue != null) {
+                    final String val = variableValue.replaceAll(":", "");
+                    Variable newVariable = new Variable(matcher.group(1), "decapitalize(\"" + val+"\")", val, true);
 
-                    Variable newVariable = new Variable(matcher.group(1), null, variableValue.replaceAll(":", ""), true);
                     variables.add(newVariable);
                     continue;
                 }

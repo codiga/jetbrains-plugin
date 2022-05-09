@@ -50,7 +50,6 @@ public class AssistantUseRecipeAction extends AnAction {
 
             @Override
             public void elementChosen(Object element) {
-
                 if (element instanceof GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch) {
                     GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch recipe = (GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch) element;
 

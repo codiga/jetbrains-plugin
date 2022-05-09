@@ -58,12 +58,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class SearchPopup implements Disposable {
     public static final String TEMPORARILY_FOCUSABLE_COMPONENT_KEY = "Codiga.SearchPopup.TemporarilyFocusableComponent";
@@ -130,10 +129,19 @@ public class SearchPopup implements Disposable {
 
         final Set<KeyStroke> upShortcuts = getShortcuts(IdeActions.ACTION_EDITOR_MOVE_CARET_UP);
         final Set<KeyStroke> downShortcuts = getShortcuts(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN);
+
         textField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(@NotNull KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER && (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
+                /**
+                 * If key is enter, we add the data and exit.
+                 */
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    Object o = getChosenElement();
+                    if (o != null) {
+                        actionListener.elementChosen(o);
+                    }
+
                     close(true);
                 }
                 if (!listScrollPane.isVisible()) {
