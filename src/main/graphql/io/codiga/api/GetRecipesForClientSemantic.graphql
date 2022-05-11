@@ -4,6 +4,7 @@ query GetRecipesForClientSemantic($term: String, $filename: String, $dependencie
     name
     code
     jetbrainsFormat
+    presentableFormat
     keywords
     imports
     language
