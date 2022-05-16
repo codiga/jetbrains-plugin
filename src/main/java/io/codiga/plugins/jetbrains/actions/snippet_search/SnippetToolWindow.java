@@ -199,7 +199,7 @@ public class SnippetToolWindow {
         }
 
 
-        java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename);
+        java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, Optional.empty(), Optional.empty(), Optional.empty());
 
         LOGGER.info("found " + snippets.size() + " recipes");
 

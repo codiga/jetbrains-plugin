@@ -1,5 +1,5 @@
-query GetRecipesForClientSemantic($term: String, $filename: String, $dependencies: [String!]!, $parameters: String, $languages: [LanguageEnumeration!], $howmany: Long!, $skip: Long!){
-  assistantRecipesSemanticSearch(term: $term, filename: $filename, dependencies:$dependencies, parameters:$parameters, languages: $languages, howmany: $howmany, skip: $skip){
+query GetRecipesForClientSemantic($term: String, $onlyPublic: Boolean, $onlyPrivate: Boolean, $onlySubscribed: Boolean, $filename: String, $dependencies: [String!]!, $parameters: String, $languages: [LanguageEnumeration!], $howmany: Long!, $skip: Long!){
+  assistantRecipesSemanticSearch(term: $term, onlyPublic: $onlyPublic, onlyPrivate: $onlyPrivate, onlySubscribed: $onlySubscribed, filename: $filename, dependencies:$dependencies, parameters:$parameters, languages: $languages, howmany: $howmany, skip: $skip){
     id
     name
     code

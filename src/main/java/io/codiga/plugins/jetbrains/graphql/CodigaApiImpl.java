@@ -19,9 +19,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static io.codiga.api.type.AnalysisResultStatus.DONE;
-import static io.codiga.api.type.AnalysisResultStatus.ERROR;
-import static io.codiga.plugins.jetbrains.Constants.*;
+import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 /**
  * This class implements the Codiga API, which is a GraphQL API.
@@ -155,16 +153,27 @@ public final class CodigaApiImpl implements CodigaApi {
     }
 
     @Override
-    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term,
+                                                                                                                List<String> dependencies,
+                                                                                                                Optional<String> parameters,
+                                                                                                                LanguageEnumeration language,
+                                                                                                                String filename,
+                                                                                                                Optional<Boolean> onlyPublic,
+                                                                                                                Optional<Boolean> onlyPrivate,
+                                                                                                                Optional<Boolean> onlySubscribed) {
         ApiRequest<List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut>> apiRequest = new ApiRequest();
         AppSettingsState settings = AppSettingsState.getInstance();
         String fingerPrintText = settings.getFingerprint();
         Input<String> fingerprint = Input.fromNullable(fingerPrintText);
         final Input<String> termParameter = term.map(Input::fromNullable).orElse(Input.absent());
+        final Input<Boolean> onlyPublicParameter = onlyPublic.map(Input::fromNullable).orElse(Input.absent());
+        final Input<Boolean> onlyPrivateParameter = onlyPrivate.map(Input::fromNullable).orElse(Input.absent());
+        final Input<Boolean> onlySubscribedParameter = onlySubscribed.map(Input::fromNullable).orElse(Input.absent());
+
 
 
         ApolloQueryCall<GetRecipesForClientByShortcutQuery.Data> queryCall = apolloClient.query(
-                        new GetRecipesForClientByShortcutQuery(fingerprint, Input.fromNullable(filename), termParameter, dependencies, Input.absent(), language))
+                        new GetRecipesForClientByShortcutQuery(fingerprint, Input.fromNullable(filename), termParameter, dependencies, Input.absent(), language, onlyPublicParameter, onlyPrivateParameter, onlySubscribedParameter))
                 .toBuilder()
                 .requestHeaders(getHeaders())
                 .build();
@@ -228,17 +237,26 @@ public final class CodigaApiImpl implements CodigaApi {
     }
 
     @Override
-    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename, Optional<Boolean> onlyPublic, Optional<Boolean> onlyPrivate, Optional<Boolean> onlySubscribed) {
         ApiRequest<List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch>> apiRequest = new ApiRequest();
         AppSettingsState settings = AppSettingsState.getInstance();
         String fingerPrintText = settings.getFingerprint();
         Input<String> fingerprint = Input.fromNullable(fingerPrintText);
         final Input<String> termParameter = term.map(Input::fromNullable).orElse(Input.absent());
+        final Input<Boolean> onlyPublicParameter = onlyPublic.map(Input::fromNullable).orElse(Input.absent());
+        final Input<Boolean> onlyPrivateParameter = onlyPrivate.map(Input::fromNullable).orElse(Input.absent());
+        final Input<Boolean> onlySubscribedParameter = onlySubscribed.map(Input::fromNullable).orElse(Input.absent());
+
+
 
 
         ApolloQueryCall<GetRecipesForClientSemanticQuery.Data> queryCall = apolloClient.query(
                         new GetRecipesForClientSemanticQuery(
-                                termParameter, Input.fromNullable(filename),
+                                termParameter,
+                                onlyPublicParameter,
+                                onlyPrivateParameter,
+                                onlySubscribedParameter,
+                                Input.fromNullable(filename),
                                 dependencies, Input.absent(),
                                 Input.optional(ImmutableList.of(language)),
                                 100,

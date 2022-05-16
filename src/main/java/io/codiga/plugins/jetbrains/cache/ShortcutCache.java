@@ -64,7 +64,15 @@ public final class ShortcutCache {
 
 
         if (shouldFetch) {
-            List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = codigaApi.getRecipesForClientByShotcurt(Optional.empty(), shortcutCacheKey.getDependencies(), Optional.empty(), shortcutCacheKey.getLanguage(), shortcutCacheKey.getFilename());
+            List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes =
+                    codigaApi.getRecipesForClientByShotcurt(Optional.empty(),
+                            shortcutCacheKey.getDependencies(),
+                            Optional.empty(),
+                            shortcutCacheKey.getLanguage(),
+                            shortcutCacheKey.getFilename(),
+                            Optional.empty(),
+                            Optional.empty(),
+                            Optional.empty());
             ShortcutCacheValue shortcutCacheValue = new ShortcutCacheValue(recipes, lastUpdateTimestamp.get());
             cache.put(shortcutCacheKey, shortcutCacheValue);
         } else {
