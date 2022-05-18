@@ -4,6 +4,7 @@ import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.Variable;
 import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -47,6 +48,7 @@ public final class RecipeUtils {
         final Project project = editor.getProject();
 
         if (project == null) {
+            LOGGER.info("project is null");
             return;
         }
 
@@ -63,52 +65,53 @@ public final class RecipeUtils {
         String unprocessedCode = new String(Base64.getDecoder().decode(jetBrainsFormat))
             .replaceAll("\r\n", LINE_SEPARATOR);
         // DataContext is exposed easily in Actions, in other places like this, we need to look for it
-        DataManager.getInstance().getDataContextFromFocusAsync().onSuccess(context -> {
-            final CodingAssistantContext codigaTransformationContext = new CodingAssistantContext(context);
+        DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
 
-            if (!codigaTransformationContext.isValid()) {
-                return;
-            }
+        final CodingAssistantContext codigaTransformationContext = new CodingAssistantContext(dataContext);
 
-            // process supported variables dynamically
-            final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(codigaTransformationContext);
-            String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
+        if (!codigaTransformationContext.isValid()) {
+            LOGGER.info("context is not valid");
+            return;
+        }
 
-            // For mysterious reasons, we need to add a newline to the code to not take the next line.
-            Template template = TemplateManagerImpl.getInstance(project).createTemplate(recipeName, recipeName, code + "\n");
-            template.setToIndent(true);
-            template.setToReformat(true);
+        // process supported variables dynamically
+        final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(codigaTransformationContext);
+        String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
 
-            List<Variable> variables = UserVariables.getInstance().getVariablesFromCode(unprocessedCode);
-            for (Variable variable: variables){
-                template.addVariable(variable);
-            }
+        // For mysterious reasons, we need to add a newline to the code to not take the next line.
+        Template template = TemplateManagerImpl.getInstance(project).createTemplate(recipeName, recipeName, code + "\n");
+        template.setToIndent(true);
+        template.setToReformat(true);
 
-            TemplateManagerImpl.getInstance(project).runTemplate(editor, template);
+        List<Variable> variables = UserVariables.getInstance().getVariablesFromCode(unprocessedCode);
+        for (Variable variable: variables){
+            template.addVariable(variable);
+        }
 
-            // Insert all imports
-            try {
-                WriteCommandAction.writeCommandAction(project).run(
-                    (ThrowableRunnable<Throwable>) () -> {
-                        int firstInsertion = firstPositionToInsert(currentCode, language);
+        TemplateManagerImpl.getInstance(project).runTemplate(editor, template);
 
-                        for(String importStatement: imports) {
-                            if(!hasImport(currentCode, importStatement, language)) {
+        // Insert all imports
+        try {
+            WriteCommandAction.writeCommandAction(project).run(
+                (ThrowableRunnable<Throwable>) () -> {
+                    int firstInsertion = firstPositionToInsert(currentCode, language);
 
-                                String dependencyStatement = importStatement + LINE_SEPARATOR;
-                                document.insertString(firstInsertion, dependencyStatement);
-                            }
+                    for(String importStatement: imports) {
+                        if(!hasImport(currentCode, importStatement, language)) {
+
+                            String dependencyStatement = importStatement + LINE_SEPARATOR;
+                            document.insertString(firstInsertion, dependencyStatement);
                         }
                     }
-                );
-            } catch (Throwable e) {
-                e.printStackTrace();
-                LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
-                LOGGER.error(e);
-            }
+                }
+            );
+        } catch (Throwable e) {
+            e.printStackTrace();
+            LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+            LOGGER.error(e);
+        }
 
-            // sent a callback that the recipe has been used.
-            codigaApi.recordRecipeUse(recipeId);
-        });
+        // sent a callback that the recipe has been used.
+        codigaApi.recordRecipeUse(recipeId);
     }
 }

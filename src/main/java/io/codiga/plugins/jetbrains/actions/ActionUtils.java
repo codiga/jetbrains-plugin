@@ -139,12 +139,6 @@ public class ActionUtils {
             }
         }
     }
-
-    /**
-     * Remove the code that was previously added when browsing a recipe.
-     * Remove the added code from the editor.
-     * @param anActionEvent
-     */
     public static void removeAddedCode(AnActionEvent anActionEvent, CodeInsertionContext context) {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
         Project project = editor.getProject();
@@ -152,7 +146,14 @@ public class ActionUtils {
         if (project == null) {
             return;
         }
+        removeAddedCode(editor, project, context);
+    }
 
+    /**
+     * Remove the code that was previously added when browsing a recipe.
+     * Remove the added code from the editor.
+     */
+    public static void removeAddedCode(@NotNull Editor editor, @NotNull Project project, @NotNull CodeInsertionContext context) {
         if(!context.getCodeInsertions().isEmpty()) {
             ApplicationManager.getApplication().invokeLater(() -> {
                 try {
@@ -201,12 +202,25 @@ public class ActionUtils {
         Editor editor = anActionEvent.getDataContext().getData(LangDataKeys.EDITOR_EVEN_IF_INACTIVE);
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
         Project project = anActionEvent.getProject();
+
+        CodingAssistantContext codigaAssistantContext = new CodingAssistantContext(anActionEvent.getDataContext());
+        addRecipeToEditor(editor, psiFile, project, codeInsertions, highlighters, recipeImports, recipeCodeJetBrainsFormat, recipeLanguage, codigaAssistantContext);
+    }
+
+    public static void addRecipeToEditor(@NotNull Editor editor,
+                                         @NotNull PsiFile psiFile,
+                                         @NotNull Project project,
+                                         List<CodeInsertion> codeInsertions,
+                                         List<RangeHighlighter> highlighters,
+                                         List<String> recipeImports,
+                                         String recipeCodeJetBrainsFormat,
+                                         LanguageEnumeration recipeLanguage,
+                                         CodingAssistantContext codigaTransformationContext){
         Document document = editor.getDocument();
         String currentCode = document.getText();
 
         String unprocessedCode = new String(Base64.getDecoder().decode(recipeCodeJetBrainsFormat)).replaceAll("\r\n", LINE_SEPARATOR);
-        final CodingAssistantContext CodigaTransformationContext = new CodingAssistantContext(anActionEvent.getDataContext());
-        final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(CodigaTransformationContext);
+        final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(codigaTransformationContext);
         String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
 
         // Get the current line and get the indentation
@@ -309,8 +323,22 @@ public class ActionUtils {
             return;
         }
         Project project = editor.getProject();
+        if (project == null) {
+            LOGGER.warn("applyRecipe - project is null");
+            return;
+        }
+        applyRecipe(editor, project, recipeName, recipeJetbrainsFormat, recipeId, imports, language, codeInsertionContext, codigaApi);
+    }
 
-
+    public static void applyRecipe(@NotNull Editor editor,
+                                   @NotNull Project project,
+                                   String recipeName,
+                                   String recipeJetbrainsFormat,
+                                   Long recipeId,
+                                   List<String> imports,
+                                   LanguageEnumeration language,
+                                   CodeInsertionContext codeInsertionContext,
+                                   CodigaApi codigaApi) {
         /**
          * Remove the code that was added before
          */
@@ -355,8 +383,6 @@ public class ActionUtils {
                 LOGGER.error(e);
             }
         });
-
-
     }
 
     public static boolean isActionActive(AnActionEvent anActionEvent) {

@@ -15,6 +15,7 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 public class SnippetToolWindowFileEditorManagerListener implements FileEditorManagerListener {
     private static Project currentProject = null;
     private static VirtualFile currentVirtualFile = null;
+    private static FileEditor currentFileEditor = null;
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     public static Project getCurrentProject() {
@@ -25,6 +26,10 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
         return currentVirtualFile;
     }
 
+    public static FileEditor getCurrentFileEditor() {
+        return currentFileEditor;
+    }
+
 
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
@@ -33,6 +38,7 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
             return;
         }
 
+
         SnippetToolWindow snippetToolWindow = SnippetToolWindowFactory.getSnippetToolWindow();
         if (snippetToolWindow == null) {
             return;
@@ -40,6 +46,7 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
 
         currentProject = event.getManager().getProject();
         currentVirtualFile = fileEditor.getFile();
+        currentFileEditor = fileEditor;
         LOGGER.info("current project: " + currentProject.getName());
         LOGGER.info("current file: " + currentVirtualFile.getName());
         snippetToolWindow.updateEditor(event.getManager().getProject(),  fileEditor.getFile(), Optional.empty(), true);

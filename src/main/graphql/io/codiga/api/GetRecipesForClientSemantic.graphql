@@ -10,6 +10,15 @@ query GetRecipesForClientSemantic($term: String, $onlyPublic: Boolean, $onlyPriv
     language
     description
     shortcut
+    owner{
+      id
+      username
+      accountType
+    }
+    groups{
+      id
+      name
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 package io.codiga.plugins.jetbrains.cache;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Collectors;
 
+import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 
@@ -21,7 +23,7 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFil
  * is being opened.
  */
 public class CacheRefreshEditorListener implements FileEditorManagerListener {
-
+    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final Alarm alarm = new Alarm();
 
     @Override

@@ -1,7 +1,5 @@
 package io.codiga.plugins.jetbrains.model;
 
-import com.intellij.ide.macro.Macro;
-import com.intellij.ide.macro.MacroManager;
 import io.codiga.plugins.jetbrains.assistant.transformers.*;
 import io.codiga.plugins.jetbrains.assistant.user_variables.UserVariables;
 import org.jetbrains.annotations.NotNull;
@@ -50,8 +48,8 @@ public class CodingAssistantCodigaTransform {
       new VariableIndentation());
   }
 
-  public CodingAssistantCodigaTransform(CodingAssistantContext CodigaTransformationContext) {
-    this.codigaTransformationContext = CodigaTransformationContext;
+  public CodingAssistantCodigaTransform(CodingAssistantContext codigaTransformationContext) {
+    this.codigaTransformationContext = codigaTransformationContext;
   }
 
   /**
@@ -66,16 +64,16 @@ public class CodingAssistantCodigaTransform {
    * any was found.
    */
   public String findAndTransformVariables (@NotNull String code) {
-    String processedCode = null;
+    String processedCode = code;
 
     // expand macros first
-    try {
-      processedCode = MacroManager.getInstance().expandMacrosInString(code,
-        true,
-        codigaTransformationContext.getDataContext());
-    } catch (Macro.ExecutionCancelledException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      processedCode = MacroManager.getInstance().expandMacrosInString(code,
+//        true,
+//        codigaTransformationContext.getDataContext());
+//    } catch (Macro.ExecutionCancelledException e) {
+//      e.printStackTrace();
+//    }
 
     // detect any codiga variable that is not a macro and resolve it
     List<String> detectedVariables = detectVariablesInsideCode(code);

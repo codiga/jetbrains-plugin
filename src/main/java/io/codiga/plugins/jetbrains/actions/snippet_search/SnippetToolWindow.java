@@ -9,22 +9,25 @@ import com.intellij.util.Alarm;
 import com.intellij.util.ui.AsyncProcessIcon;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
+import io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
+import static io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier.CODIGA_API_KEY_CHANGE_TOPIC;
 
 public class SnippetToolWindow {
     private JPanel mainPanel;
@@ -43,12 +46,17 @@ public class SnippetToolWindow {
     private boolean searchPrivateSnippetsOnly;
     private boolean searchPublicSnippetsOnly;
     private boolean searchFavoriteSnippetsOnly;
+    private boolean searchPrivateSnippetsOnlyEnabled;
+    private boolean searchPublicSnippetsOnlyEnabled;
+    private boolean searchFavoriteSnippetsOnlyEnabled;
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+
     private final JPanel noRecipePanel = new JPanel();
     private final JPanel languageNotSupportedPanel = new JPanel();
+    private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
 
     public void updateSearchPreferences(boolean _allSnippets, boolean _privateOnly, boolean _publicOnly, boolean _favoriteOnly) {
         this.searchFavoriteSnippetsOnly = _favoriteOnly;
@@ -59,24 +67,26 @@ public class SnippetToolWindow {
         radioPrivateOnly.setSelected(this.searchPrivateSnippetsOnly);
         radioPublicOnly.setSelected(this.searchPublicSnippetsOnly);
         checkboxFavoritesOnly.setSelected(this.searchFavoriteSnippetsOnly);
+
+        radioPrivateOnly.setEnabled(searchPrivateSnippetsOnlyEnabled);
+        radioPublicOnly.setEnabled(searchPublicSnippetsOnlyEnabled);
+        checkboxFavoritesOnly.setEnabled(searchFavoriteSnippetsOnlyEnabled);
     }
 
-    public SnippetToolWindow(ToolWindow toolWindow) {
+    public void setDefaultValuesForSearchPreferences() {
         searchAllSnippets = true;
         searchPrivateSnippetsOnly = false;
         searchPublicSnippetsOnly = false;
         searchFavoriteSnippetsOnly = false;
+        searchPrivateSnippetsOnlyEnabled = false;
+        searchPublicSnippetsOnlyEnabled = false;
+        searchFavoriteSnippetsOnlyEnabled = false;
+    }
 
-//        snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
-//        snippetsPanel.add(new SnippetPanel().getComponent());
+
+    public SnippetToolWindow(ToolWindow toolWindow) {
+        setDefaultValuesForSearchPreferences();
+
         Alarm searchTermAlarm = new Alarm();
 
         radioAllSnippets.addActionListener(new ActionListener() {
@@ -122,7 +132,7 @@ public class SnippetToolWindow {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                loadingPanel.setVisible(false);
+                loadingPanel.setVisible(true);
                 searchTermAlarm.cancelAllRequests();
                 searchTermAlarm.addRequest(() -> {
                     final String searchTermString = searchTerm.getText();
@@ -148,7 +158,7 @@ public class SnippetToolWindow {
         loadingPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         loadingPanel.add(new AsyncProcessIcon("loading..."));
         loadingPanel.add(new JLabel(" loading..."));
-
+        loadingPanel.setVisible(false);
         noRecipePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         noRecipePanel.add(new JLabel("no snippet found"));
 
@@ -159,8 +169,67 @@ public class SnippetToolWindow {
         scrollPane.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
         scrollPane.getVerticalScrollBar().setBlockIncrement(16);
 
+        updateUser();
         updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
 
+
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC, new ApiKeyChangeNotifier() {
+            @Override
+            public void beforeAction(Object context) {
+
+            }
+
+            @Override
+            public void afterAction(Object context) {
+                updateUser();
+                updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
+            }
+        });
+
+    }
+
+    public void updateUser() {
+        Optional<String> username = codigaApi.getUsername();
+        if (username.isPresent()) {
+            searchPrivateSnippetsOnlyEnabled = true;
+            searchPublicSnippetsOnlyEnabled = true;
+            searchFavoriteSnippetsOnlyEnabled = true;
+            String htmlLoginLabel = String.format("<html>Logged as <a href=\"https://app.codiga.io\">%s</a></html>", username.get());
+            loggedInLabel.setText(htmlLoginLabel);
+            loggedInLabel.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    try {
+                        Desktop.getDesktop().browse(new URI("https://app.codiga.io"));
+                    } catch (IOException | URISyntaxException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
+            });
+        } else {
+            setDefaultValuesForSearchPreferences();
+            loggedInLabel.setText("not logged in");
+        }
     }
 
     public static void fixScrolling(JScrollPane scrollpane) {
@@ -203,10 +272,7 @@ public class SnippetToolWindow {
 
         LOGGER.info("found " + snippets.size() + " recipes");
 
-        java.util.List<SnippetPanel> panels =  snippets.stream().map(snippet -> {
-            LOGGER.info(snippet.name());
-            return new SnippetPanel(snippet);
-        }).collect(Collectors.toList());
+        java.util.List<SnippetPanel> panels =  snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext)).collect(Collectors.toList());
 
         snippetsPanel.removeAll();
         snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));
@@ -224,7 +290,7 @@ public class SnippetToolWindow {
         snippetsPanel.repaint();
         scrollPane.getViewport().setViewPosition(new Point(0,0 ));
 
-       // fixScrolling(scrollPane);
+        fixScrolling(scrollPane);
         // scroll back to the top
 //        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0,0 )));
     }
