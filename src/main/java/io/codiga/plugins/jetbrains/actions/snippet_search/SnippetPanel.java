@@ -8,6 +8,7 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -119,8 +120,10 @@ public class SnippetPanel {
                 });
             }
         }
+        LOGGER.info(owner);
         code.setText(decodedCode);
-        
+
+
         userInformation.setText(owner);
 
         description.setText(String.format("<html>%s</html>", htmlDescription));
@@ -144,7 +147,7 @@ public class SnippetPanel {
 
                 Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
-                // TODO: get focus in the editor
+                IdeFocusManager.getInstance(project).requestFocusInProject(editor.getComponent(), project);
 
                 applyRecipe(editor,
                         project,
