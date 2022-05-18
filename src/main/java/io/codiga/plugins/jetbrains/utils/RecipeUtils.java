@@ -1,6 +1,7 @@
 package io.codiga.plugins.jetbrains.utils;
 
 import com.intellij.codeInsight.template.Template;
+import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.Variable;
 import com.intellij.ide.DataManager;
@@ -88,7 +89,7 @@ public final class RecipeUtils {
             template.addVariable(variable);
         }
 
-        TemplateManagerImpl.getInstance(project).runTemplate(editor, template);
+        TemplateManager.getInstance(project).runTemplate(editor, template);
 
         // Insert all imports
         try {

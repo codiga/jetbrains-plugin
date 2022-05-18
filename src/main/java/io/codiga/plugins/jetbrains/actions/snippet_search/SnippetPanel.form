@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="io.codiga.plugins.jetbrains.actions.snippet_search.SnippetPanel">
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-    <margin top="10" left="5" bottom="10" right="5"/>
+    <margin top="20" left="5" bottom="20" right="5"/>
     <constraints>
-      <xy x="20" y="20" width="374" height="359"/>
+      <xy x="20" y="20" width="394" height="359"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -36,6 +36,7 @@
             </constraints>
             <properties>
               <text value="Preview"/>
+              <toolTipText value="Preview and insert the snippet"/>
             </properties>
           </component>
           <hspacer id="a7b44">
@@ -66,14 +67,6 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
-          <component id="2b80c" class="javax.swing.JLabel" binding="description">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="description"/>
-            </properties>
-          </component>
           <grid id="2d45a" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
@@ -88,6 +81,7 @@
                 </constraints>
                 <properties>
                   <text value="Learn More"/>
+                  <toolTipText value="View this snippet on Codiga"/>
                 </properties>
               </component>
               <hspacer id="9a4db">
@@ -97,23 +91,29 @@
               </hspacer>
             </children>
           </grid>
-          <scrollpane id="92868">
+          <component id="4d05e" class="javax.swing.JTextPane" binding="description">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="1" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
             </constraints>
-            <properties/>
-            <border type="none"/>
-            <children>
-              <component id="b6eca" class="javax.swing.JTextArea" binding="code">
-                <constraints/>
-                <properties>
-                  <editable value="false"/>
-                  <lineWrap value="true"/>
-                  <wrapStyleWord value="true"/>
-                </properties>
-              </component>
-            </children>
-          </scrollpane>
+            <properties>
+              <contentType value="text/html"/>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="b6eca" class="javax.swing.JTextArea" binding="code">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <doubleBuffered value="true"/>
+              <dragEnabled value="true"/>
+              <editable value="false"/>
+              <lineWrap value="true"/>
+              <wrapStyleWord value="true"/>
+            </properties>
+          </component>
         </children>
       </grid>
     </children>

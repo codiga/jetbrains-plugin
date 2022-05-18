@@ -249,7 +249,19 @@ public class SnippetToolWindow {
 
     public JPanel getContent() { return mainPanel;};
 
-    public void updateEditor(@NotNull Project project, @NotNull VirtualFile virtualFile, Optional<String> term, boolean resetSearch) {
+    public void setLoading(boolean isLoading) {
+        if (isLoading) {
+            snippetsPanel.removeAll();
+            snippetsPanel.revalidate();
+            snippetsPanel.repaint();
+        }
+        loadingPanel.setVisible(true);
+    }
+
+    public void updateEditor(@NotNull Project project,
+                             @NotNull VirtualFile virtualFile,
+                             @NotNull Optional<String> term,
+                             boolean resetSearch) {
 
         String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, virtualFile);
         java.util.List<String> dependencies = DependencyManagement.getInstance().getDependencies(project, virtualFile).stream().map(v -> v.getName()).collect(Collectors.toList());
@@ -281,6 +293,7 @@ public class SnippetToolWindow {
             snippetsPanel.add(noRecipePanel);
         } else {
             panels.forEach(p -> {
+                snippetsPanel.add(new JSeparator());
                 snippetsPanel.add(p.getComponent());
             });
         }
@@ -292,6 +305,6 @@ public class SnippetToolWindow {
 
         fixScrolling(scrollPane);
         // scroll back to the top
-//        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0,0 )));
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0,0 )));
     }
 }

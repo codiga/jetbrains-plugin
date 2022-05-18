@@ -36,7 +36,7 @@ public class SnippetPanel {
     private JButton learnMore;
     private JLabel name;
     private JLabel userInformation;
-    private JLabel description;
+    private JTextPane description;
     private CodeInsertionContext codeInsertionContext;
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -49,13 +49,16 @@ public class SnippetPanel {
         codeInsertionContext = _codeInsertionContext;
         String owner = "unknown author";
         String decodedCode = new String(Base64.getDecoder().decode(snippet.presentableFormat().getBytes()));
-        String snippetLink = String.format("https://app.codiga.io/hub/snippet/%s/view", snippet.id());
+        final String publicSnippetLink = String.format("https://app.codiga.io/hub/snippet/%s/view", snippet.id());
+        final String privateSnippetLink = String.format("https://app.codiga.io/assistant/snippet/%s/view", snippet.id());
+
 
         learnMore.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    Desktop.getDesktop().browse(new URI(snippetLink));
+                    final String link = snippet.isPublic() ? publicSnippetLink : privateSnippetLink;
+                    Desktop.getDesktop().browse(new URI(link));
                 } catch (IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                 }
@@ -116,12 +119,12 @@ public class SnippetPanel {
                 });
             }
         }
-        LOGGER.info(owner);
         code.setText(decodedCode);
-
+        
         userInformation.setText(owner);
 
         description.setText(String.format("<html>%s</html>", htmlDescription));
+
         name.setText(snippet.name());
 
         insert.addMouseListener(new MouseListener() {
@@ -140,6 +143,9 @@ public class SnippetPanel {
                 }
 
                 Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+
+                // TODO: get focus in the editor
+
                 applyRecipe(editor,
                         project,
                         snippet.name(),

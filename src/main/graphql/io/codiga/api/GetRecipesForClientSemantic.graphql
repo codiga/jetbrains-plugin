@@ -8,6 +8,7 @@ query GetRecipesForClientSemantic($term: String, $onlyPublic: Boolean, $onlyPriv
     keywords
     imports
     language
+    isPublic
     description
     shortcut
     owner{
