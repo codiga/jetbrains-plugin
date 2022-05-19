@@ -2,7 +2,10 @@ package io.codiga.plugins.jetbrains.model;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,11 +41,21 @@ final public class CodingAssistantContext {
     DATE_MONTH_TWO_DIGITS, CODIGA_INDENT);
 
   private final VirtualFile virtualFile;
-  private final DataContext dataContext;
+  private final Project project;
+  private final PsiFile psiFile;
 
   public CodingAssistantContext(DataContext dataContext) {
     this.virtualFile = dataContext.getData(LangDataKeys.VIRTUAL_FILE);
-    this.dataContext = dataContext;
+    this.project = dataContext.getData(LangDataKeys.PROJECT);
+    this.psiFile = dataContext.getData(LangDataKeys.PSI_FILE);
+  }
+
+  public CodingAssistantContext(@NotNull VirtualFile _virtualFile,
+                                @NotNull Project _project,
+                                @NotNull PsiFile _psiFile) {
+    this.virtualFile = _virtualFile;
+    this.project = _project;
+    this.psiFile = _psiFile;
   }
 
   /**
@@ -53,22 +66,15 @@ final public class CodingAssistantContext {
    * @return true is all values required for the transformation are present.
    */
   public boolean isValid() {
-    if (dataContext.getData(LangDataKeys.PSI_FILE) == null) {
-      return false;
-    }
-
-    if (dataContext.getData(LangDataKeys.PROJECT) == null) {
-      return false;
-    }
-    return true;
-  }
-
-  public DataContext getDataContext() {
-    return this.dataContext;
+    return ((this.virtualFile != null) && (this.project != null));
   }
 
   public VirtualFile getVirtualFile() {
     return this.virtualFile;
   }
+
+  public Project getProject() { return this.project;}
+
+  public PsiFile getPsiFile() {return this.psiFile;}
 
 }

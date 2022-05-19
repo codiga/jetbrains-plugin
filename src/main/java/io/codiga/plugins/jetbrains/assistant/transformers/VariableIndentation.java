@@ -1,7 +1,6 @@
 package io.codiga.plugins.jetbrains.assistant.transformers;
 
 import com.intellij.application.options.CodeStyle;
-import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
@@ -27,7 +26,7 @@ public class VariableIndentation implements VariableTransformer {
        * type, tab and indent sizes because there are multiple FileTypes per extension where each one of these have
        * different values.
        */
-      PsiFile currentFile = codigaTransformationContext.getDataContext().getData(LangDataKeys.PSI_FILE);
+      PsiFile currentFile = codigaTransformationContext.getPsiFile();
 
       // We want to know if the user set to use tabs or spaces in the file where the snippet is going to be inserted
       if (CodeStyle.getIndentOptions(currentFile).USE_TAB_CHARACTER) {
@@ -42,7 +41,7 @@ public class VariableIndentation implements VariableTransformer {
          * of the file back here.
          */
         PsiFile currentFileInMemory = PsiFileFactory
-          .getInstance(codigaTransformationContext.getDataContext().getData(LangDataKeys.PROJECT))
+          .getInstance(codigaTransformationContext.getProject())
           .createFileFromText("codiga_var_trans", currentFile.getFileType(), processedCode);
 
         // Get the recipe code with `\t` transcode ready for insertion

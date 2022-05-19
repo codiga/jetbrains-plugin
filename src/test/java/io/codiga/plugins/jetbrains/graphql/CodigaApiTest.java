@@ -162,7 +162,14 @@ public final class CodigaApiTest implements CodigaApi {
     }
 
     @Override
-    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term,
+                                                                                                                List<String> dependencies,
+                                                                                                                Optional<String> parameters,
+                                                                                                                LanguageEnumeration language,
+                                                                                                                String filename,
+                                                                                                                Optional<Boolean> onlyPublic,
+                                                                                                                Optional<Boolean> onlyPrivate,
+                                                                                                                Optional<Boolean> onlySubscribed) {
         return null;
     }
 
@@ -172,7 +179,7 @@ public final class CodigaApiTest implements CodigaApi {
     }
 
     @Override
-    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename) {
+    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename, Optional<Boolean> onlyPublic, Optional<Boolean> onlyPrivate, Optional<Boolean> onlySubscribed) {
         return null;
     }
 

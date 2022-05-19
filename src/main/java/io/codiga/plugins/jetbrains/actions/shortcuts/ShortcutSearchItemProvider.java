@@ -43,11 +43,14 @@ public class ShortcutSearchItemProvider implements SearchPopup.SearchItemProvide
         }
 
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> newRecipes = codigaApi.getRecipesForClientByShotcurt(
-            Optional.ofNullable(toSearch),
-            dependenciesName,
-            Optional.empty(),
-            language,
-            filename
+                Optional.ofNullable(toSearch),
+                dependenciesName,
+                Optional.empty(),
+                language,
+                filename,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty()
         );
 
         newRecipes.forEach(processor::process);

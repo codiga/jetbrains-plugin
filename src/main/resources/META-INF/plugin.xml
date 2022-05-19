@@ -52,6 +52,9 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Snippet Search" secondary="true" icon="CodigaIcons.Codiga_default_icon" anchor="right"
+                    factoryClass="io.codiga.plugins.jetbrains.actions.snippet_search.SnippetToolWindowFactory"/>
+
         <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.AppStarter" />
         <notificationGroup
                 id="Codiga API"
@@ -80,6 +83,8 @@
     </extensions>
     <projectListeners>
         <listener class="io.codiga.plugins.jetbrains.cache.CacheRefreshEditorListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+        <listener class="io.codiga.plugins.jetbrains.actions.snippet_search.SnippetToolWindowFileEditorManagerListener"
                   topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </projectListeners>
     <actions>

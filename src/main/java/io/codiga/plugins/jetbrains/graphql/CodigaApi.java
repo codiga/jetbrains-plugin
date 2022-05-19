@@ -50,7 +50,10 @@ public interface CodigaApi {
                                                                                   List<String> dependencies,
                                                                                   Optional<String> parameters,
                                                                                   LanguageEnumeration language,
-                                                                                  String filename);
+                                                                                  String filename,
+                                                                                  Optional<Boolean> onlyPublic,
+                                                                                  Optional<Boolean> onlyPrivate,
+                                                                                  Optional<Boolean> onlySubscribed);
 
     public Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language);
 
@@ -58,7 +61,10 @@ public interface CodigaApi {
                                                                                                      List<String> dependencies,
                                                                                                      Optional<String> parameters,
                                                                                                      LanguageEnumeration language,
-                                                                                                     String filename);
+                                                                                                     String filename,
+                                                                                                     Optional<Boolean> onlyPublic,
+                                                                                                     Optional<Boolean> onlyPrivate,
+                                                                                                     Optional<Boolean> onlySubscribed);
 
     public void recordRecipeUse(Long recipeId);
 }

@@ -1,5 +1,5 @@
-query GetRecipesForClientByShortcut($fingerprint: String, $filename: String, $term: String, $dependencies: [String!]!, $parameters: String, $language: LanguageEnumeration!){
-  getRecipesForClientByShortcut(fingerprint: $fingerprint, term: $term, filename: $filename, dependencies:$dependencies, parameters:$parameters, language:$language){
+query GetRecipesForClientByShortcut($fingerprint: String, $filename: String, $term: String, $dependencies: [String!]!, $parameters: String, $language: LanguageEnumeration!, $onlyPublic: Boolean, $onlyPrivate: Boolean, $onlySubscribed: Boolean){
+  getRecipesForClientByShortcut(fingerprint: $fingerprint, term: $term, filename: $filename, dependencies:$dependencies, parameters:$parameters, language:$language, onlyPublic: $onlyPublic, onlyPrivate: $onlyPrivate, onlySubscribed: $onlySubscribed){
     id
     name
     code

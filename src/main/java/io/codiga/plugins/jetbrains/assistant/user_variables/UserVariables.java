@@ -4,7 +4,9 @@ import com.intellij.codeInsight.template.impl.Variable;
 import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +27,9 @@ public final class UserVariables {
     public List<Variable> getVariablesFromCode(String code) {
         List<Variable> variables = new ArrayList<Variable>();
 
+        // We use a set for all variables in the code to guarantee we do not use the same variable twice.
+        Set<String> addedVariables = new HashSet<>();
+
         Matcher matcher = pattern.matcher(code);
         while (matcher.find()) {
 
@@ -35,20 +40,22 @@ public final class UserVariables {
                 /**
                  * Variable name and value are present.
                  */
-                if (variableName != null && variableValue != null) {
-                    final String val = variableValue.replaceAll(":", "");
-                    Variable newVariable = new Variable(matcher.group(1), "decapitalize(\"" + val+"\")", val, true);
+                if (variableName != null && variableValue != null && !addedVariables.contains(variableName)) {
+                    final String val = variableValue.replaceAll(":", "").toLowerCase();
+                    Variable newVariable = new Variable(variableName, "decapitalize(String)", String.format("\"%s\"", val), true);
 
                     variables.add(newVariable);
+                    addedVariables.add(variableName);
                     continue;
                 }
 
                 /**
                  * Only variable name is here
                  */
-                if (variableName != null) {
-                    Variable newVariable = new Variable(matcher.group(1), null, null, true);
+                if (variableName != null && !addedVariables.contains(variableName)) {
+                    Variable newVariable = new Variable(variableName, null, null, true);
                     variables.add(newVariable);
+                    addedVariables.add(variableName);
                     continue;
                 }
 

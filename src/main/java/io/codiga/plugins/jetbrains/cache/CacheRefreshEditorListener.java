@@ -1,11 +1,12 @@
 package io.codiga.plugins.jetbrains.cache;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.Alarm;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Collectors;
 
+import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 
@@ -21,8 +23,7 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFil
  * is being opened.
  */
 public class CacheRefreshEditorListener implements FileEditorManagerListener {
-
-    private final Alarm alarm = new Alarm();
+    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
@@ -31,10 +32,7 @@ public class CacheRefreshEditorListener implements FileEditorManagerListener {
             return;
         }
 
-        alarm.cancelAllRequests();
-
-        final int delay = 100;
-        alarm.addRequest(() -> runBackgroundProcess(event), delay);
+        ApplicationManager.getApplication().executeOnPooledThread(() -> runBackgroundProcess(event));
     }
 
     /**
