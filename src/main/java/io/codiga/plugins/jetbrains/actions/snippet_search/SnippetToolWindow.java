@@ -28,6 +28,7 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier.CODIGA_API_KEY_CHANGE_TOPIC;
+import static io.codiga.plugins.jetbrains.utils.LanguageUtils.getLanguageName;
 
 public class SnippetToolWindow {
     private JPanel mainPanel;
@@ -41,6 +42,7 @@ public class SnippetToolWindow {
     private JLabel loggedInLabel;
     private JPanel loadingPanel;
     private JScrollPane scrollPane;
+    private JLabel languageLabel;
     private JPanel snippetsScrollPanel;
     private boolean searchAllSnippets;
     private boolean searchPrivateSnippetsOnly;
@@ -132,7 +134,7 @@ public class SnippetToolWindow {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                loadingPanel.setVisible(true);
+                setLoading(false);
                 searchTermAlarm.cancelAllRequests();
                 searchTermAlarm.addRequest(() -> {
                     final String searchTermString = searchTerm.getText();
@@ -249,12 +251,11 @@ public class SnippetToolWindow {
 
     public JPanel getContent() { return mainPanel;};
 
-    public void setLoading(boolean isLoading) {
-        if (isLoading) {
-            snippetsPanel.removeAll();
-            snippetsPanel.revalidate();
-            snippetsPanel.repaint();
+    public void setLoading(boolean resetLanguage) {
+        if (resetLanguage) {
+            languageLabel.setText("loading");
         }
+        snippetsPanel.setVisible(false);
         loadingPanel.setVisible(true);
     }
 
@@ -276,9 +277,11 @@ public class SnippetToolWindow {
             snippetsPanel.add(languageNotSupportedPanel);
             snippetsPanel.revalidate();
             snippetsPanel.repaint();
+            languageLabel.setText("unknown");
             return;
         }
 
+        languageLabel.setText(getLanguageName(languageEnumeration));
 
         java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, Optional.empty(), Optional.empty(), Optional.empty());
 
@@ -299,12 +302,17 @@ public class SnippetToolWindow {
         }
 
         loadingPanel.setVisible(false);
+        snippetsPanel.setVisible(true);
         snippetsPanel.revalidate();
         snippetsPanel.repaint();
         scrollPane.getViewport().setViewPosition(new Point(0,0 ));
 
         fixScrolling(scrollPane);
         // scroll back to the top
-        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0,0 )));
+        SwingUtilities.invokeLater(() -> {
+            scrollPane.getViewport().setViewPosition(new Point(0,0 ));
+            snippetsPanel.revalidate();
+            snippetsPanel.repaint();
+        });
     }
 }

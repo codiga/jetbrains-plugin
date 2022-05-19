@@ -1,6 +1,8 @@
 package io.codiga.plugins.jetbrains.actions;
 
+import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -219,9 +221,11 @@ public class ActionUtils {
         Document document = editor.getDocument();
         String currentCode = document.getText();
 
+        DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
+
         String unprocessedCode = new String(Base64.getDecoder().decode(recipeCodeJetBrainsFormat)).replaceAll("\r\n", LINE_SEPARATOR);
         final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(codigaTransformationContext);
-        String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
+        String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode, dataContext);
 
         // Get the current line and get the indentation
         int selectedLine = editor.getCaretModel().getVisualPosition().getLine();

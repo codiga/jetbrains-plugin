@@ -1,12 +1,12 @@
 package io.codiga.plugins.jetbrains.cache;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.Alarm;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,6 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFil
  */
 public class CacheRefreshEditorListener implements FileEditorManagerListener {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private final Alarm alarm = new Alarm();
 
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
@@ -33,10 +32,7 @@ public class CacheRefreshEditorListener implements FileEditorManagerListener {
             return;
         }
 
-        alarm.cancelAllRequests();
-
-        final int delay = 100;
-        alarm.addRequest(() -> runBackgroundProcess(event), delay);
+        ApplicationManager.getApplication().executeOnPooledThread(() -> runBackgroundProcess(event));
     }
 
     /**

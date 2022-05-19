@@ -259,7 +259,7 @@ public final class CodigaApiImpl implements CodigaApi {
                                 Input.fromNullable(filename),
                                 dependencies, Input.absent(),
                                 Input.optional(ImmutableList.of(language)),
-                                100,
+                                10,
                                 0))
                 .toBuilder()
                 .requestHeaders(getHeaders())

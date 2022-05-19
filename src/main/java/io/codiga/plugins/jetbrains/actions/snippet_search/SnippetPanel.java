@@ -38,6 +38,8 @@ public class SnippetPanel {
     private JLabel name;
     private JLabel userInformation;
     private JTextPane description;
+    private JLabel shortcutLabel;
+    private JLabel visibilityLabel;
     private CodeInsertionContext codeInsertionContext;
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -130,6 +132,18 @@ public class SnippetPanel {
 
         name.setText(snippet.name());
 
+        if (snippet.shortcut() == null) {
+            shortcutLabel.setText("No Shortcut");
+        } else {
+            shortcutLabel.setText(snippet.shortcut());
+        }
+
+        if (snippet.isPublic()) {
+            visibilityLabel.setText("public");
+        } else {
+            visibilityLabel.setText("private");
+        }
+
         insert.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -147,7 +161,12 @@ public class SnippetPanel {
 
                 Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
-                IdeFocusManager.getInstance(project).requestFocusInProject(editor.getComponent(), project);
+                if (editor == null) {
+                    return;
+                }
+
+
+                IdeFocusManager.getInstance(project).requestFocusInProject(editor.getContentComponent(), project);
 
                 applyRecipe(editor,
                         project,
@@ -158,6 +177,9 @@ public class SnippetPanel {
                         snippet.language(),
                         codeInsertionContext,
                         codigaApi);
+
+                IdeFocusManager.getInstance(project).requestFocusInProject(editor.getContentComponent(), project);
+
                 insert.setText("Preview");
                 codeInsertionContext.clearAll();
             }
@@ -189,6 +211,11 @@ public class SnippetPanel {
 
                 PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
                 Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+
+                if (editor == null) {
+                    return;
+                }
+
                 removeAddedCode(editor, project, codeInsertionContext);
                 addRecipeToEditor(
                         editor,
@@ -206,14 +233,16 @@ public class SnippetPanel {
             @Override
             public void mouseExited(MouseEvent e) {
                 Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
-                FileEditor fileEditor = SnippetToolWindowFileEditorManagerListener.getCurrentFileEditor();
-                VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
 
                 if (project == null) {
                     return;
                 }
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
                 Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+
+                if (editor == null) {
+                    return;
+                }
+
                 removeAddedCode(editor, project, codeInsertionContext);
                 insert.setText("Preview");
             }

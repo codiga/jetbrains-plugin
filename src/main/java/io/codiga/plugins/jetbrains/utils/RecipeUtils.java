@@ -75,9 +75,11 @@ public final class RecipeUtils {
             return;
         }
 
+
+
         // process supported variables dynamically
         final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(codigaTransformationContext);
-        String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode);
+        String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode, dataContext);
 
         // For mysterious reasons, we need to add a newline to the code to not take the next line.
         Template template = TemplateManagerImpl.getInstance(project).createTemplate(recipeName, recipeName, code + "\n");
