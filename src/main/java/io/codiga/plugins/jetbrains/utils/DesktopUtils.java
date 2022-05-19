@@ -2,7 +2,7 @@ package io.codiga.plugins.jetbrains.utils;
 
 import java.awt.*;
 
-public class DesktopUtils {
+public final class DesktopUtils {
     private DesktopUtils() {
         // empty, nothing needed here
     }

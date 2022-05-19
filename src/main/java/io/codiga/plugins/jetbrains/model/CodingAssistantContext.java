@@ -66,17 +66,8 @@ final public class CodingAssistantContext {
    * @return true is all values required for the transformation are present.
    */
   public boolean isValid() {
-    if (this.virtualFile == null) {
-      return false;
-    }
-
-    if (this.project == null) {
-      return false;
-    }
-    return true;
+    return ((this.virtualFile != null) && (this.project != null));
   }
-
-
 
   public VirtualFile getVirtualFile() {
     return this.virtualFile;
