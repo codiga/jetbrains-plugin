@@ -26,6 +26,8 @@ public final class UserVariables {
 
     public List<Variable> getVariablesFromCode(String code) {
         List<Variable> variables = new ArrayList<Variable>();
+
+        // We use a set for all variables in the code to guarantee we do not use the same variable twice.
         Set<String> addedVariables = new HashSet<>();
 
         Matcher matcher = pattern.matcher(code);

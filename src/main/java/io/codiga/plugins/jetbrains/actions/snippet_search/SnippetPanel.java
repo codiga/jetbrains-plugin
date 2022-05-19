@@ -21,15 +21,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 
+/**
+ * This class renders only one snippet. This is created/instantiated
+ * every time a snippet is rendered.
+ */
 public class SnippetPanel {
     private JTextArea code;
     private JPanel mainPanel;
@@ -40,96 +42,37 @@ public class SnippetPanel {
     private JTextPane description;
     private JLabel shortcutLabel;
     private JLabel visibilityLabel;
-    private CodeInsertionContext codeInsertionContext;
+    private final CodeInsertionContext codeInsertionContext;
+    private static final MarkdownDecorator markdownDecorator = new MarkdownDecorator();
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
 
     public SnippetPanel(GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet, CodeInsertionContext _codeInsertionContext) {
-        MarkdownDecorator markdownDecorator = new MarkdownDecorator();
-        String htmlDescription = Processor.process(snippet.description(), markdownDecorator, true);
         codeInsertionContext = _codeInsertionContext;
-        String owner = "unknown author";
-        String decodedCode = new String(Base64.getDecoder().decode(snippet.presentableFormat().getBytes()));
-        final String publicSnippetLink = String.format("https://app.codiga.io/hub/snippet/%s/view", snippet.id());
-        final String privateSnippetLink = String.format("https://app.codiga.io/assistant/snippet/%s/view", snippet.id());
+
+        // The description is in Markdown, we need to decode it into HTML.
+        String htmlDescription = Processor.process(snippet.description(), markdownDecorator, true);
+
+        String owner = "unknown author"; // default value for the owner
+        String decodedCode = new String(Base64.getDecoder().decode(snippet.presentableFormat().getBytes(StandardCharsets.UTF_8)));
 
 
-        learnMore.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                try {
-                    final String link = snippet.isPublic() ? publicSnippetLink : privateSnippetLink;
-                    Desktop.getDesktop().browse(new URI(link));
-                } catch (IOException | URISyntaxException e1) {
-                    e1.printStackTrace();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
+        learnMore.addMouseListener(new LearnMoreMouseListener(snippet));
 
         if (snippet.owner() != null){
-            String userLink = String.format("https://app.codiga.io/hub/user/%s/%s", snippet.owner().accountType().toString().toLowerCase(), snippet.owner().username());
-            owner = String.format("<html>Owner: <a href=\"%s\">%s</a></html>", userLink, snippet.owner().username());
+            owner = String.format("<html>Owner: <a>%s</a></html>", snippet.owner().username());
 
             if (DesktopUtils.isBrowsingSupported()){
-                userInformation.addMouseListener(new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        try {
-                            Desktop.getDesktop().browse(new URI(userLink));
-                        } catch (IOException | URISyntaxException e1) {
-                            e1.printStackTrace();
-                        }
-
-                    }
-
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                    }
-                });
+                userInformation.addMouseListener(new OwnerMouseListener(
+                        snippet.owner().accountType().toString().toLowerCase(),
+                        snippet.owner().username()));
             }
         }
-        LOGGER.info(owner);
         code.setText(decodedCode);
-
-
         userInformation.setText(owner);
-
         description.setText(String.format("<html>%s</html>", htmlDescription));
-
         name.setText(snippet.name());
 
         if (snippet.shortcut() == null) {
@@ -144,12 +87,15 @@ public class SnippetPanel {
             visibilityLabel.setText("private");
         }
 
+        /**
+         * Logic to preview or insert the snippet. When we hover the button, we preview
+         * the snippet. Once clicked, we insert the snippet into the code.
+         */
         insert.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
                 FileEditor fileEditor = SnippetToolWindowFileEditorManagerListener.getCurrentFileEditor();
-                VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
 
                 if (project == null) {
                     return;
@@ -251,9 +197,5 @@ public class SnippetPanel {
 
     public Component getComponent() {
         return mainPanel;
-    }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 }

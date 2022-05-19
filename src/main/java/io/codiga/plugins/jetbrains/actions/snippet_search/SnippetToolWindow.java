@@ -16,11 +16,9 @@ import io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,6 +28,9 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFil
 import static io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier.CODIGA_API_KEY_CHANGE_TOPIC;
 import static io.codiga.plugins.jetbrains.utils.LanguageUtils.getLanguageName;
 
+/**
+ * This implements the main tool window for the snippets.
+ */
 public class SnippetToolWindow {
     private JPanel mainPanel;
     private JTextField searchTerm;
@@ -37,13 +38,13 @@ public class SnippetToolWindow {
     private JRadioButton radioPublicOnly;
     private JRadioButton radioPrivateOnly;
     private JCheckBox checkboxFavoritesOnly;
-    private JPanel scrollPanePanel;
     private JPanel snippetsPanel;
     private JLabel loggedInLabel;
     private JPanel loadingPanel;
     private JScrollPane scrollPane;
+    private JPanel scrollPanePanel;
     private JLabel languageLabel;
-    private JPanel snippetsScrollPanel;
+    private JPanel noEditorPanel;
     private boolean searchAllSnippets;
     private boolean searchPrivateSnippetsOnly;
     private boolean searchPublicSnippetsOnly;
@@ -75,6 +76,9 @@ public class SnippetToolWindow {
         checkboxFavoritesOnly.setEnabled(searchFavoriteSnippetsOnlyEnabled);
     }
 
+    /**
+     * Set the default value for all checkboxes (e.g. public search by default).
+     */
     public void setDefaultValuesForSearchPreferences() {
         searchAllSnippets = true;
         searchPrivateSnippetsOnly = false;
@@ -91,71 +95,53 @@ public class SnippetToolWindow {
 
         Alarm searchTermAlarm = new Alarm();
 
-        radioAllSnippets.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSearchPreferences(true, false, false, searchFavoriteSnippetsOnly);
-            }
-        });
+        radioAllSnippets.addActionListener(e -> updateSearchPreferences(true, false, false, searchFavoriteSnippetsOnly));
+        radioPrivateOnly.addActionListener(e -> updateSearchPreferences(false, true, false, searchFavoriteSnippetsOnly));
+        radioPublicOnly.addActionListener(e -> updateSearchPreferences(false, false, true, searchFavoriteSnippetsOnly));
+        checkboxFavoritesOnly.addActionListener(e -> updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, !searchFavoriteSnippetsOnly));
 
-        radioPrivateOnly.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSearchPreferences(false, true, false, searchFavoriteSnippetsOnly);
-            }
-        });
+        /**
+         * The search term is triggered a new search. We wait 500 ms before doing the search
+         * in order to not hammer the backend with too many requests. We only make a
+         * request if no key has not been typed within 500 ms.
+         */
+        searchTerm.getDocument().addDocumentListener(new DocumentListener() {
+            private void updateResult () {
+                Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
+                VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
 
-        radioPublicOnly.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSearchPreferences(false, false, true, searchFavoriteSnippetsOnly);
-            }
-        });
+                if (project == null || virtualFile == null) {
+                    LOGGER.info("project or file are null");
+                    return;
+                }
 
-
-        checkboxFavoritesOnly.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, !searchFavoriteSnippetsOnly);
-            }
-        });
-
-
-        searchTerm.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
                 setLoading(false);
                 searchTermAlarm.cancelAllRequests();
                 searchTermAlarm.addRequest(() -> {
                     final String searchTermString = searchTerm.getText();
                     Optional<String> searchArgument = Optional.empty();
-                    LOGGER.info("new search term: " + searchTermString);
                     if(searchTermString.length() > 0) {
                         searchArgument = Optional.of(searchTermString);
                     }
-                    Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
-                    VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
-
-                    if (project == null || virtualFile == null) {
-                        LOGGER.info("project or file are null");
-                        return;
-                    }
-
                     updateEditor(project, virtualFile, searchArgument, false);
                 }, 500);
+            }
 
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateResult();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateResult();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
             }
         });
+
 
         loadingPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         loadingPanel.add(new AsyncProcessIcon("loading..."));
@@ -167,14 +153,16 @@ public class SnippetToolWindow {
         languageNotSupportedPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         languageNotSupportedPanel.add(new JLabel("language not supported"));
 
-        scrollPane.setAutoscrolls(false);
-        scrollPane.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
-        scrollPane.getVerticalScrollBar().setBlockIncrement(16);
+        snippetsPanel.setVisible(false);
+        noEditorPanel.setVisible(false);
 
         updateUser();
         updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
 
-
+        /**
+         * Listen to message bus if the user added their API keys. If that is the
+         * case, we update the user and search preferences.
+         */
         ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC, new ApiKeyChangeNotifier() {
             @Override
             public void beforeAction(Object context) {
@@ -190,6 +178,20 @@ public class SnippetToolWindow {
 
     }
 
+    /**
+     * Show a label that no editor is being selected.
+     */
+    public void updateNoEditor() {
+        snippetsPanel.setVisible(false);
+        loadingPanel.setVisible(false);
+        noEditorPanel.setVisible(true);
+    }
+
+    /**
+     * Check the user - if the user is logged, we offer to search
+     * private, favorite and shared snippets. If not, only
+     * public snippets are proposed.
+     */
     public void updateUser() {
         Optional<String> username = codigaApi.getUsername();
         if (username.isPresent()) {
@@ -198,42 +200,19 @@ public class SnippetToolWindow {
             searchFavoriteSnippetsOnlyEnabled = true;
             String htmlLoginLabel = String.format("<html>Logged as <a href=\"https://app.codiga.io\">%s</a></html>", username.get());
             loggedInLabel.setText(htmlLoginLabel);
-            loggedInLabel.addMouseListener(new MouseListener() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    try {
-                        Desktop.getDesktop().browse(new URI("https://app.codiga.io"));
-                    } catch (IOException | URISyntaxException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-
-                }
-            });
+            loggedInLabel.addMouseListener(new LoginMouseListener());
         } else {
             setDefaultValuesForSearchPreferences();
             loggedInLabel.setText("not logged in");
         }
     }
 
+    /**
+     * By default, the scrollpanes are *very* slow. This function
+     * fix the scroll pane passed as parameter and makes
+     * the scroll speed faster.
+     * @param scrollpane
+     */
     public static void fixScrolling(JScrollPane scrollpane) {
         JLabel systemLabel = new JLabel();
         FontMetrics metrics = systemLabel.getFontMetrics(systemLabel.getFont());
@@ -251,12 +230,19 @@ public class SnippetToolWindow {
 
     public JPanel getContent() { return mainPanel;};
 
+    /**
+     * Set the loading panel, hides all current snippets
+     * This should then be reversed by the updateEditor
+     * function when snippets are found.
+     * @param resetLanguage
+     */
     public void setLoading(boolean resetLanguage) {
         if (resetLanguage) {
             languageLabel.setText("loading");
         }
         snippetsPanel.setVisible(false);
         loadingPanel.setVisible(true);
+        noEditorPanel.setVisible(false);
     }
 
     public void updateEditor(@NotNull Project project,
@@ -268,6 +254,9 @@ public class SnippetToolWindow {
         java.util.List<String> dependencies = DependencyManagement.getInstance().getDependencies(project, virtualFile).stream().map(v -> v.getName()).collect(Collectors.toList());
         LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(virtualFile);
 
+        /**
+         * This is used when we open a new editor, we want to reset the search term.
+         */
         if (resetSearch) {
             searchTerm.setText("");
         }
@@ -278,15 +267,16 @@ public class SnippetToolWindow {
             snippetsPanel.revalidate();
             snippetsPanel.repaint();
             languageLabel.setText("unknown");
+            loadingPanel.setVisible(false);
+            snippetsPanel.setVisible(true);
             return;
         }
 
         languageLabel.setText(getLanguageName(languageEnumeration));
 
+        // Make the request to get snippets from Codiga
         java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, Optional.empty(), Optional.empty(), Optional.empty());
-
-        LOGGER.info("found " + snippets.size() + " recipes");
-
+        // Create the snippet panel.
         java.util.List<SnippetPanel> panels =  snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext)).collect(Collectors.toList());
 
         snippetsPanel.removeAll();
@@ -303,9 +293,7 @@ public class SnippetToolWindow {
 
         loadingPanel.setVisible(false);
         snippetsPanel.setVisible(true);
-        snippetsPanel.revalidate();
-        snippetsPanel.repaint();
-        scrollPane.getViewport().setViewPosition(new Point(0,0 ));
+        noEditorPanel.setVisible(false);
 
         fixScrolling(scrollPane);
         // scroll back to the top

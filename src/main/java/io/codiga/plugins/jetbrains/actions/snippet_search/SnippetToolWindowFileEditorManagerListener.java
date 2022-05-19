@@ -13,6 +13,10 @@ import java.util.Optional;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
+/**
+ * This class listens when the editor changes and updates the snippets available
+ * in the window toolbar.
+ */
 public class SnippetToolWindowFileEditorManagerListener implements FileEditorManagerListener {
     private static Project currentProject = null;
     private static VirtualFile currentVirtualFile = null;
@@ -32,16 +36,23 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
     }
 
 
+    /**
+     * This function is triggered every time the user changes the editor.
+     * @param event
+     */
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
         FileEditor fileEditor = event.getNewEditor();
-        if (fileEditor == null || fileEditor.getFile() == null) {
+        SnippetToolWindow snippetToolWindow = SnippetToolWindowFactory.getSnippetToolWindow();
+
+        // Snippet tool not created or initialize: do not do anything
+        if (snippetToolWindow == null) {
             return;
         }
 
-
-        SnippetToolWindow snippetToolWindow = SnippetToolWindowFactory.getSnippetToolWindow();
-        if (snippetToolWindow == null) {
+        // there is no new file selected.
+        if (fileEditor == null || fileEditor.getFile() == null) {
+            snippetToolWindow.updateNoEditor();
             return;
         }
 
@@ -50,6 +61,16 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
         currentVirtualFile = fileEditor.getFile();
         currentFileEditor = fileEditor;
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> snippetToolWindow.updateEditor(event.getManager().getProject(),  fileEditor.getFile(), Optional.empty(), true));
+        /**
+         * Execute on pool thread so that we do not block the main thread
+         * and do not cause IntelliJ to hang forever.
+         */
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            snippetToolWindow.updateEditor(
+                    event.getManager().getProject(),
+                    fileEditor.getFile(),
+                    Optional.empty(),
+                    true);
+        });
     }
 }
