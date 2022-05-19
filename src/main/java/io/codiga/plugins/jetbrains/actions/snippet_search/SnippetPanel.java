@@ -132,12 +132,12 @@ public class SnippetPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-
+                // empty, nothing needed here
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
+                // empty, nothing needed here
             }
 
             @Override

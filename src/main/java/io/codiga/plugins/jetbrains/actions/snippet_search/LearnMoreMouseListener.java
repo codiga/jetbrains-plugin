@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
  * Mouse listener to redirect the user to the login page.
  */
 public class LearnMoreMouseListener implements MouseListener {
-    private GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet;
+    private final GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet;
 
     public LearnMoreMouseListener(GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch _snippet) {
         this.snippet = _snippet;
@@ -34,21 +34,21 @@ public class LearnMoreMouseListener implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 }

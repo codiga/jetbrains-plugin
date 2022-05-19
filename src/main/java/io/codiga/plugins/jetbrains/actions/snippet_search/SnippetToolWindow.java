@@ -79,7 +79,7 @@ public class SnippetToolWindow {
     /**
      * Set the default value for all checkboxes (e.g. public search by default).
      */
-    public void setDefaultValuesForSearchPreferences() {
+    private void setDefaultValuesForSearchPreferences() {
         searchAllSnippets = true;
         searchPrivateSnippetsOnly = false;
         searchPublicSnippetsOnly = false;
@@ -139,6 +139,7 @@ public class SnippetToolWindow {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
+                // empty, nothing needed here
             }
         });
 
@@ -166,7 +167,7 @@ public class SnippetToolWindow {
         ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC, new ApiKeyChangeNotifier() {
             @Override
             public void beforeAction(Object context) {
-
+                // empty, nothing needed here
             }
 
             @Override
@@ -192,7 +193,7 @@ public class SnippetToolWindow {
      * private, favorite and shared snippets. If not, only
      * public snippets are proposed.
      */
-    public void updateUser() {
+    private void updateUser() {
         Optional<String> username = codigaApi.getUsername();
         if (username.isPresent()) {
             searchPrivateSnippetsOnlyEnabled = true;

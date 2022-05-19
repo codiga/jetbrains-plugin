@@ -22,21 +22,21 @@ public class LoginMouseListener implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 }

@@ -3,6 +3,9 @@ package io.codiga.plugins.jetbrains.utils;
 import java.awt.*;
 
 public class DesktopUtils {
+    private DesktopUtils() {
+        // empty, nothing needed here
+    }
     public static boolean isBrowsingSupported() {
         if (!Desktop.isDesktopSupported()) {
             return false;

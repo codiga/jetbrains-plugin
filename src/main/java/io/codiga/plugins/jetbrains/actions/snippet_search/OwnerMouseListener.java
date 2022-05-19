@@ -11,8 +11,8 @@ import java.net.URISyntaxException;
  * Mouse listener to redirect the user to the login page.
  */
 public class OwnerMouseListener implements MouseListener {
-    private String accountType;
-    private String username;
+    private final String accountType;
+    private final String username;
 
     public OwnerMouseListener(String _accountType, String _username) {
         this.accountType = _accountType;
@@ -20,7 +20,7 @@ public class OwnerMouseListener implements MouseListener {
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-        String userLink = String.format("https://app.codiga.io/hub/user/%s/%s", accountType.toLowerCase(), username);
+        final String userLink = String.format("https://app.codiga.io/hub/user/%s/%s", accountType.toLowerCase(), username);
         try {
             Desktop.getDesktop().browse(new URI(userLink));
         } catch (IOException | URISyntaxException e1) {
@@ -30,21 +30,21 @@ public class OwnerMouseListener implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        // empty, nothing needed here
     }
 }
