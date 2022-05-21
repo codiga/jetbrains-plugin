@@ -2,6 +2,8 @@ package io.codiga.plugins.jetbrains.actions.snippet_search;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -90,7 +92,7 @@ public class SnippetToolWindow {
     }
 
 
-    public SnippetToolWindow(ToolWindow toolWindow) {
+    public SnippetToolWindow(ToolWindow toolWindow, Project project) {
         setDefaultValuesForSearchPreferences();
 
         Alarm searchTermAlarm = new Alarm();
@@ -177,6 +179,21 @@ public class SnippetToolWindow {
             }
         });
 
+
+        /**
+         * Fill the content of the panel with the existing data
+         * from the current editor if there is one opened.
+         */
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+            FileEditor fileEditor = fileEditorManager.getSelectedEditor();
+            if (fileEditor != null) {
+                VirtualFile virtualFile = fileEditor.getFile();
+                if (virtualFile != null) {
+                    updateEditor(project, virtualFile, Optional.empty(), true);
+                }
+            }
+        });
     }
 
     /**
