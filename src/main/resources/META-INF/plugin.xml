@@ -106,7 +106,7 @@
         </action>
         <action id="com.code_inspector.plugins.intellij.actions.AssistantCreateRecipeAction"
                 class="io.codiga.plugins.jetbrains.actions.create_recipe.AssistantCreateRecipeAction"
-                text="Create Codiga Recipe" description="Use the selected code to create a recipe"
+                text="Create Codiga Snippet" description="Use the selected code to create a snippet"
                 icon="CodigaIcons.Codiga_default_icon">
 
             <add-to-group group-id="EditorPopupMenu"  anchor="last"/>
