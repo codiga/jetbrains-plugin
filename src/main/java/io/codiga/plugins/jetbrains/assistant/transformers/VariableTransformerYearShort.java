@@ -9,7 +9,7 @@ import java.util.Locale;
 
 public class VariableTransformerYearShort implements VariableTransformer {
   /**
-   * Get the current year (shortened)
+   * Transforms and replaces with the current year (shortened)
    *
    * @param code
    * @param codigaTransformationContext
@@ -19,7 +19,7 @@ public class VariableTransformerYearShort implements VariableTransformer {
   public String transform(String code, CodingAssistantContext codigaTransformationContext){
     final Calendar calendar = Calendar.getInstance();
     final Date date = calendar.getTime();
-    return code.replace(CodingAssistantContext.DATE_CURRENT_YEAR_SHORT,
-      new SimpleDateFormat("YY", Locale.ENGLISH).format(date.getTime()));
+    return code.replace(CodingAssistantContext.DATE_CURRENT_YEAR,
+      new SimpleDateFormat("yy", Locale.ENGLISH).format(date.getTime()));
   }
 }
