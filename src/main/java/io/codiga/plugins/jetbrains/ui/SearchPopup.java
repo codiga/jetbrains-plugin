@@ -204,6 +204,15 @@ public class SearchPopup implements Disposable {
                     Rectangle selectedCellBounds = list.getCellBounds(selectedIndex, selectedIndex);
 
                     if (selectedCellBounds != null && selectedCellBounds.contains(e.getPoint())) { // Otherwise it was reselected in the selection listener
+                        Object selectedValue = list.getSelectedValue();
+
+                        /**
+                         * If something is selected, we invoke the callback to insert the code
+                         * into the editor.
+                         */
+                        if (selectedValue != null) {
+                           actionListener.elementChosen(selectedValue);
+                        }
                         doClose();
                     }
                     return true;
