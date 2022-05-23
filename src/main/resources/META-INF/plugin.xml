@@ -16,7 +16,7 @@
                 <li>Type a dot (just a .) in your editor to list all snippets available with a shortcut</li>
                 <li>Type CTRL + ALT + C to search for snippets based on keywords</li>
                 <li>Type CTRL + ALT + S to list all snippets with a shortcuts</li>
-                <li>Create public or private snippets from your IDE by selecting code, right-click and select "Create Codiga Recipe"</li>
+                <li>Create public or private snippets from your IDE by selecting code, right-click and select "Create Codiga Snippet"</li>
             </ul>
 
             <h3>
@@ -26,7 +26,7 @@
                 <li>Search for code snippets based on keywords (CTRL + ALT + C)</li>
                 <li>List all code snippets with a shortcut (CTRL + ALT + S)</li>
                 <li>Use a snippet directly using a shortcut in your editor (type the shortcut of the snippet, IDE fetch snippets when a dot (.) is entered)</li>
-                <li>Create snippets with your team (select code, right click and select "Create Codiga Recipe"</li>
+                <li>Create snippets with your team (select code, right click and select "Create Codiga Snippet"</li>
                 <li>Share snippets with your team</li>
             </ul>
 
