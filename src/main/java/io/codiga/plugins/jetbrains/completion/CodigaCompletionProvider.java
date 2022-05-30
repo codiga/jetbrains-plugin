@@ -95,6 +95,11 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             return;
         }
 
+        // The keyword has to start with a . or a slash
+        if(!keyword.get().startsWith(".") && !keyword.get().startsWith("/")) {
+            return;
+        }
+
         /**
          * If the text entered is only a dot or slash, put no keyword so that we search all shortcuts
          */
