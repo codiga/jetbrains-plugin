@@ -1,6 +1,8 @@
 package io.codiga.plugins.jetbrains.actions.snippet_search;
 
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
@@ -17,6 +19,15 @@ public class SnippetToolWindowFactory implements ToolWindowFactory {
 
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+        // Make sure the current project is set.
+        SnippetToolWindowFileEditorManagerListener.setCurrentProject(project);
+        VirtualFile[] virtualFiles = FileEditorManager.getInstance(project).getSelectedFiles();
+
+        // Make sure we have one virtual file present.
+        if (virtualFiles.length > 0) {
+            SnippetToolWindowFileEditorManagerListener.setCurrentVirtualFile(virtualFiles[0]);
+        }
+
         snippetToolWindow = new SnippetToolWindow(toolWindow, project);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(snippetToolWindow.getContent(), "", false);

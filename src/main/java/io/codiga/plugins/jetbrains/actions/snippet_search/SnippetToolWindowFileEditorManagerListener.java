@@ -27,6 +27,14 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
         return currentProject;
     }
 
+    public static void setCurrentProject(@NotNull Project project) {
+        currentProject = project;
+    }
+
+    public static void setCurrentVirtualFile(@NotNull VirtualFile virtualFile) {
+        currentVirtualFile = virtualFile;
+    }
+
     public static VirtualFile getCurrentVirtualFile() {
         return currentVirtualFile;
     }

@@ -4,7 +4,6 @@ import com.github.rjeschke.txtmark.Processor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -95,22 +94,18 @@ public class SnippetPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
-                FileEditor fileEditor = SnippetToolWindowFileEditorManagerListener.getCurrentFileEditor();
 
                 if (project == null) {
-                    return;
-                }
-
-                if (fileEditor == null || fileEditor.getFile() == null) {
+                    LOGGER.info("[mouseClicked] project is null");
                     return;
                 }
 
                 Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
                 if (editor == null) {
+                    LOGGER.info("[mouseClicked] editor is null");
                     return;
                 }
-
 
                 IdeFocusManager.getInstance(project).requestFocusInProject(editor.getContentComponent(), project);
 
@@ -144,15 +139,15 @@ public class SnippetPanel {
             public void mouseEntered(MouseEvent e) {
 
                 Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
-                FileEditor fileEditor = SnippetToolWindowFileEditorManagerListener.getCurrentFileEditor();
                 VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
 
                 if (project == null) {
+                    LOGGER.info("[mouseEntered] project is null");
                     return;
                 }
 
-                if (fileEditor == null || fileEditor.getFile() == null) {
-                    return;
+                if (virtualFile == null) {
+                    LOGGER.info("[mouseEntered] virtualFile is null");
                 }
 
                 PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
@@ -172,7 +167,7 @@ public class SnippetPanel {
                         snippet.imports(),
                         snippet.jetbrainsFormat(),
                         snippet.language(),
-                        new CodingAssistantContext(fileEditor.getFile(), project, psiFile));
+                        new CodingAssistantContext(virtualFile, project, psiFile));
                 insert.setText("Insert");
             }
 
