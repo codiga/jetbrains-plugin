@@ -6,9 +6,9 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+    id("org.jetbrains.kotlin.jvm") version "1.7.0"
     // GraphQL
-    id("com.apollographql.apollo") version "2.5.11"
+    id("com.apollographql.apollo") version "2.5.12"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     id("org.jetbrains.intellij") version "1.6.0"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     // GraphQL API
-    implementation("com.apollographql.apollo:apollo-runtime:2.5.11")
+    implementation("com.apollographql.apollo:apollo-runtime:2.5.12")
 
     // OS detection
     implementation("org.apache.commons:commons-lang3:3.12.0")
