@@ -1,21 +1,21 @@
 <idea-plugin>
     <id>io.codiga.plugins.jetbrains-plugin</id>
-    <name>Codiga - Code Snippets</name>
+    <name>Codiga - Smart Code Snippets</name>
     <vendor email="support@codiga.io" url="http://www.codiga.io">Codiga</vendor>
 
     <description>
         <![CDATA[
             <p>
-                Search, create and share code snippets for 15+ languages.
+                Search, create and share <a href="https://www.codiga.io/code-snippets/smart-code-snippets/">Smart Code Snippets</a> for 15+ languages.
             </p>
 
             <h3>
                 Quick Start
             </h3>
             <ul>
-                <li>Type a dot (just a .) in your editor to list all snippets available with a shortcut</li>
-                <li>Type CTRL + ALT + C to search for snippets based on keywords</li>
-                <li>Type CTRL + ALT + S to list all snippets with a shortcuts</li>
+                <li>Type a dot (just a .) in your editor to list all smart code snippets available with a shortcut</li>
+                <li>Type CTRL + ALT + C to search for smart code snippets based on keywords</li>
+                <li>Type CTRL + ALT + S to list all smart code snippets with a shortcuts</li>
                 <li>Create public or private snippets from your IDE by selecting code, right-click and select "Create Codiga Snippet"</li>
             </ul>
 
@@ -23,10 +23,10 @@
                 All features
             </h3>
             <ul>
-                <li>Search for code snippets based on keywords (CTRL + ALT + C)</li>
-                <li>List all code snippets with a shortcut (CTRL + ALT + S)</li>
+                <li>Search for smart code snippets based on keywords (CTRL + ALT + C)</li>
+                <li>List all smart code snippets with a shortcut (CTRL + ALT + S)</li>
                 <li>Use a snippet directly using a shortcut in your editor (type the shortcut of the snippet, IDE fetch snippets when a dot (.) is entered)</li>
-                <li>Create snippets with your team (select code, right click and select "Create Codiga Snippet"</li>
+                <li>Create smart code snippets with your team (select code, right click and select "Create Codiga Snippet"</li>
                 <li>Share snippets with your team</li>
             </ul>
 
