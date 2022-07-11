@@ -229,7 +229,17 @@ public class ActionUtils {
 
         // Get the current line and get the indentation
         int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
-        String currentLine = document.getText(new TextRange(document.getLineStartOffset(selectedLine), document.getLineEndOffset(selectedLine)));
+        int lineStartOffset;
+        int lineEndOffset;
+        try {
+            lineStartOffset = document.getLineStartOffset(selectedLine);
+            lineEndOffset = document.getLineEndOffset(selectedLine);
+        } catch (IndexOutOfBoundsException iobe) {
+            LOGGER.warn("[addRecipeToEditor] error while trying to get start or end offset");
+            return;
+        }
+
+        String currentLine = document.getText(new TextRange(lineStartOffset, lineEndOffset));
         final boolean usesTabs = detectIfTabs(currentLine);
         int indentationCurrentLine = getIndentation(currentLine, usesTabs);
 
