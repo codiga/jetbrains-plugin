@@ -11,6 +11,8 @@ public final class LanguageUtils {
         switch (languageEnumeration) {
             case HASKELL:
                 return "Haskell";
+            case COLDFUSION:
+                return "Coldfusion";
             case HTML:
                 return "HTML";
             case DOCKER:
