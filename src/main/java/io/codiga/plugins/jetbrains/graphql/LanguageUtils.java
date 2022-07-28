@@ -12,6 +12,8 @@ public final class LanguageUtils {
         .put("bash", LanguageEnumeration.SHELL)
         .put("c", LanguageEnumeration.C)
         .put("cls", LanguageEnumeration.APEX)
+        .put("cfc", LanguageEnumeration.COLDFUSION)
+        .put("cfm", LanguageEnumeration.COLDFUSION)
         .put("cpp", LanguageEnumeration.CPP)
         .put("css", LanguageEnumeration.CSS)
         .put("cs", LanguageEnumeration.CSHARP)
