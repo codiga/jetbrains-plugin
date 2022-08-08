@@ -28,6 +28,9 @@ public class CacheRefreshEditorListener implements FileEditorManagerListener {
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
         FileEditor fileEditor = event.getNewEditor();
+
+        // refresh the last activity timestamp
+        ShortcutCache.getInstance().updateLastActivityTimestamp();
         if (isNotNewFile(fileEditor)) {
             return;
         }

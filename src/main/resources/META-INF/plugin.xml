@@ -80,6 +80,7 @@
         />
         <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
 <!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
+        <typedHandler implementation="io.codiga.plugins.jetbrains.cache.TypedKeyHandler"/>
     </extensions>
     <projectListeners>
         <listener class="io.codiga.plugins.jetbrains.cache.CacheRefreshEditorListener"
