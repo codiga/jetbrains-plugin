@@ -4,15 +4,12 @@ import com.google.common.collect.ImmutableList;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 
 public class ShortcutCacheKeyTest extends TestBase {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ShortcutCacheKeyTest.class);
 
     @Test
     public void testKeyEquals()  {
