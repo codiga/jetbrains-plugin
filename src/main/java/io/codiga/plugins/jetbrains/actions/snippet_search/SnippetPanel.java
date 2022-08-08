@@ -32,7 +32,6 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
  * every time a snippet is rendered.
  */
 public class SnippetPanel {
-    private JTextArea code;
     private JPanel mainPanel;
     private JButton insert;
     private JButton learnMore;
@@ -41,6 +40,10 @@ public class SnippetPanel {
     private JTextPane description;
     private JLabel shortcutLabel;
     private JLabel visibilityLabel;
+
+    private JTextArea code;
+    private JButton copytoClipboard;
+
     private final CodeInsertionContext codeInsertionContext;
     private static final MarkdownDecorator markdownDecorator = new MarkdownDecorator();
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
@@ -57,7 +60,7 @@ public class SnippetPanel {
         String owner = "unknown author"; // default value for the owner
         String decodedCode = new String(Base64.getDecoder().decode(snippet.presentableFormat().getBytes(StandardCharsets.UTF_8)));
 
-
+        copytoClipboard.addMouseListener(new CopyToClipboardMouseListener(snippet));
         learnMore.addMouseListener(new LearnMoreMouseListener(snippet));
 
         if (snippet.owner() != null){
@@ -70,6 +73,7 @@ public class SnippetPanel {
             }
         }
         code.setText(decodedCode);
+
         userInformation.setText(owner);
         description.setText(String.format("<html>%s</html>", htmlDescription));
         name.setText(snippet.name());
