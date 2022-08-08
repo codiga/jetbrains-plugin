@@ -29,7 +29,7 @@ public class SnippetToolWindowFactory implements ToolWindowFactory {
         }
 
         snippetToolWindow = new SnippetToolWindow(toolWindow, project);
-        ContentFactory contentFactory = ContentFactory.getInstance();
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(snippetToolWindow.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);
     }

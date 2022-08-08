@@ -70,7 +70,6 @@ public final class ShortcutCache {
      * @param shortcutCacheKey
      */
     private void updateKey(ShortcutCacheKey shortcutCacheKey) {
-        LOGGER.info("refreshing cache key " + shortcutCacheKey.toString());
         Optional<Long> lastUpdateTimestamp = codigaApi.getRecipesForClientByShotcurtLastTimestmap(shortcutCacheKey.getDependencies(), shortcutCacheKey.getLanguage());
         boolean shouldFetch = false;
         if (!lastUpdateTimestamp.isPresent()) {
@@ -129,7 +128,7 @@ public final class ShortcutCache {
             }
 
         } catch (NullPointerException npe) {
-            LOGGER.info("error when refreshing the cache");
+            LOGGER.error("error when refreshing the cache");
         }
     }
 
