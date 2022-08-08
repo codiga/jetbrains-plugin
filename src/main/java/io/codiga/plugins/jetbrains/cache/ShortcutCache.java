@@ -22,18 +22,41 @@ public final class ShortcutCache {
     // Uses a concurrent hashmap to avoid threading issues.
     ConcurrentHashMap<ShortcutCacheKey, ShortcutCacheValue> cache;
 
+    /**
+     * Last activity of the user on the system.
+     */
+    private long lastActivityTimestamp;
+
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
     private static ShortcutCache _INSTANCE = new ShortcutCache();
 
+    private static long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
+
+
     private ShortcutCache() {
         cache = new ConcurrentHashMap<>();
+        lastActivityTimestamp = System.currentTimeMillis();
     }
 
     public static ShortcutCache getInstance() {
         return _INSTANCE;
     }
+
+    public void updateLastActivityTimestamp() {
+        this.lastActivityTimestamp = System.currentTimeMillis();
+    }
+
+    /**
+     * Return true if the user was active in the last ten minutes.
+     * @return
+     */
+    public boolean wasActiveRecently() {
+        long tenMinutesAgo = System.currentTimeMillis() - TEN_MINUTES_IN_MILLISECONDS;
+        return lastActivityTimestamp > tenMinutesAgo;
+    }
+
 
 
     /**
@@ -47,6 +70,7 @@ public final class ShortcutCache {
      * @param shortcutCacheKey
      */
     private void updateKey(ShortcutCacheKey shortcutCacheKey) {
+        LOGGER.info("refreshing cache key " + shortcutCacheKey.toString());
         Optional<Long> lastUpdateTimestamp = codigaApi.getRecipesForClientByShotcurtLastTimestmap(shortcutCacheKey.getDependencies(), shortcutCacheKey.getLanguage());
         boolean shouldFetch = false;
         if (!lastUpdateTimestamp.isPresent()) {
@@ -84,13 +108,20 @@ public final class ShortcutCache {
 
     /**
      * Refresh a cache key in the cache if and only if it needs to be updated.
+     * Only update if there was no activity for 10 minutes.
      * @param shortcutCacheKey
      */
     public void refreshCacheKey(final ShortcutCacheKey shortcutCacheKey) {
         try {
+            if(!wasActiveRecently()) {
+                LOGGER.debug("was not active recently, do not refresh");
+                return;
+            }
+
             if (cache.containsKey(shortcutCacheKey)) {
                 ShortcutCacheValue shortcutCacheValue = cache.get(shortcutCacheKey);
                 if (shortcutCacheValue.needsUpdate()) {
+                    LOGGER.debug("Not updating the following key, do not need refresh: " + shortcutCacheKey.toString());
                     updateKey(shortcutCacheKey);
                 }
             } else {
