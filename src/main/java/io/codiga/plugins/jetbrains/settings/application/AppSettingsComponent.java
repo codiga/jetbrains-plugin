@@ -34,8 +34,9 @@ public class AppSettingsComponent {
     private JBRadioButton snippetsVisibilityPublic = new JBRadioButton();
     private JBRadioButton snippetsVisibilityPrivate = new JBRadioButton();
     private JBCheckBox snippetsVisibilityFavoriteOnly = new JBCheckBox();
-    private JBCheckBox useInlineCompletion = new JBCheckBox();
+    private JBCheckBox useInlineCompletionCheckbox = new JBCheckBox();
     private boolean useCompletion;
+    private boolean useInlineCompletion;
     private boolean snippetsPublicOnly;
     private boolean snippetsPrivateOnly;
     private boolean snippetsFavoriteOnly;
@@ -97,6 +98,10 @@ public class AppSettingsComponent {
             setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
         });
 
+        useInlineCompletionCheckbox.addActionListener(event -> {
+            this.useInlineCompletion = useInlineCompletionCheckbox.isSelected();
+        });
+
 
         buttonGetApiKeys.addActionListener(arg0 -> {
             try {
@@ -122,7 +127,7 @@ public class AppSettingsComponent {
                 .addLabeledComponent(new JBLabel("            "), new JBLabel(" Add your Codiga API keys to use your recipes in your IDE."), 1, false)
                 .addComponent(p, 0)
                 .addLabeledComponent(this.useCompletationCheckbox, new JBLabel(SETTINGS_ENABLED_COMPLETION))
-            .addLabeledComponent(useInlineCompletion, new JBLabel("Enable Coding Assistant with inline completion"))
+            .addLabeledComponent(useInlineCompletionCheckbox, new JBLabel("Enable Coding Assistant with inline completion"))
                 .addSeparator(1)
 
                 .addComponent(new JLabel(SETTINGS_SNIPPETS_VISIBILITY_PARAMETERS), 1)
@@ -159,6 +164,13 @@ public class AppSettingsComponent {
     public boolean usePublicSnippetsOnly() { return this.snippetsPublicOnly; }
     public boolean usePrivateSnippetsOnly() { return this.snippetsPrivateOnly; }
     public boolean useFavoriteSnippetsOnly() { return this.snippetsFavoriteOnly; }
+
+    public boolean useInlineCompletion() { return this.useInlineCompletion; }
+
+    public void setUseInlineComplextion(Boolean b) {
+        this.useInlineCompletion = b;
+        this.useInlineCompletionCheckbox.setSelected(b);
+    }
 
     public void setUseEnabledCheckbox(Boolean b) {
         if (this.useCompletationCheckbox != null) {

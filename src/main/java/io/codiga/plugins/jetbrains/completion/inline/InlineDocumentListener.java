@@ -35,6 +35,7 @@ public class InlineDocumentListener implements DocumentListener {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
     private final DependencyManagement dependencyManagement = new DependencyManagement();
+    private final AppSettingsState settings = AppSettingsState.getInstance();
 
     @Override
     public void documentChanged(@NotNull DocumentEvent documentEvent) {
@@ -50,6 +51,11 @@ public class InlineDocumentListener implements DocumentListener {
 
         if (editor == null){
             LOGGER.debug("editor is null");
+            return;
+        }
+
+        if(!settings.getUseInlineCompletion()) {
+            LOGGER.debug("inline completion disabled");
             return;
         }
 

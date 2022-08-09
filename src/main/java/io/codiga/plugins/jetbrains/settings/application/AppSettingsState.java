@@ -36,6 +36,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     @Tag
     private Boolean useCompletion = true;
     @Tag
+    private Boolean useInlineCompletion = true;
+    @Tag
     private Boolean showDialogApiNotification = true;
     @Tag
     private Boolean showDialogOnboarding = true;
@@ -83,6 +85,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     public boolean getFavoriteSnippetsOnly() { return this.favoriteSnippetsOnly; }
 
+    public boolean getUseInlineCompletion() { return this.useInlineCompletion; }
+
     public void setApiToken(String s) {
         this.apiToken = s;
     }
@@ -90,6 +94,8 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public void setUseCompletion(Boolean b) {
         this.useCompletion = b;
     }
+
+
 
     public boolean hasApiKeys() {
         return getAccessKey().length() > 0 && getSecretKey().length() > 0;
@@ -116,6 +122,12 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         LOGGER.debug("[AppSettingsState] setFavoriteSnippetsOnly: " + favoriteSnippetsOnly);
         this.favoriteSnippetsOnly = favoriteSnippetsOnly;
     }
+
+    public void setUseInlineCompletion(Boolean b) {
+        LOGGER.debug("[AppSettingsState] useInlineCompletion: " + b);
+        this.useInlineCompletion = b;
+    }
+
 
     @Nullable
     @Override

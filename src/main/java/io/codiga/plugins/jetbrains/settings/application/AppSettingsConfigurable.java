@@ -51,21 +51,10 @@ public class AppSettingsConfigurable implements Configurable {
         boolean publicSnippetsModified = mySettingsComponent.usePublicSnippetsOnly() != settings.getPublicSnippetsOnly();
         boolean privateSnippetsModified = mySettingsComponent.usePrivateSnippetsOnly() != settings.getPrivateSnippetsOnly();
         boolean favoriteSnippetsModified = mySettingsComponent.useFavoriteSnippetsOnly() != settings.getFavoriteSnippetsOnly();
-
-        LOGGER.debug("component public snippets: " + mySettingsComponent.usePublicSnippetsOnly());
-        LOGGER.debug("component private snippets: " + mySettingsComponent.usePrivateSnippetsOnly());
-        LOGGER.debug("componnent favorite snippets: " + mySettingsComponent.useFavoriteSnippetsOnly());
-
-        LOGGER.debug("settings public snippets: " + settings.getPublicSnippetsOnly());
-        LOGGER.debug("settings private snippets: " + settings.getPrivateSnippetsOnly());
-        LOGGER.debug("settings favorite snippets: " + settings.getFavoriteSnippetsOnly());
-
-        LOGGER.debug("publicSnippetsModified: " + publicSnippetsModified);
-        LOGGER.debug("privateSnippetsModified: " + privateSnippetsModified);
-        LOGGER.debug("favoriteSnippetsModified: " + favoriteSnippetsModified);
+        boolean useInlineCompletionModified = mySettingsComponent.useInlineCompletion() != settings.getUseInlineCompletion();
 
 
-        return apiTokenModified || completionModified || publicSnippetsModified || privateSnippetsModified || favoriteSnippetsModified;
+        return apiTokenModified || completionModified || publicSnippetsModified || privateSnippetsModified || favoriteSnippetsModified || useInlineCompletionModified;
     }
 
     @Override
@@ -76,6 +65,7 @@ public class AppSettingsConfigurable implements Configurable {
         settings.setPublicSnippetsOnly(mySettingsComponent.usePublicSnippetsOnly());
         settings.setPrivateSnippetsOnly(mySettingsComponent.usePrivateSnippetsOnly());
         settings.setFavoriteSnippetsOnly(mySettingsComponent.useFavoriteSnippetsOnly());
+        settings.setUseInlineCompletion(mySettingsComponent.useInlineCompletion());
         // Trigger all the subscriber of the API key notification so that they can change their behavior
         // accordingly.
         apiKeyChangeNotifier.afterAction(null);
@@ -88,6 +78,7 @@ public class AppSettingsConfigurable implements Configurable {
         mySettingsComponent.setApiToken(settings.getApiToken());
         mySettingsComponent.setUseEnabledCheckbox(settings.getUseCompletion());
         mySettingsComponent.setSnippetsVisiliblity(settings.getPrivateSnippetsOnly(), settings.getPublicSnippetsOnly(), settings.getFavoriteSnippetsOnly());
+        mySettingsComponent.setUseInlineComplextion(settings.getUseInlineCompletion());
     }
 
     @Override
