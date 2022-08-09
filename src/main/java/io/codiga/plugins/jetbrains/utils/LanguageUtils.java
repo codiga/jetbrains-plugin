@@ -1,6 +1,9 @@
 package io.codiga.plugins.jetbrains.utils;
 
 import io.codiga.api.type.LanguageEnumeration;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 public final class LanguageUtils {
 
@@ -62,5 +65,56 @@ public final class LanguageUtils {
             default:
                 return "Unknown";
         }
+    }
+
+    /**
+     * Indicate if a line of code starts as a comment.
+     * @param languageEnumeration
+     * @param line
+     * @return
+     */
+    public static boolean lineStartsWithComment(@NotNull LanguageEnumeration languageEnumeration, @NotNull String line) {
+        String filteredLine = line.replaceAll(" ", "");
+        switch (languageEnumeration){
+            case JAVASCRIPT:
+            case TYPESCRIPT:
+            case C:
+            case APEX:
+            case CPP:
+            case SCALA:
+            case DART:
+            case GO:
+            case OBJECTIVEC:
+            case KOTLIN:
+            case JAVA:
+            case SWIFT:
+            case SOLIDITY:
+            case RUST:
+                return filteredLine.startsWith("//");
+            case PYTHON:
+            case SHELL:
+            case PERL:
+            case YAML:
+                return filteredLine.startsWith("#");
+            case TERRAFORM:
+            case PHP:
+                return filteredLine.startsWith("#") || filteredLine.startsWith("//");
+            case COLDFUSION:
+                return filteredLine.startsWith("<!---");
+            case HASKELL:
+                return filteredLine.startsWith("--");
+            case CSS:
+                return filteredLine.startsWith("/*");
+            default:
+                return false;
+        }
+    }
+
+    public static @NotNull String removeLineFromCommentsSymbols(@NotNull String line) {
+        return line.replaceAll("#", "").replaceAll("//", "");
+    }
+
+    public static long numberOfWordsInComment(@NotNull String line) {
+        return Arrays.asList(removeLineFromCommentsSymbols(line).split(" ")).stream().filter(s -> s.length() > 0).count();
     }
 }
