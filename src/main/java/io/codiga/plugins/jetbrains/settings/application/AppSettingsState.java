@@ -1,4 +1,5 @@
 package io.codiga.plugins.jetbrains.settings.application;
+import com.intellij.openapi.diagnostic.Logger;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -10,6 +11,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+
 /**
  * Represents the API parameters (access key and secret key) to access the
  * Codiga API. Used as an Application Service extension, to get
@@ -20,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
         storages = {@Storage("CodeInspectorApplicationSettings.xml")}
 )
 public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
+    private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     @Tag
     private String accessKey = "";
@@ -35,6 +39,12 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     private Boolean showDialogApiNotification = true;
     @Tag
     private Boolean showDialogOnboarding = true;
+    @Tag
+    private Boolean publicSnippetsOnly = false;
+    @Tag
+    private Boolean privateSnippetsOnly = false;
+    @Tag
+    private Boolean favoriteSnippetsOnly = false;
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
@@ -67,6 +77,12 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         return this.apiToken;
     }
 
+    public boolean getPublicSnippetsOnly() { return this.publicSnippetsOnly; }
+
+    public boolean getPrivateSnippetsOnly() { return this.privateSnippetsOnly; }
+
+    public boolean getFavoriteSnippetsOnly() { return this.favoriteSnippetsOnly; }
+
     public void setApiToken(String s) {
         this.apiToken = s;
     }
@@ -86,6 +102,20 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public void setShowDialogApiNotification(Boolean b) { this.showDialogApiNotification = b;}
 
     public void setShowDialogOnboarding(Boolean b) { this.showDialogOnboarding = b;}
+
+    public void setPublicSnippetsOnly(Boolean b) {
+        LOGGER.debug("[AppSettingsState] setPublicSnippetsOnly: " + b);
+        this.publicSnippetsOnly = b;}
+
+    public void setPrivateSnippetsOnly(Boolean b){
+        LOGGER.debug("[AppSettingsState] setPrivateSnippetsOnly: " + b);
+        this.privateSnippetsOnly = b;
+    }
+
+    public void setFavoriteSnippetsOnly(Boolean favoriteSnippetsOnly) {
+        LOGGER.debug("[AppSettingsState] setFavoriteSnippetsOnly: " + favoriteSnippetsOnly);
+        this.favoriteSnippetsOnly = favoriteSnippetsOnly;
+    }
 
     @Nullable
     @Override

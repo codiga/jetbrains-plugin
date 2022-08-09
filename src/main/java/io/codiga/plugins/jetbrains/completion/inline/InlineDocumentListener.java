@@ -17,6 +17,7 @@ import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.Dependency;
+import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -88,8 +89,9 @@ public class InlineDocumentListener implements DocumentListener {
                         return;
                     }
 
-                    if(numberOfWordsInComment(currentLine) < 1) {
-                        LOGGER.debug("not enough keywords");
+                    long numberOfWords = numberOfWordsInComment(currentLine);
+                    if(numberOfWords <= 1) {
+                        LOGGER.debug("not enough keywords: " + numberOfWords);
                         return;
                     }
 
@@ -100,9 +102,34 @@ public class InlineDocumentListener implements DocumentListener {
                         .stream().map(Dependency::getName)
                         .collect(Collectors.toList());
                     String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(editor.getProject(), virtualFile);
-                    List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(searchTerm, dependenciesName, Optional.empty(), language, filename, Optional.empty(), Optional.empty(), Optional.empty());
 
+                    AppSettingsState settings = AppSettingsState.getInstance();
+                    Optional<Boolean> onlyPublic = Optional.empty();
+                    Optional<Boolean> onlyPrivate = Optional.empty();
+                    Optional<Boolean> onlyFavorite = Optional.empty();
 
+                    if(settings.getPublicSnippetsOnly()){
+                        onlyPublic = Optional.of(true);
+                        onlyPrivate = Optional.empty();
+                    }
+                    if(settings.getPrivateSnippetsOnly()){
+                        onlyPrivate = Optional.of(true);
+                        onlyPublic = Optional.empty();
+                    }
+                    if(settings.getFavoriteSnippetsOnly()) {
+                        onlyFavorite = Optional.of(true);
+                    }
+
+                    LOGGER.debug(String.format("[InlineDocumentListener] initiate search with onlyPublic %s, onlyPrivate %s, onlyFavorite %s", onlyPublic, onlyPrivate, onlyFavorite));
+
+                    List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(searchTerm,
+                        dependenciesName,
+                        Optional.empty(),
+                        language,
+                        filename,
+                        onlyPublic,
+                        onlyPrivate,
+                        onlyFavorite);
 
 
                     SnippetPreview snippetPreview = new SnippetPreview(editor, offset, snippets);

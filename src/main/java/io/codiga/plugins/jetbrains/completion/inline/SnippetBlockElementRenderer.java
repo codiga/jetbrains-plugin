@@ -45,6 +45,9 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
         Color color = Color.lightGray;
         Font font = getFont(editor);
 
+        g.setFont(font);
+        g.setColor(color);
+
         for (int i = 0 ; i < textToInsert.size() ; i++) {
             g.drawString(textToInsert.get(i),
                 0, targetRegion.y + i * editor.getLineHeight() + editor.getAscent());

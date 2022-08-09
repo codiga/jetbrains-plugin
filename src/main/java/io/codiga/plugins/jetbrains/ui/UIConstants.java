@@ -8,6 +8,7 @@ public class UIConstants {
     public final static String SETTINGS_TEST_API_BUTTON_TEXT = "Test API connection";
     public final static String SETTINGS_GET_API_TOKEN_BUTTON_TEXT = "Get API token";
     public final static String SETTINGS_API_TOKEN_LABEL = "API Token:";
+    public final static String SETTINGS_SNIPPETS_VISIBILITY_PARAMETERS = "Default Snippets Search when logged in";
     public final static String SETTINGS_CHOOSE_PROJECT = "Choose Project:";
     public final static String SETTINGS_ASSOCIATE_CODE_INSPECTOR_PROJECT = "Associate a Codiga project";
     public final static String SETTINGS_PROJECT_ENABLE = "Enable Code Analysis on this project";
