@@ -50,6 +50,9 @@ public class SnippetPreview implements Disposable {
     }
 
     public void display() {
+        if(this.currentIndex >= suggestions.size()) {
+            return;
+        }
         GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet = suggestions.get(this.currentIndex);
 
         String decodedCode = new String(Base64.getDecoder().decode(snippet.presentableFormat().getBytes(StandardCharsets.UTF_8)));

@@ -11,6 +11,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.Alarm;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
@@ -30,19 +31,19 @@ import static io.codiga.plugins.jetbrains.utils.EditorUtils.getActiveEditor;
 import static io.codiga.plugins.jetbrains.utils.LanguageUtils.*;
 
 public class InlineDocumentListener implements DocumentListener {
-
-
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
     private final DependencyManagement dependencyManagement = new DependencyManagement();
     private final AppSettingsState settings = AppSettingsState.getInstance();
 
+    private final Alarm updateListAlarm = new Alarm();
+
+    private long lastRequestTimestamp = 0;
+
     @Override
     public void documentChanged(@NotNull DocumentEvent documentEvent) {
-        LOGGER.info("document changed");
-
         if(documentEvent.getDocument().isInBulkUpdate()) {
-            LOGGER.debug("bulk update");
+            LOGGER.debug("bulk update - skipping");
             return;
         }
 
@@ -59,9 +60,15 @@ public class InlineDocumentListener implements DocumentListener {
             return;
         }
 
+        this.lastRequestTimestamp = System.currentTimeMillis();
+        long requestTimestamp = this.lastRequestTimestamp;
+
+
         ApplicationManager.getApplication()
-            .invokeLater(
-                () -> {
+                .invokeLater(() -> {
+                    LOGGER.debug("request timestamp:      " + requestTimestamp);
+                    LOGGER.debug("last request timestamp: " + this.lastRequestTimestamp);
+                    LOGGER.debug("making request");
                     int offset = editor.getCaretModel().getOffset();
 
                     SnippetPreview previousPreview = SnippetPreview.getInstance(editor);
@@ -105,44 +112,59 @@ public class InlineDocumentListener implements DocumentListener {
 
                     LOGGER.debug("search term: " + searchTerm);
                     List<String> dependenciesName = dependencyManagement.getDependencies(editor.getProject(), virtualFile)
-                        .stream().map(Dependency::getName)
-                        .collect(Collectors.toList());
+                            .stream().map(Dependency::getName)
+                            .collect(Collectors.toList());
                     String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(editor.getProject(), virtualFile);
 
                     AppSettingsState settings = AppSettingsState.getInstance();
-                    Optional<Boolean> onlyPublic = Optional.empty();
-                    Optional<Boolean> onlyPrivate = Optional.empty();
-                    Optional<Boolean> onlyFavorite = Optional.empty();
-
-                    if(settings.getPublicSnippetsOnly()){
-                        onlyPublic = Optional.of(true);
-                        onlyPrivate = Optional.empty();
-                    }
-                    if(settings.getPrivateSnippetsOnly()){
-                        onlyPrivate = Optional.of(true);
-                        onlyPublic = Optional.empty();
-                    }
-                    if(settings.getFavoriteSnippetsOnly()) {
-                        onlyFavorite = Optional.of(true);
-                    }
-
-                    LOGGER.debug(String.format("[InlineDocumentListener] initiate search with onlyPublic %s, onlyPrivate %s, onlyFavorite %s", onlyPublic, onlyPrivate, onlyFavorite));
-
-                    List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(searchTerm,
-                        dependenciesName,
-                        Optional.empty(),
-                        language,
-                        filename,
-                        onlyPublic,
-                        onlyPrivate,
-                        onlyFavorite);
 
 
-                    SnippetPreview snippetPreview = new SnippetPreview(editor, offset, snippets);
-                    snippetPreview.display();
+
+                    // Finally, make the request
+                    updateListAlarm.addRequest(() -> {
+                        if (requestTimestamp != this.lastRequestTimestamp) {
+                            LOGGER.debug("expired request");
+                            return;
+                        }
+                        Optional<Boolean> onlyPublic = Optional.empty();
+                        Optional<Boolean> onlyPrivate = Optional.empty();
+                        Optional<Boolean> onlyFavorite = Optional.empty();
+
+                        if(settings.getPublicSnippetsOnly()){
+                            onlyPublic = Optional.of(true);
+                            onlyPrivate = Optional.empty();
+                        }
+                        if(settings.getPrivateSnippetsOnly()){
+                            onlyPrivate = Optional.of(true);
+                            onlyPublic = Optional.empty();
+                        }
+                        if(settings.getFavoriteSnippetsOnly()) {
+                            onlyFavorite = Optional.of(true);
+                        }
+                        LOGGER.debug(String.format("[InlineDocumentListener] initiate search with onlyPublic %s, onlyPrivate %s, onlyFavorite %s", onlyPublic, onlyPrivate, onlyFavorite));
+
+                        List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(searchTerm,
+                                dependenciesName,
+                                Optional.empty(),
+                                language,
+                                filename,
+                                onlyPublic,
+                                onlyPrivate,
+                                onlyFavorite);
+
+                        if (snippets.size() == 0){
+                            return;
+                        }
+
+                        SnippetPreview snippetPreview = new SnippetPreview(editor, offset, snippets);
+                        snippetPreview.display();
+                    }, 500);
+
 
 
                 });
+
+
     }
 
 }
