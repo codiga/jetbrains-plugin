@@ -80,7 +80,11 @@ public class SnippetPreview implements Disposable {
         LOGGER.debug("indentationCurrentLine: " + indentationCurrentLine);
         String indentedCode = indentAllLines(decodedCode, indentationCurrentLine, usesTabs);
         LOGGER.info(indentedCode);
-        SnippetBlockElementRenderer snippetBlockElementRenderer = new SnippetBlockElementRenderer(editor, Arrays.asList(indentedCode.split("\n")));
+        SnippetBlockElementRenderer snippetBlockElementRenderer = new SnippetBlockElementRenderer(
+                editor,
+                Arrays.asList(indentedCode.split("\n")),
+                currentIndex + 1,
+                suggestions.size());
         currentInlay = this.editor.getInlayModel().addBlockElement(offset, true, false, 1, snippetBlockElementRenderer);
         Disposer.register(this, currentInlay);
 

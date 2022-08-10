@@ -77,11 +77,9 @@ public class InlineDocumentListener implements DocumentListener {
                         LOGGER.debug("dispose previous preview");
                         Disposer.dispose(previousPreview);
                     }
-
-
+                    
                     VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
                     ProjectManager.getInstance().getDefaultProject();
-
 
                     if (virtualFile == null){
                         LOGGER.debug("no virtual file");
@@ -159,12 +157,7 @@ public class InlineDocumentListener implements DocumentListener {
                         SnippetPreview snippetPreview = new SnippetPreview(editor, offset, snippets);
                         snippetPreview.display();
                     }, 500);
-
-
-
                 });
-
-
     }
 
 }
