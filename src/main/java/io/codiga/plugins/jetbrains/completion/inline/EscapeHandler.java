@@ -9,6 +9,10 @@ import org.jetbrains.annotations.NotNull;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
+
+/**
+ * Clear the suggestions when the user types escape.
+ */
 public class EscapeHandler extends EditorActionHandler {
 
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
@@ -16,14 +20,15 @@ public class EscapeHandler extends EditorActionHandler {
 
     @Override
     public void doExecute(@NotNull Editor editor, Caret caret, DataContext dataContext) {
-        LOGGER.info("execute escape handler");
-        SnippetPreview.clear(editor);
+        SnippetPreview snippetPreview = SnippetPreview.getInstance(editor);
+        if (snippetPreview != null){
+            SnippetPreview.clear(editor);
+        }
     }
 
     @Override
     public boolean isEnabledForCaret(
         @NotNull Editor editor, @NotNull Caret caret, DataContext dataContext) {
-        LOGGER.info("execute isEnabledForCaret");
         return true;
     }
 }

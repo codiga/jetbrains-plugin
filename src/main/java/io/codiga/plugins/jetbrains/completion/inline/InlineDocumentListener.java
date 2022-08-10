@@ -36,6 +36,8 @@ public class InlineDocumentListener implements DocumentListener {
     private final DependencyManagement dependencyManagement = new DependencyManagement();
     private final AppSettingsState settings = AppSettingsState.getInstance();
 
+    private final int TIMEOUT_REQUEST_POLLING_MILLISECONDS = 500;
+
     private final Alarm updateListAlarm = new Alarm();
 
     private long lastRequestTimestamp = 0;
@@ -66,15 +68,11 @@ public class InlineDocumentListener implements DocumentListener {
 
         ApplicationManager.getApplication()
                 .invokeLater(() -> {
-                    LOGGER.debug("request timestamp:      " + requestTimestamp);
-                    LOGGER.debug("last request timestamp: " + this.lastRequestTimestamp);
-                    LOGGER.debug("making request");
                     int offset = editor.getCaretModel().getOffset();
 
                     SnippetPreview previousPreview = SnippetPreview.getInstance(editor);
 
                     if (previousPreview != null) {
-                        LOGGER.debug("dispose previous preview");
                         Disposer.dispose(previousPreview);
                     }
 
@@ -82,7 +80,6 @@ public class InlineDocumentListener implements DocumentListener {
                     ProjectManager.getInstance().getDefaultProject();
 
                     if (virtualFile == null){
-                        LOGGER.debug("no virtual file");
                         return;
                     }
 
@@ -106,9 +103,9 @@ public class InlineDocumentListener implements DocumentListener {
                         return;
                     }
 
+                    // what we are looking for on the API
                     Optional<String> searchTerm = Optional.of(removeLineFromCommentsSymbols(currentLine));
 
-                    LOGGER.debug("search term: " + searchTerm);
                     List<String> dependenciesName = dependencyManagement.getDependencies(editor.getProject(), virtualFile)
                             .stream().map(Dependency::getName)
                             .collect(Collectors.toList());
@@ -116,12 +113,10 @@ public class InlineDocumentListener implements DocumentListener {
 
                     AppSettingsState settings = AppSettingsState.getInstance();
 
-
-
-                    // Finally, make the request
+                    // Finally, make the request. We make a request periodically and then
+                    // only get the latest request. We poll
                     updateListAlarm.addRequest(() -> {
                         if (requestTimestamp != this.lastRequestTimestamp) {
-                            LOGGER.debug("expired request");
                             return;
                         }
                         Optional<Boolean> onlyPublic = Optional.empty();
@@ -156,7 +151,7 @@ public class InlineDocumentListener implements DocumentListener {
 
                         SnippetPreview snippetPreview = new SnippetPreview(editor, offset, snippets);
                         snippetPreview.display();
-                    }, 500);
+                    }, TIMEOUT_REQUEST_POLLING_MILLISECONDS);
                 });
     }
 

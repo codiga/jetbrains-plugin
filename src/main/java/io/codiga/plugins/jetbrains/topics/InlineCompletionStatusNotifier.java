@@ -1,0 +1,18 @@
+package io.codiga.plugins.jetbrains.topics;
+
+import com.intellij.util.messages.Topic;
+
+/**
+ * Topic that represent what a change of the API key.
+ *
+ * We subscribe to this topic in the preferences when the API key change in order to refresh the list
+ * of projects.
+ */
+public interface InlineCompletionStatusNotifier {
+
+    Topic<InlineCompletionStatusNotifier> CODIGA_INLINE_COMPLETION_CHANGE =
+        Topic.create("Codiga inline completion change", InlineCompletionStatusNotifier.class);
+
+    void beforeAction(Object context);
+    void afterAction(Object context);
+}

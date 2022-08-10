@@ -8,6 +8,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
+
+/**
+ * Show the next snippet if we have a current snippet suggestion.
+ */
 public class ShowNextInlineCompletion extends BaseCodeInsightAction implements DumbAware {
     @Override
     protected @NotNull CodeInsightActionHandler getHandler() {

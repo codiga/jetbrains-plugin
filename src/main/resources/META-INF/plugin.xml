@@ -82,7 +82,7 @@
                 language="any"
         />
         <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
-<!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
+        <statusBarWidgetFactory implementation="io.codiga.plugins.jetbrains.ui.StatusBar"/>
         <typedHandler implementation="io.codiga.plugins.jetbrains.cache.TypedKeyHandler"/>
     </extensions>
     <projectListeners>

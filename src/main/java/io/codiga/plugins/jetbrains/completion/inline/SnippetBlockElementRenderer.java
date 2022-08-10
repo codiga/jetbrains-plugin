@@ -96,7 +96,7 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
         g.setFont(fontAnnotation);
 
         // compute distance between labels
-        String suggestion = String.format("snippet %d/%d", this.currentIndex, this.numberOfSnippets);
+        String suggestion = String.format("snippet %d/%d - TAB to insert", this.currentIndex, this.numberOfSnippets);
         int previousBoxWidth = g.getFontMetrics().stringWidth(PREVIOUS_STRING) + MARGIN * 2;
         int suggestionBoxWidth = g.getFontMetrics().stringWidth(suggestion) + MARGIN * 2;
         int nextBoxWidth = g.getFontMetrics().stringWidth(NEXT_STRING) + MARGIN * 2;

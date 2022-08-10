@@ -130,7 +130,11 @@ public class SnippetPreview implements Disposable {
         }
     }
 
-    public void apply(Caret caret){
+    /**
+     * Insert the snippet that is selected into the IDE.
+     * @param caret
+     */
+    public void addSnippetToEditor(Caret caret){
         GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet = suggestions.get(currentIndex);
         Document document = this.editor.getDocument();
         int selectedLine = editor.getCaretModel().getVisualPosition().getLine();

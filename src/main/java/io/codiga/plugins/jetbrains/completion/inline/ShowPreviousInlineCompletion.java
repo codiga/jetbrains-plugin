@@ -5,6 +5,9 @@ import com.intellij.codeInsight.actions.BaseCodeInsightAction;
 import com.intellij.openapi.project.DumbAware;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Show the previous snippet if we have a current snippet suggestion.
+ */
 public class ShowPreviousInlineCompletion extends BaseCodeInsightAction implements DumbAware {
     @Override
     protected @NotNull CodeInsightActionHandler getHandler() {
