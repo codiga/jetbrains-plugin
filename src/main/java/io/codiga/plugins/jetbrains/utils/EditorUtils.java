@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
-public class EditorUtils {
+public final class EditorUtils {
 
     private EditorUtils () {
         // no code, private util class

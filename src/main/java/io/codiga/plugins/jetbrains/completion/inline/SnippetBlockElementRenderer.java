@@ -13,13 +13,13 @@ import java.util.List;
 
 public class SnippetBlockElementRenderer implements EditorCustomElementRenderer {
 
-    private List<String> textToInsert;
-    private Editor editor;
+    private final List<String> textToInsert;
+    private final Editor editor;
 
-    private final int MARGIN = 5;
-    private final int DEFAULT_SPACE_BETWEEN_BOXES = 50;
-    private final String NEXT_STRING = "Next (ALT + ])";
-    private final String PREVIOUS_STRING = "Previous (ALT + [)";
+    private static final int MARGIN = 5;
+    private static final int DEFAULT_SPACE_BETWEEN_BOXES = 50;
+    private static final String NEXT_STRING = "Next (ALT + ])";
+    private static final String PREVIOUS_STRING = "Previous (ALT + [)";
     private int currentIndex = 0;
     private int numberOfSnippets = 0;
 
@@ -31,8 +31,7 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
     }
 
     private Font getFont(Editor editor) {
-        Font font = editor.getColorsScheme().getFont(EditorFontType.ITALIC);
-        return font;
+        return editor.getColorsScheme().getFont(EditorFontType.ITALIC);
     }
 
     @Override
