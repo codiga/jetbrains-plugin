@@ -150,7 +150,7 @@ public class InlineDocumentListener implements DocumentListener {
                                 onlyPrivate,
                                 onlyFavorite);
 
-                        if (snippets.size() == 0){
+                        if (snippets.isEmpty()){
                             return;
                         }
 
