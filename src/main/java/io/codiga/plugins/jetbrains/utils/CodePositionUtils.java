@@ -40,6 +40,21 @@ public final class CodePositionUtils {
         return String.join(LINE_SEPARATOR, codeArrayUpdated);
     }
 
+    public static String indentAllLines(String code, int indentation, boolean usesTabs) {
+        String[] codeArray = code.split(LINE_SEPARATOR);
+        List<String> codeArrayUpdated = new ArrayList<String>();
+
+        for (int i = 0 ; i < codeArray.length ; i++){
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0 ; j < indentation ; j++) {
+                sb.append(usesTabs ? CHARACTER_TAB : CHARACTER_SPACE);
+            }
+            sb.append(codeArray[i]);
+            codeArrayUpdated.add(sb.toString());
+        }
+        return String.join(LINE_SEPARATOR, codeArrayUpdated);
+    }
+
     /**
      * Know if the current line has tabs indentation
      *

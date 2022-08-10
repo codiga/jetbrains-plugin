@@ -4,11 +4,13 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.Inlay;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.TextRange;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +23,7 @@ import java.util.Base64;
 import java.util.List;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.*;
 import static io.codiga.plugins.jetbrains.utils.RecipeUtils.addRecipeInEditor;
 
 public class SnippetPreview implements Disposable {
@@ -57,8 +60,27 @@ public class SnippetPreview implements Disposable {
 
         String decodedCode = new String(Base64.getDecoder().decode(snippet.presentableFormat().getBytes(StandardCharsets.UTF_8)));
 
+        Document document = editor.getDocument();
+        int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
+        int lineStartOffset;
+        int lineEndOffset;
+        try {
+            lineStartOffset = document.getLineStartOffset(selectedLine);
+            lineEndOffset = document.getLineEndOffset(selectedLine);
+        } catch (IndexOutOfBoundsException iobe) {
+            LOGGER.warn("[addRecipeToEditor] error while trying to get start or end offset");
+            return;
+        }
+        String currentLine = document.getText(new TextRange(lineStartOffset, lineEndOffset));
+        final boolean usesTabs = detectIfTabs(currentLine);
+        LOGGER.debug("currentLine: " + currentLine);
+        LOGGER.debug("use tabs: " + usesTabs);
 
-        SnippetBlockElementRenderer snippetBlockElementRenderer = new SnippetBlockElementRenderer(editor, Arrays.asList(decodedCode.split("\n")));
+        int indentationCurrentLine = getIndentation(currentLine, usesTabs);
+        LOGGER.debug("indentationCurrentLine: " + indentationCurrentLine);
+        String indentedCode = indentAllLines(decodedCode, indentationCurrentLine, usesTabs);
+        LOGGER.info(indentedCode);
+        SnippetBlockElementRenderer snippetBlockElementRenderer = new SnippetBlockElementRenderer(editor, Arrays.asList(indentedCode.split("\n")));
         currentInlay = this.editor.getInlayModel().addBlockElement(offset, true, false, 1, snippetBlockElementRenderer);
         Disposer.register(this, currentInlay);
 
@@ -96,8 +118,24 @@ public class SnippetPreview implements Disposable {
 
     public void apply(Caret caret){
         GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet = suggestions.get(currentIndex);
+        Document document = this.editor.getDocument();
+        int selectedLine = editor.getCaretModel().getVisualPosition().getLine();
+        int lineStartOffset;
+        int lineEndOffset;
+        try {
+            lineStartOffset = document.getLineStartOffset(selectedLine);
+            lineEndOffset = document.getLineEndOffset(selectedLine);
+        } catch (IndexOutOfBoundsException iobe) {
+            LOGGER.warn("[addRecipeToEditor] error while trying to get start or end offset");
+            return;
+        }
+        String currentLine = document.getText(new TextRange(lineStartOffset, lineEndOffset));
+        final boolean usesTabs = detectIfTabs(currentLine);
+        int indentationCurrentLine = getIndentation(currentLine, usesTabs);
 
-        addRecipeInEditor(this.editor, snippet.name(), snippet.jetbrainsFormat(), ((BigDecimal)snippet.id()).longValue(), snippet.imports(), snippet.language(), 0, true, codigaApi);
+        String indentedCode = indentAllLines(snippet.jetbrainsFormat(), indentationCurrentLine, usesTabs);
+
+        addRecipeInEditor(this.editor, snippet.name(), snippet.jetbrainsFormat(), ((BigDecimal)snippet.id()).longValue(), snippet.imports(), snippet.language(), indentationCurrentLine, true, codigaApi);
         Disposer.dispose(this);
     }
 
