@@ -4,73 +4,74 @@
 ![JetBrains Plugins Ratings](https://img.shields.io/jetbrains/plugin/r/rating/17969)
 ![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/v/17969)
 
-# Codiga Plugin for Jetbrains products
+# Codiga for Jetbrains
 
-This is the source code for the Jetbrains plugin for Codiga.
+Codiga is a tool to search, create and share [smart code snippets](https://www.codiga.io/code-snippets/smart-code-snippets/) from your IDE. It is integrated
+with all JetBrains products as well as [VS Code](https://marketplace.visualstudio.com/items?itemName=codiga.vscode-plugin) and [Google Chrome](https://chrome.google.com/webstore/detail/codiga/dbkhkhonmelajjempmoadocgneoadjge).
 
-Codiga provides two main functionalities:
+Codiga is compatible with all JetBrains products: IntelliJ, AppCode, PHPStorm, DataDrip, GoLand, RubyMine, PyCharm, CLion (and many more).
 
- - **Coding Assistant**: import reusable code blocks based on your context
- - **Code Analysis**: no-configuration code analysis for 12+ languages
+With Codiga, you can create your own code snippets and find and import them easily.
 
-It is available on the [Jetbrains marketplace](https://plugins.jetbrains.com/plugin/17969-codiga) 
+![Inline Completion](images/inline.gif "Using an inline snippet")
+
+## Installation
+
+Codiga is available on the [Jetbrains marketplace](https://plugins.jetbrains.com/plugin/17969-codiga) 
 and you can install it directly within any Jetbrains product (IntelliJ, PHPStorm, PYCharm, etc).
+
+![Codiga Jetbrains plugin](images/plugin-description.png "Codiga PlugIn")
 
 
 ## Quick Start
+
+Open a file, make a one-line comment to see all suggestions from the Codiga API.
+
+By default, Codiga searches all public snippet. If you want Codiga to also
+look for your own snippets, add your API keys (see configuration below).
+
+## Using shortcuts in the IDE
 
 Install the extension and type `.` in your IDE to list all available snippets for your current environment (language, file, libraries).
 
 Accept a snippet using either Enter ↩ or Tab ↹. Go through the snippet variables using the Tab key.
 
-![Create Recipe](images/shortcut.gif "Using a shortcut")
+![Using Code Snippet Shortcut](images/shortcut.gif "Using a shortcut")
+
+## Snippet Search
+
+Use the Codiga Snippets panel on the right to find code snippets that matches your environment.
+
+![Code Snippet Search](images/snippet-search.gif "Code Snippet Search")
 
 ## Semantic Search
 
 Press CTRL + ALT + C (or choose the menu option "Tools" → "Coding Assistant") to launch a request 
 to Codiga and find snippets based on your keywords.
 
-![Create Recipe](images/coding-assistant.gif "Coding Assistant")
+![Code Snippet Semantic Search](images/coding-assistant.gif "Coding Assistant")
 
 ## List all shortcuts
 
 Press CTRL + ALT + S (or choose the menu option "Tools" → "Shortcuts") to list
 all keywords for your environment.
 
-![Create Recipe](images/shortcut-list.gif "List of all shortcuts")
+![List all snippet shortcuts](images/shortcut-list.gif "List of all shortcuts")
 
 ## Creating and sharing snippets
 
-![Create Recipe](images/create-recipe.gif "Creating Recipe")
+![Create Code Snippet](images/create-recipe.gif "Creating Recipe")
 
 1. Select the code in your editor
-2. Right click on "Create Codiga Recipe"
+2. Right click on `Create Codiga Snippet`
 
 
-
-## Installation
-
-Go to the plugins section of your Jetbrains product and search for "Codiga" on the marketplace.
-
-![Codiga Jetbrains plugin](images/plugin-description.png "Codiga PlugIn")
-
-
-### Code Analysis
-
-Codiga analyzes your code and surfaces any issue. It works for 12+ languages. Codiga directly annotates all issues in your IDE. 
-You can select to learn more about each violation, see them on Code Inspector or just ignore them.
-
-![Action Available](images/actions-available.png)
-
-Enable or disable the Code Analysis in the project preferences as shown below.
-
-![Disable Code Analysis](images/disable-code-analysis.gif)
 
 ## Connecting your Codiga Account
 
 You can connect your Codiga account and benefit from all the Codiga features: 
 
- 1. use the code recipes and cookbooks you define and subscribe to
+ 1. use the code snippets and cookbooks you define and subscribe to
  2. use all your code analysis preferences on Codiga
 
 In order to link your Codiga account, you need to add your API token to your preferences.
@@ -84,6 +85,11 @@ Then, enter your API token in the Jetbrains plugin configuration, as shown below
 ![Project Configuration](images/api-token.png)
 
 Once the token is added, click on "Apply" and then "Test API connection".
+
+# Support
+
+You can use the current [issue tracker](https://github.com/codiga/jetbrains-plugin/issues)
+or report the issue on our [Slack channel](https://join.slack.com/t/codigahq/shared_invite/zt-9hvmfwie-9BUVFwZDwvpIGlkHv2mzYQ).
 
 # Implementation Details
 
