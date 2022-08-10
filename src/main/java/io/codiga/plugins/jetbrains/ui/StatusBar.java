@@ -124,9 +124,9 @@ public class StatusBar implements StatusBarWidgetFactory {
         @Override
         public @Nullable Icon getIcon() {
             if (settings.getUseInlineCompletion()) {
-                return IconLoader.findIcon("/icons/codiga-enabled-13px.png");
+                return IconLoader.getIcon("/icons/codiga-enabled-13px.png");
             } else {
-                return IconLoader.findIcon("/icons/codiga-disabled-13px.png");
+                return IconLoader.getIcon("/icons/codiga-disabled-13px.png");
             }
         }
 
