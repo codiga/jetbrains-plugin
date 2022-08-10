@@ -36,7 +36,7 @@ public class InlineDocumentListener implements DocumentListener {
     private final DependencyManagement dependencyManagement = new DependencyManagement();
     private final AppSettingsState settings = AppSettingsState.getInstance();
 
-    private final int TIMEOUT_REQUEST_POLLING_MILLISECONDS = 500;
+    private static final int TIMEOUT_REQUEST_POLLING_MILLISECONDS = 500;
 
     private final Alarm updateListAlarm = new Alarm();
 

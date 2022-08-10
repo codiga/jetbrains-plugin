@@ -22,10 +22,7 @@ import static io.codiga.plugins.jetbrains.topics.InlineCompletionStatusNotifier.
 
 public class StatusBar implements StatusBarWidgetFactory {
     private static final String ID = "codiga.status";
-    private AppSettingsState settings = AppSettingsState.getInstance();
-
-    public StatusBar() {
-    }
+    private final AppSettingsState settings = AppSettingsState.getInstance();
 
 
     @Override
@@ -54,7 +51,7 @@ public class StatusBar implements StatusBarWidgetFactory {
 
                         @Override
                         public void beforeAction(Object context) {
-
+                            // no need any before action
                         }
 
                         @Override
@@ -69,6 +66,7 @@ public class StatusBar implements StatusBarWidgetFactory {
 
     @Override
     public void disposeWidget(@NotNull StatusBarWidget widget) {
+        // no need
     }
 
     @Override
@@ -91,6 +89,7 @@ public class StatusBar implements StatusBarWidgetFactory {
 
         @Override
         public void install(@NotNull com.intellij.openapi.wm.StatusBar statusBar) {
+            // no need
         }
 
         @Override
@@ -133,6 +132,7 @@ public class StatusBar implements StatusBarWidgetFactory {
 
         @Override
         public void dispose() {
+            // no need
         }
     }
 }
