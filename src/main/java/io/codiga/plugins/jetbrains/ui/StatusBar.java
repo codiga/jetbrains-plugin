@@ -2,11 +2,11 @@ package io.codiga.plugins.jetbrains.ui;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.Consumer;
+import icons.CodigaIcons;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import io.codiga.plugins.jetbrains.topics.InlineCompletionStatusNotifier;
 import org.jetbrains.annotations.Nls;
@@ -124,9 +124,9 @@ public class StatusBar implements StatusBarWidgetFactory {
         @Override
         public @Nullable Icon getIcon() {
             if (settings.getUseInlineCompletion()) {
-                return IconLoader.findIcon("/icons/codiga-enabled-13px.png");
+                return CodigaIcons.Codiga_enabled_icon;
             } else {
-                return IconLoader.findIcon("/icons/codiga-disabled-13px.png");
+                return CodigaIcons.Codiga_disabled_icon;
             }
         }
 
