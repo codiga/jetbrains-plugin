@@ -52,6 +52,9 @@ public class SnippetPreview implements Disposable {
         editor.putUserData(CODIGA_SNIPPET_PREVIEW, this);
     }
 
+    /**
+     * Display/Show the current snippet. The snippet index should be changed beforehand calling this method.
+     */
     public void display() {
         if(this.currentIndex >= suggestions.size()) {
             return;
@@ -68,18 +71,15 @@ public class SnippetPreview implements Disposable {
             lineStartOffset = document.getLineStartOffset(selectedLine);
             lineEndOffset = document.getLineEndOffset(selectedLine);
         } catch (IndexOutOfBoundsException iobe) {
-            LOGGER.warn("[addRecipeToEditor] error while trying to get start or end offset");
+            LOGGER.warn("[display] error while trying to get start or end offset");
             return;
         }
         String currentLine = document.getText(new TextRange(lineStartOffset, lineEndOffset));
         final boolean usesTabs = detectIfTabs(currentLine);
-        LOGGER.debug("currentLine: " + currentLine);
-        LOGGER.debug("use tabs: " + usesTabs);
 
         int indentationCurrentLine = getIndentation(currentLine, usesTabs);
-        LOGGER.debug("indentationCurrentLine: " + indentationCurrentLine);
         String indentedCode = indentAllLines(decodedCode, indentationCurrentLine, usesTabs);
-        LOGGER.info(indentedCode);
+
         SnippetBlockElementRenderer snippetBlockElementRenderer = new SnippetBlockElementRenderer(
                 editor,
                 Arrays.asList(indentedCode.split("\n")),
@@ -87,10 +87,12 @@ public class SnippetPreview implements Disposable {
                 suggestions.size());
         currentInlay = this.editor.getInlayModel().addBlockElement(offset, true, false, 1, snippetBlockElementRenderer);
         Disposer.register(this, currentInlay);
-
     }
 
 
+    /**
+     * Show the previous snippet. Remove the previous preview and display a new one.
+     */
     public void showPrevious() {
         LOGGER.info("show previous");
         int nextIndex = (this.currentIndex - 1) % suggestions.size();
@@ -104,6 +106,9 @@ public class SnippetPreview implements Disposable {
         display();
     }
 
+    /**
+     * Show the next snippet. Remove the previous preview and add the new one.
+     */
     public void showNext() {
         int nextIndex = (this.currentIndex + 1) % suggestions.size();
 
@@ -113,6 +118,11 @@ public class SnippetPreview implements Disposable {
         display();
     }
 
+    /**
+     * Clear the preview in the editor passed as parameter. This is used when the user
+     * types ESC to prevent the preview to be shown.
+     * @param editor
+     */
     public static void clear(@NotNull Editor editor) {
         SnippetPreview snippetPreview = getInstance(editor);
         if (snippetPreview != null) {

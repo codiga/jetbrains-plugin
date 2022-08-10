@@ -20,6 +20,7 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
     private static final int DEFAULT_SPACE_BETWEEN_BOXES = 50;
     private static final String NEXT_STRING = "Next (ALT + ])";
     private static final String PREVIOUS_STRING = "Previous (ALT + [)";
+    private static final int NUMBER_OF_LINES_FOR_BOXES = 3;
     private int currentIndex = 0;
     private int numberOfSnippets = 0;
 
@@ -30,40 +31,61 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
         this.numberOfSnippets = numberofSnippets;
     }
 
+    /**
+     * Calculate the font
+     * @param editor
+     * @return
+     */
     private Font getFont(Editor editor) {
         return editor.getColorsScheme().getFont(EditorFontType.ITALIC);
     }
 
+    /**
+     * Calculator the width of the box we take to show the suggestions.
+     * @param inlay
+     * @return
+     */
     @Override
     public int calcWidthInPixels(@NotNull Inlay inlay) {
-        String firstLine = this.textToInsert.get(0);
+//        String firstLine = this.textToInsert.get(0);
+        String longestString = textToInsert.stream().sorted((o1, o2) -> o2.length() - o1.length()).findFirst().get();
 
         return editor.getContentComponent()
-            .getFontMetrics(getFont(editor)).stringWidth(firstLine);
+            .getFontMetrics(getFont(editor)).stringWidth(longestString);
     }
 
+    /**
+     * Calculate the height of the box we take to show the suggestions.
+     * @param inlay
+     * @return
+     */
     @Override
     public int calcHeightInPixels(@NotNull Inlay inlay) {
-        return editor.getLineHeight() * textToInsert.size();
+        return editor.getLineHeight() * (textToInsert.size() + NUMBER_OF_LINES_FOR_BOXES);
     }
 
+    /**
+     * Paint the content of the box. We first draw the text block and then, add the indication
+     * to notify the user to go through the suggestions.
+     * @param inlay
+     * @param g
+     * @param targetRegion
+     * @param textAttributes
+     */
     @Override
     public void paint(@NotNull Inlay inlay, @NotNull Graphics g, @NotNull Rectangle targetRegion, @NotNull TextAttributes textAttributes) {
 
         Color snippetColor = Color.lightGray;
         Color frontgroundColor = editor.getColorsScheme().getDefaultForeground();
         Color backgroundColor = editor.getColorsScheme().getDefaultBackground();
-        Font font = getFont(editor);
 
-        g.setFont(font);
         g.setColor(snippetColor);
 
         String longestString = textToInsert.stream().sorted((o1, o2) -> o2.length() - o1.length()).findFirst().get();
         int totalWidth = g.getFontMetrics().stringWidth(longestString);
 
-        System.out.println(longestString);
-        System.out.println(font.getSize());
 
+        // draw the text box.
         for (int i = 0 ; i < textToInsert.size() ; i++) {
             g.drawString(textToInsert.get(i),
                 0, targetRegion.y + i * editor.getLineHeight() + editor.getAscent());
@@ -72,7 +94,8 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
 
         Font fontAnnotation = editor.getColorsScheme().getFont(EditorFontType.PLAIN);
         g.setFont(fontAnnotation);
-        // compute distance
+
+        // compute distance between labels
         String suggestion = String.format("snippet %d/%d", this.currentIndex, this.numberOfSnippets);
         int previousBoxWidth = g.getFontMetrics().stringWidth(PREVIOUS_STRING) + MARGIN * 2;
         int suggestionBoxWidth = g.getFontMetrics().stringWidth(suggestion) + MARGIN * 2;
@@ -84,8 +107,7 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
             initialSpace = spaceBetweenBoxes;
         }
 
-
-        // previous
+        // previous snippet notification
         int previousBoxStartX = initialSpace;
         int previousBoxStartY = targetRegion.y + textToInsert.size() * editor.getLineHeight() + editor.getAscent();
         int previousBoxHeight = editor.getLineHeight() * 2;
@@ -111,7 +133,7 @@ public class SnippetBlockElementRenderer implements EditorCustomElementRenderer 
                 suggestionBoxHeight);
 
 
-        // next
+        // next snippet suggestion
         int nextBoxStartX = suggestionBoxStartX + suggestionBoxWidth + spaceBetweenBoxes;
         int nextBoxStartY = targetRegion.y + textToInsert.size() * editor.getLineHeight() + editor.getAscent();
         int nextBoxHeight = editor.getLineHeight() * 2;
