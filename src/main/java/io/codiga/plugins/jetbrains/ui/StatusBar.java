@@ -101,9 +101,9 @@ public class StatusBar implements StatusBarWidgetFactory {
         @Override
         public @Nullable String getTooltipText() {
             if(settings.getUseInlineCompletion()) {
-                return "Codiga is enabled";
+                return "Codiga completion is enabled";
             } else {
-                return "Codiga is disabled";
+                return "Codiga completion is disabled";
             }
 
         }
