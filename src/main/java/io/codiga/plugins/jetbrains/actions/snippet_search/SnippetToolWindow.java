@@ -14,7 +14,9 @@ import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
+import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier;
+import io.codiga.plugins.jetbrains.topics.VisibilityKeyChangeNotifier;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -28,6 +30,7 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier.CODIGA_API_KEY_CHANGE_TOPIC;
+import static io.codiga.plugins.jetbrains.topics.VisibilityKeyChangeNotifier.CODIGA_VISIBILITY_CHANGE_TOPIC;
 import static io.codiga.plugins.jetbrains.utils.LanguageUtils.getLanguageName;
 
 /**
@@ -63,6 +66,8 @@ public class SnippetToolWindow {
     private final JPanel languageNotSupportedPanel = new JPanel();
     private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
 
+    AppSettingsState settings = AppSettingsState.getInstance();
+
     public void updateSearchPreferences(boolean _allSnippets, boolean _privateOnly, boolean _publicOnly, boolean _favoriteOnly) {
         this.searchFavoriteSnippetsOnly = _favoriteOnly;
         this.searchPublicSnippetsOnly = _publicOnly;
@@ -91,11 +96,23 @@ public class SnippetToolWindow {
         searchFavoriteSnippetsOnlyEnabled = false;
     }
 
+    private void getVisibilityFromSettings() {
+        this.searchAllSnippets = !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
+        this.searchPrivateSnippetsOnly = settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
+        this.searchPublicSnippetsOnly = !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly();
+        this.searchFavoriteSnippetsOnly = settings.getFavoriteSnippetsOnly();
+    }
+
 
     public SnippetToolWindow(ToolWindow toolWindow, Project project) {
         setDefaultValuesForSearchPreferences();
-
+        getVisibilityFromSettings();
         Alarm searchTermAlarm = new Alarm();
+
+        this.searchAllSnippets = !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
+        this.searchPrivateSnippetsOnly = settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
+        this.searchPublicSnippetsOnly = !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly();
+        this.searchFavoriteSnippetsOnly = settings.getFavoriteSnippetsOnly();
 
         radioAllSnippets.addActionListener(e -> updateSearchPreferences(true, false, false, searchFavoriteSnippetsOnly));
         radioPrivateOnly.addActionListener(e -> updateSearchPreferences(false, true, false, searchFavoriteSnippetsOnly));
@@ -175,6 +192,20 @@ public class SnippetToolWindow {
             @Override
             public void afterAction(Object context) {
                 updateUser();
+                updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
+            }
+        });
+
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_VISIBILITY_CHANGE_TOPIC, new VisibilityKeyChangeNotifier() {
+            @Override
+            public void beforeAction(Object context) {
+                // empty, nothing needed here
+            }
+
+            @Override
+            public void afterAction(Object context) {
+                updateUser();
+                getVisibilityFromSettings();
                 updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
             }
         });
@@ -292,8 +323,29 @@ public class SnippetToolWindow {
 
         languageLabel.setText(getLanguageName(languageEnumeration));
 
+        Optional<Boolean> onlyPublic = Optional.empty();
+        Optional<Boolean> onlyPrivate = Optional.empty();
+        Optional<Boolean> onlyFavorite = Optional.empty();
+
+        if(this.searchPublicSnippetsOnly) {
+            onlyPublic = Optional.of(true);
+            onlyPrivate = Optional.empty();
+        }
+
+        if(this.searchPrivateSnippetsOnly) {
+            onlyPrivate = Optional.of(true);
+            onlyPublic = Optional.empty();
+        }
+
+        if (this.searchFavoriteSnippetsOnly) {
+            onlyFavorite = Optional.of(true);
+        }
+
         // Make the request to get snippets from Codiga
-        java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, Optional.empty(), Optional.empty(), Optional.empty());
+        java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, onlyPublic, onlyPrivate, onlyFavorite);
+
+        LOGGER.info("found snippets: " + snippets.size());
+
         // Create the snippet panel.
         java.util.List<SnippetPanel> panels =  snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext)).collect(Collectors.toList());
 

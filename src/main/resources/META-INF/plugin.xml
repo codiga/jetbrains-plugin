@@ -55,6 +55,9 @@
         <toolWindow id="Snippet Search" secondary="true" icon="CodigaIcons.Codiga_default_icon" anchor="right"
                     factoryClass="io.codiga.plugins.jetbrains.actions.snippet_search.SnippetToolWindowFactory"/>
 
+        <editorActionHandler action="EditorEscape" implementationClass="io.codiga.plugins.jetbrains.completion.inline.EscapeHandler" id="previewEscape" order="before hide-hints"/>
+        <editorFactoryDocumentListener implementation="io.codiga.plugins.jetbrains.completion.inline.InlineDocumentListener"/>
+
         <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.AppStarter" />
         <notificationGroup
                 id="Codiga API"
@@ -75,11 +78,11 @@
                 displayName="Codiga"/>
 
         <completion.contributor
-                implementationClass="io.codiga.plugins.jetbrains.completion.CodigaCompletion"
+                implementationClass="io.codiga.plugins.jetbrains.completion.shortcuts.CodigaCompletion"
                 language="any"
         />
         <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
-<!--        <statusBarWidgetFactory implementation="com.code_inspector.plugins.intellij.ui.CodeInspectorStatusBar"/>-->
+        <statusBarWidgetFactory implementation="io.codiga.plugins.jetbrains.ui.StatusBar"/>
         <typedHandler implementation="io.codiga.plugins.jetbrains.cache.TypedKeyHandler"/>
     </extensions>
     <projectListeners>
@@ -114,5 +117,15 @@
             <override-text place="MainMenu" text="Codiga Assistant"/>
         </action>
 
+        <action class="io.codiga.plugins.jetbrains.completion.inline.AcceptInlineAction"
+                id="ApplySnippet" text="Apply Snippet">
+            <keyboard-shortcut first-keystroke="TAB" keymap="$default"/>
+        </action>
+        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowPreviousInlineCompletion" id="ShowPreviousInlineCompletionAction" text="Show Previous Snippet">
+            <keyboard-shortcut first-keystroke="alt OPEN_BRACKET" keymap="$default"/>
+        </action>
+        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowNextInlineCompletion" id="ShowNextInlineCompletionAction" text="Show Previous Snippet">
+            <keyboard-shortcut first-keystroke="alt CLOSE_BRACKET" keymap="$default"/>
+        </action>
     </actions>
 </idea-plugin>

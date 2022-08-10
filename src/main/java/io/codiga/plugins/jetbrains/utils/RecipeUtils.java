@@ -75,8 +75,6 @@ public final class RecipeUtils {
             return;
         }
 
-
-
         // process supported variables dynamically
         final CodingAssistantCodigaTransform codingAssistantCodigaTransform = new CodingAssistantCodigaTransform(codigaTransformationContext);
         String code = codingAssistantCodigaTransform.findAndTransformVariables(unprocessedCode, dataContext);

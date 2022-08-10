@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.completion;
+package io.codiga.plugins.jetbrains.completion.shortcuts;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
