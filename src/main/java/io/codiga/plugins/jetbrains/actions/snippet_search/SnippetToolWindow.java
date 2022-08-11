@@ -215,16 +215,24 @@ public class SnippetToolWindow {
          * Fill the content of the panel with the existing data
          * from the current editor if there is one opened.
          */
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+//        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+//            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+//            FileEditor fileEditor = fileEditorManager.getSelectedEditor();
+//            if (fileEditor != null) {
+//                VirtualFile virtualFile = fileEditor.getFile();
+//                if (virtualFile != null) {
+//                    updateEditor(project, virtualFile, Optional.empty(), true);
+//                }
+//            }
+//        });
+
+        searchTermAlarm.addRequest(() -> {
             FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
             FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-            if (fileEditor != null) {
-                VirtualFile virtualFile = fileEditor.getFile();
-                if (virtualFile != null) {
-                    updateEditor(project, virtualFile, Optional.empty(), true);
-                }
+            if (fileEditor.getFile() != null) {
+                updateEditor(project, fileEditor.getFile(), Optional.empty(), false);
             }
-        });
+        }, 500);
     }
 
     /**

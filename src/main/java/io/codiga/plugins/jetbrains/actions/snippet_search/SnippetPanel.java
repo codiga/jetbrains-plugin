@@ -41,8 +41,8 @@ public class SnippetPanel {
     private JLabel shortcutLabel;
     private JLabel visibilityLabel;
 
+    private JButton copyToClipboard;
     private JTextArea code;
-    private JButton copytoClipboard;
 
     private final CodeInsertionContext codeInsertionContext;
     private static final MarkdownDecorator markdownDecorator = new MarkdownDecorator();
@@ -60,7 +60,7 @@ public class SnippetPanel {
         String owner = "unknown author"; // default value for the owner
         String decodedCode = new String(Base64.getDecoder().decode(snippet.presentableFormat().getBytes(StandardCharsets.UTF_8)));
 
-        copytoClipboard.addMouseListener(new CopyToClipboardMouseListener(snippet));
+        copyToClipboard.addMouseListener(new CopyToClipboardMouseListener(snippet));
         learnMore.addMouseListener(new LearnMoreMouseListener(snippet));
 
         if (snippet.owner() != null){
