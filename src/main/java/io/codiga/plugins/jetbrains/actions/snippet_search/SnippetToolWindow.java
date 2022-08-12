@@ -231,7 +231,7 @@ public class SnippetToolWindow {
             try{
                 FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
                 FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-                if (fileEditor.getFile() != null) {
+                if (fileEditor != null && fileEditor.getFile() != null) {
                     updateEditor(project, fileEditor.getFile(), Optional.empty(), false);
                 }
             } catch (AlreadyDisposedException ade){
