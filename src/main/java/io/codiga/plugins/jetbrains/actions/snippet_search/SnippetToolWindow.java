@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.serviceContainer.AlreadyDisposedException;
 import com.intellij.util.Alarm;
 import com.intellij.util.ui.AsyncProcessIcon;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -227,10 +228,14 @@ public class SnippetToolWindow {
 //        });
 
         searchTermAlarm.addRequest(() -> {
-            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-            FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-            if (fileEditor.getFile() != null) {
-                updateEditor(project, fileEditor.getFile(), Optional.empty(), false);
+            try{
+                FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+                FileEditor fileEditor = fileEditorManager.getSelectedEditor();
+                if (fileEditor.getFile() != null) {
+                    updateEditor(project, fileEditor.getFile(), Optional.empty(), false);
+                }
+            } catch (AlreadyDisposedException ade){
+                LOGGER.debug("Cannot create new panel", ade);
             }
         }, 500);
     }
