@@ -29,6 +29,7 @@ public class EscapeHandler extends EditorActionHandler {
     @Override
     public boolean isEnabledForCaret(
         @NotNull Editor editor, @NotNull Caret caret, DataContext dataContext) {
-        return true;
+        SnippetPreview snippetPreview = SnippetPreview.getInstance(editor);
+        return snippetPreview != null;
     }
 }
