@@ -118,7 +118,7 @@
         </action>
 
         <action class="io.codiga.plugins.jetbrains.completion.inline.AcceptInlineAction"
-                id="ApplySnippet" text="Apply Snippet">
+                id="io.codiga.ApplySnippet" text="Apply Snippet">
             <keyboard-shortcut first-keystroke="TAB" keymap="$default"/>
         </action>
         <action class="io.codiga.plugins.jetbrains.completion.inline.ShowPreviousInlineCompletion" id="io.codiga.ShowPreviousSnippetCompletionAction" text="Show Previous Snippet">
