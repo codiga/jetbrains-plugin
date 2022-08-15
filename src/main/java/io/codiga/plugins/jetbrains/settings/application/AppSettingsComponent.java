@@ -40,7 +40,6 @@ public class AppSettingsComponent {
     private boolean snippetsPublicOnly;
     private boolean snippetsPrivateOnly;
     private boolean snippetsFavoriteOnly;
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
@@ -112,6 +111,7 @@ public class AppSettingsComponent {
         });
 
         buttonTestConnection.addActionListener(arg0 -> {
+            final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
             Optional<String> username = codigaApi.getUsername();
             if(username.isPresent()) {
                 new DialogApiStatus(API_STATUS_TEXT_OK).showAndGet();
