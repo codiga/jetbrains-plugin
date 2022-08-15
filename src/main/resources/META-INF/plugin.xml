@@ -121,10 +121,10 @@
                 id="ApplySnippet" text="Apply Snippet">
             <keyboard-shortcut first-keystroke="TAB" keymap="$default"/>
         </action>
-        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowPreviousInlineCompletion" id="ShowPreviousInlineCompletionAction" text="Show Previous Snippet">
+        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowPreviousInlineCompletion" id="io.codiga.ShowPreviousSnippetCompletionAction" text="Show Previous Snippet">
             <keyboard-shortcut first-keystroke="alt OPEN_BRACKET" keymap="$default"/>
         </action>
-        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowNextInlineCompletion" id="ShowNextInlineCompletionAction" text="Show Previous Snippet">
+        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowNextInlineCompletion" id="io.codiga.ShowNextSnippetCompletionAction" text="Show Previous Snippet">
             <keyboard-shortcut first-keystroke="alt CLOSE_BRACKET" keymap="$default"/>
         </action>
     </actions>
