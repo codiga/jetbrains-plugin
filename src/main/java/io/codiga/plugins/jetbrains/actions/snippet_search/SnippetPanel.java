@@ -64,13 +64,17 @@ public class SnippetPanel {
         learnMore.addMouseListener(new LearnMoreMouseListener(snippet));
 
         if (snippet.owner() != null){
-            owner = String.format("<html>Owner: <a>%s</a></html>", snippet.owner().username());
 
-            if (DesktopUtils.isBrowsingSupported()){
-                userInformation.addMouseListener(new OwnerMouseListener(
-                        snippet.owner().accountType().toString().toLowerCase(),
-                        snippet.owner().username()));
+            if (snippet.owner().hasSlug() && snippet.owner().slug() != null) {
+                owner = String.format("<html>Owner: <a>%s</a></html>", snippet.owner().displayName());
+
+                if (DesktopUtils.isBrowsingSupported()){
+                    userInformation.addMouseListener(new OwnerMouseListener(snippet.owner().slug()));
+                }
+            } else {
+                owner = String.format("<html>Owner: %s</html>", snippet.owner().displayName());
             }
+
         }
         code.setText(decodedCode);
 
