@@ -89,9 +89,9 @@ public class SnippetPanel {
         }
 
         if (snippet.isPublic()) {
-            visibilityLabel.setText("public");
+            visibilityLabel.setText("Visibility: public");
         } else {
-            visibilityLabel.setText("private");
+            visibilityLabel.setText("Visibility: private");
         }
 
         /**
