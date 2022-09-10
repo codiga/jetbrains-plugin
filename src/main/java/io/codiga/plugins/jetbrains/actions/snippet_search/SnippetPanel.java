@@ -4,10 +4,12 @@ import com.github.rjeschke.txtmark.Processor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -49,10 +51,16 @@ public class SnippetPanel {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final ToolWindow toolWindow;
+    private final Project project;
 
-
-    public SnippetPanel(GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet, CodeInsertionContext _codeInsertionContext) {
+    public SnippetPanel(GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet,
+                        CodeInsertionContext _codeInsertionContext,
+                        ToolWindow toolWindow,
+                        Project project) {
         codeInsertionContext = _codeInsertionContext;
+        this.project = project;
+        this.toolWindow = toolWindow;
 
         // The description is in Markdown, we need to decode it into HTML.
         String htmlDescription = Processor.process(snippet.description(), markdownDecorator, true);
@@ -101,8 +109,6 @@ public class SnippetPanel {
         insert.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
-
                 if (project == null) {
                     LOGGER.info("[mouseClicked] project is null");
                     return;
@@ -146,28 +152,30 @@ public class SnippetPanel {
             @Override
             public void mouseEntered(MouseEvent e) {
 
-                Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
-                VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
-
                 if (project == null) {
                     LOGGER.info("[mouseEntered] project is null");
                     return;
                 }
+                FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor();
+                Editor textEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+
+                if (editor == null || textEditor == null) {
+                    LOGGER.info("[mouseEntered] editor is null");
+                    return;
+                }
+
+                VirtualFile virtualFile = editor.getFile();
 
                 if (virtualFile == null) {
                     LOGGER.info("[mouseEntered] virtualFile is null");
                 }
 
                 PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-                Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
-                if (editor == null) {
-                    return;
-                }
 
-                removeAddedCode(editor, project, codeInsertionContext);
+                removeAddedCode(textEditor, project, codeInsertionContext);
                 addRecipeToEditor(
-                        editor,
+                        textEditor,
                         psiFile,
                         project,
                         codeInsertionContext.getCodeInsertions(),
@@ -181,7 +189,6 @@ public class SnippetPanel {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
 
                 if (project == null) {
                     return;

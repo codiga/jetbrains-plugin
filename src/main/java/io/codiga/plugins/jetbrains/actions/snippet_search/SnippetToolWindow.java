@@ -17,6 +17,7 @@ import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier;
+import io.codiga.plugins.jetbrains.topics.SnippetToolWindowFileChangeNotifier;
 import io.codiga.plugins.jetbrains.topics.VisibilityKeyChangeNotifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,7 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getLanguageFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.actions.ActionUtils.getUnitRelativeFilenamePathFromEditorForVirtualFile;
 import static io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier.CODIGA_API_KEY_CHANGE_TOPIC;
+import static io.codiga.plugins.jetbrains.topics.SnippetToolWindowFileChangeNotifier.CODIGA_NEW_FILE_SELECTED_TOPIC;
 import static io.codiga.plugins.jetbrains.topics.VisibilityKeyChangeNotifier.CODIGA_VISIBILITY_CHANGE_TOPIC;
 import static io.codiga.plugins.jetbrains.utils.LanguageUtils.getLanguageName;
 
@@ -66,7 +68,8 @@ public class SnippetToolWindow {
     private final JPanel noRecipePanel = new JPanel();
     private final JPanel languageNotSupportedPanel = new JPanel();
     private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
-
+    private final Project project;
+    private final ToolWindow toolWindow;
     AppSettingsState settings = AppSettingsState.getInstance();
 
     public void updateSearchPreferences(boolean _allSnippets, boolean _privateOnly, boolean _publicOnly, boolean _favoriteOnly) {
@@ -110,6 +113,8 @@ public class SnippetToolWindow {
         getVisibilityFromSettings();
         Alarm searchTermAlarm = new Alarm();
 
+        this.project = project;
+        this.toolWindow = toolWindow;
         this.searchAllSnippets = !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
         this.searchPrivateSnippetsOnly = settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
         this.searchPublicSnippetsOnly = !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly();
@@ -127,8 +132,15 @@ public class SnippetToolWindow {
          */
         searchTerm.getDocument().addDocumentListener(new DocumentListener() {
             private void updateResult () {
-                Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
-                VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
+
+                FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+
+                if (fileEditorManager == null) {
+                    LOGGER.info("cannot find editor manager");
+                    return;
+                }
+
+                VirtualFile virtualFile = fileEditorManager.getSelectedEditor().getFile();
 
                 if (project == null || virtualFile == null) {
                     LOGGER.info("project or file are null");
@@ -208,6 +220,31 @@ public class SnippetToolWindow {
                 updateUser();
                 getVisibilityFromSettings();
                 updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
+            }
+        });
+
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC, new SnippetToolWindowFileChangeNotifier() {
+            @Override
+            public void beforeAction(Object context) {
+                // empty, nothing needed here
+            }
+
+            @Override
+            public void afterAction(Object context) {
+                updateUser();
+                FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+                if (fileEditorManager == null) {
+                    return;
+                }
+                FileEditor fileEditor = fileEditorManager.getSelectedEditor();
+                if(fileEditor == null) {
+                    return;
+                }
+                VirtualFile virtualFile = fileEditor.getFile();
+                if(virtualFile == null) {
+                    return;
+                }
+                updateEditor(project, virtualFile, Optional.empty(), true);
             }
         });
 
@@ -298,7 +335,7 @@ public class SnippetToolWindow {
      * function when snippets are found.
      * @param resetLanguage
      */
-    public void setLoading(boolean resetLanguage) {
+    public void setLoading(Boolean resetLanguage) {
         if (resetLanguage) {
             languageLabel.setText("loading");
         }
@@ -357,10 +394,8 @@ public class SnippetToolWindow {
         // Make the request to get snippets from Codiga
         java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, onlyPublic, onlyPrivate, onlyFavorite);
 
-        LOGGER.info("found snippets: " + snippets.size());
-
         // Create the snippet panel.
-        java.util.List<SnippetPanel> panels =  snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext)).collect(Collectors.toList());
+        java.util.List<SnippetPanel> panels =  snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext, toolWindow, project)).collect(Collectors.toList());
 
         snippetsPanel.removeAll();
         snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));
