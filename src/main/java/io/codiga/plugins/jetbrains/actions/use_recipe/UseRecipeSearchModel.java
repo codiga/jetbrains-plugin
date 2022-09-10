@@ -23,7 +23,7 @@ public class UseRecipeSearchModel implements SearchPopup.Model {
 
     @Override
     public @NotNull String getTitleText() {
-        return "Codiga: Recipe Search";
+        return "Codiga: Snippet Search";
     }
 
     @Override

@@ -89,10 +89,12 @@ public final class RecipeUtils {
             template.addVariable(variable);
         }
 
-        TemplateManager.getInstance(project).runTemplate(editor, template);
 
         // Insert all imports
         try {
+            TemplateManager.getInstance(project).runTemplate(editor, template);
+
+
             WriteCommandAction.writeCommandAction(project).run(
                 (ThrowableRunnable<Throwable>) () -> {
                     int firstInsertion = firstPositionToInsert(currentCode, language);
