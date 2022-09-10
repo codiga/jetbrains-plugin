@@ -154,6 +154,16 @@ public class AppStarter implements StartupActivity {
         AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
+                final AppSettingsState settings = AppSettingsState.getInstance();
+                if (settings == null) {
+                    return;
+                }
+
+                if(!settings.getUseInlineCompletion()) {
+                    LOGGER.debug("do not refresh cache, completion disabled");
+                    return;
+                }
+
                 for(Project project: ProjectManager.getInstance().getOpenProjects()) {
 
                     for(FileEditor fileEditor: FileEditorManager.getInstance(project).getAllEditors()) {
