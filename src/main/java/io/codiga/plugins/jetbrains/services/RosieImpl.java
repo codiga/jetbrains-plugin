@@ -42,6 +42,7 @@ public class RosieImpl implements Rosie {
     private static final List<LanguageEnumeration> SUPPORTED_LANGUAGES = List.of(LanguageEnumeration.PYTHON);
 
     public RosieImpl() {
+        // no constructor instructions
     }
 
     private String getUserAgent() {
@@ -59,14 +60,14 @@ public class RosieImpl implements Rosie {
      * "rules": [
      * {
      * "id": "empty-parameters",
-     * "contentBase64": "ICAgICAgICBmdW5jdGlvbiB2aXNpdChub2RlKSB7CiAgICAgICAgICAgIGNvbnN0IHBhcmFtZXRlcnNXaXRoRW1wdHlBcnJheSA9IG5vZGUucGFyYW1ldGVycy52YWx1ZXMuZmlsdGVyKHAgPT4gcCAmJiBwLmRlZmF1bHRWYWx1ZSAmJiBwLmRlZmF1bHRWYWx1ZS52YWx1ZSA9PT0gIltdIik7CgogICAgICAgICAgICBmb3IodmFyIGkgPSAwIDsgaSA8IHBhcmFtZXRlcnNXaXRoRW1wdHlBcnJheS5sZW5ndGggOyBpKyspIHsKICAgICAgICAgICAgICAgIGNvbnN0IHBhcmFtZXRlciA9IHBhcmFtZXRlcnNXaXRoRW1wdHlBcnJheVtpXTsKICAgICAgICAgICAgICAgIGNvbnNvbGUubG9nKHBhcmFtZXRlci5uYW1lLnZhbHVlKTsKICAgICAgICAgICAgICAgIGNvbnNvbGUubG9nKHBhcmFtZXRlci5zdGFydC5jb2wpOwogICAgICAgICAgICAgICAgY29uc3QgZXJyb3IgPSBidWlsZEVycm9yKHBhcmFtZXRlci5kZWZhdWx0VmFsdWUuc3RhcnQubGluZSwgcGFyYW1ldGVyLmRlZmF1bHRWYWx1ZS5zdGFydC5jb2wsIHBhcmFtZXRlci5kZWZhdWx0VmFsdWUuZW5kLmxpbmUsIHBhcmFtZXRlci5kZWZhdWx0VmFsdWUuZW5kLmNvbCwgImNhbm5vdCB1c2UgZGVmYXVsdCBpbml0aWFsaXplciBbXSBpbiBmdW5jdGlvbiIsICJDUklUSUNBTCIsICJTQUZFVFkiKTsKICAgICAgICAgICAgICAgIGFkZEVycm9yKGVycm9yKTsKICAgICAgICAgICAgfQogICAgICAgIH0=",
+     * "contentBase64": "<rule-content-base64>=",
      * "language": "python",
      * "type": "ast",
      * "entityChecked": "functiondefinition"
      * },
      * {
      * "id": "timeout-request",
-     * "contentBase64": "ICAgICAgICBmdW5jdGlvbiB2aXNpdChub2RlKSB7CiAgICAgICAgICAgIG5vZGUuYXJndW1lbnRzLnZhbHVlcy5maWx0ZXIoYSA9PiBhLm5hbWUpLmZvckVhY2goYSA9PiBjb25zb2xlLmxvZyhhLm5hbWUudmFsdWUpKTsKICAgICAgICAgICAgY29uc3QgaGFzVGltZW91dCA9IG5vZGUuYXJndW1lbnRzLnZhbHVlcy5maWx0ZXIoYSA9PiBhLm5hbWUgJiYgYS5uYW1lLnZhbHVlID09ICJ0aW1lb3V0IikubGVuZ3RoID4gMDsKICAgICAgICAgICAgY29uc3QgYXJndW1lbnRzID0gbm9kZS5hcmd1bWVudHMudmFsdWVzOwogICAgICAgICAgICBjb25zdCBuYkFyZ3VtZW50cyA9IG5vZGUuYXJndW1lbnRzLnZhbHVlcy5sZW5ndGg7CiAgICAgICAgICAgIGNvbnN0IGFsbFBhY2thZ2VzID0gbm9kZS5nZXRJbXBvcnRzKCkuZmxhdE1hcChpID0+IGkucGFja2FnZXMubWFwKHAgPT4gcC5uYW1lLnN0cikpOwogICAgICAgICAgICBjb25zdCB1c2VSZXF1ZXN0c1BhY2thZ2UgPSBhbGxQYWNrYWdlcy5maWx0ZXIoaSA9PiBpID09PSAicmVxdWVzdHMiKS5sZW5ndGggPiAwOwogICAgICAgICAgICBjb25zb2xlLmxvZygiSEFTIFRJTUVPVVQ6IitoYXNUaW1lb3V0KTsKICAgICAgICAgICAgaWYoIWhhc1RpbWVvdXQgJiYgdXNlUmVxdWVzdHNQYWNrYWdlICYmIG5vZGUuZnVuY3Rpb25OYW1lLnZhbHVlID09PSAiZ2V0IiAmJiBub2RlLm1vZHVsZU9yT2JqZWN0LnZhbHVlID09PSAicmVxdWVzdHMiKXsKICAgICAgICAgICAgICAgIGNvbnN0IGVycm9yID0gYnVpbGRFcnJvcihub2RlLnN0YXJ0LmxpbmUsIG5vZGUuc3RhcnQuY29sLCBub2RlLmVuZC5saW5lLCBub2RlLmVuZC5jb2wsICJ0aW1lb3V0IG5vdCBkZWZpbmVkIiwgIkNSSVRJQ0FMIiwgIlNBRkVUWSIpOwogICAgICAgICAgICAgICAgY29uc3QgbGluZVRvSW5zZXJ0ID0gYXJndW1lbnRzW2FyZ3VtZW50cy5sZW5ndGggLSAxXS5lbmQubGluZTsKICAgICAgICAgICAgICAgIGNvbnN0IGNvbFRvSW5zZXJ0ID0gYXJndW1lbnRzW2FyZ3VtZW50cy5sZW5ndGggLSAxXS5lbmQuY29sICsgMTsKICAgICAgICAgICAgICAgIGNvbnN0IGVkaXQgPSBidWlsZEVkaXRBZGQobGluZVRvSW5zZXJ0LCBjb2xUb0luc2VydCwgIiwgdGltZW91dD01IikKICAgICAgICAgICAgICAgIGNvbnN0IGZpeCA9IGJ1aWxkRml4KCJhZGQgdGltZW91dCBhcmd1bWVudCIsIFtlZGl0XSk7CiAgICAgICAgICAgICAgICBhZGRFcnJvcihlcnJvci5hZGRGaXgoZml4KSk7CiAgICAgICAgICAgIH0KICAgICAgICB9",
+     * "contentBase64": "<rule-content-base64>",
      * "language": "python",
      * "type": "ast",
      * "entityChecked": "functioncall"
@@ -85,14 +86,15 @@ public class RosieImpl implements Rosie {
 
         // Find package.json in these files
         Optional<VirtualFile> packageFileOptional = rootFiles.stream().filter(v -> v.getName().equalsIgnoreCase("rosie.debug")).findFirst();
+        String content = null;
         if (packageFileOptional.isPresent()) {
-            InputStream inputStream = null;
             try {
-                inputStream = packageFileOptional.get().getInputStream();
-                String content = new String(inputStream.readAllBytes());
+                InputStream inputStream = packageFileOptional.get().getInputStream();
+                content = new String(inputStream.readAllBytes());
                 inputStream.close();
                 return content;
             } catch (IOException e) {
+                LOGGER.error("cannot open rosie.debug", e);
                 return null;
             }
         }

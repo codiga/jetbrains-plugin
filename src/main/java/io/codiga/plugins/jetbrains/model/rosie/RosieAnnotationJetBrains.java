@@ -10,12 +10,12 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
  */
 public class RosieAnnotationJetBrains {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private String ruleName;
-    private String message;
-    private String severity;
+    private final String ruleName;
+    private final String message;
+    private final String severity;
+    private final int start;
+    private final int end;
     private String category;
-    private int start;
-    private int end;
 
 
     public RosieAnnotationJetBrains(String ruleName, String message, String severity, String category, RosiePosition start, RosiePosition end, Editor editor) {
