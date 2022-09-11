@@ -19,11 +19,11 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.*;
 
 /**
-<<<<<<< HEAD
+ * <<<<<<< HEAD
  * This is an [[IntentionAction]] to apply a fix with the series of edit on the code.
-=======
+ * =======
  * An updated  version of the annotation that contains an offset for JetBrains
->>>>>>> 54c6cca7a6fc96154871d929b8d8dbfec6223327
+ * >>>>>>> 54c6cca7a6fc96154871d929b8d8dbfec6223327
  */
 public class RosieAnnotationFix implements IntentionAction {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
@@ -37,7 +37,7 @@ public class RosieAnnotationFix implements IntentionAction {
 
     @Override
     public @IntentionName @NotNull String getText() {
-        return rosieViolationFix.description;
+        return String.format("Fix: %s", rosieViolationFix.description);
     }
 
     @Override

@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.ROSIE_SEVERITY_CRITICAL;
+import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.ROSIE_SEVERITY_ERROR;
 import static io.codiga.plugins.jetbrains.ui.UIConstants.ANNOTATION_PREFIX;
 
 class RosieAnnotatorInformation {
@@ -96,6 +98,15 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
         return annotations;
     }
 
+    private ProblemHighlightType getProblemHighlightType(String rosieSeverity) {
+        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_CRITICAL)) {
+            return ProblemHighlightType.ERROR;
+        }
+        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_ERROR)) {
+            return ProblemHighlightType.WARNING;
+        }
+        return ProblemHighlightType.INFO;
+    }
 
     /**
      * Generate an annotation for a violation
@@ -127,11 +138,11 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
             .highlightType(ProblemHighlightType.ERROR)
             .range(annotationRange);
 
-        annotationBuilder.withFix(new AnnotationFixOpenBrowser(annotation));
 
         for (RosieViolationFix rosieViolationFix : annotation.getFixes()) {
             annotationBuilder.withFix(new RosieAnnotationFix(rosieViolationFix));
         }
+        annotationBuilder.withFix(new AnnotationFixOpenBrowser(annotation));
 
 
         LOGGER.info("Creating annotation with range: " + annotationRange);

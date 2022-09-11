@@ -18,7 +18,7 @@ import java.net.URL;
  */
 public class AnnotationFixOpenBrowser implements IntentionAction {
 
-    private RosieAnnotationJetBrains rosieAnnotation;
+    private final RosieAnnotationJetBrains rosieAnnotation;
 
     public AnnotationFixOpenBrowser(RosieAnnotationJetBrains rosieAnnotation) {
         this.rosieAnnotation = rosieAnnotation;

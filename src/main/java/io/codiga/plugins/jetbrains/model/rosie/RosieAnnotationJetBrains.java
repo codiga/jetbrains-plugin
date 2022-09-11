@@ -17,7 +17,7 @@ public class RosieAnnotationJetBrains {
     private final String severity;
     private final int start;
     private final int end;
-    List<RosieViolationFix> fixes;
+    private final List<RosieViolationFix> fixes;
     private String category;
 
 
