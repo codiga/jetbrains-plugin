@@ -14,6 +14,7 @@ import com.intellij.psi.PsiFile;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
 import io.codiga.plugins.jetbrains.model.rosie.RosieViolationFix;
 import io.codiga.plugins.jetbrains.services.Rosie;
+import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +40,7 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final Rosie rosieService = ApplicationManager.getApplication().getService(Rosie.class);
+    private final AppSettingsState settings = AppSettingsState.getInstance();
 
 
     /**
@@ -70,6 +72,10 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
     @Nullable
     @Override
     public List<RosieAnnotationJetBrains> doAnnotate(RosieAnnotatorInformation rosieAnnotatorInformation) {
+        if (!settings.getCodigaEnabled()) {
+            LOGGER.debug("codiga disabled");
+            return List.of();
+        }
 
         long startTime = System.currentTimeMillis();
         List<RosieAnnotationJetBrains> annotations = rosieService
@@ -122,7 +128,7 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
             .range(annotationRange);
 
         annotationBuilder.withFix(new AnnotationFixOpenBrowser(annotation));
-        
+
         for (RosieViolationFix rosieViolationFix : annotation.getFixes()) {
             annotationBuilder.withFix(new RosieAnnotationFix(rosieViolationFix));
         }
