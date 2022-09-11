@@ -6,12 +6,12 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 public class RosieAnnotation {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private String ruleName;
-    private String message;
-    private String severity;
-    private String category;
-    private RosiePosition start;
-    private RosiePosition end;
+    private final String ruleName;
+    private final String message;
+    private final String severity;
+    private final String category;
+    private final RosiePosition start;
+    private final RosiePosition end;
 
 
     public RosieAnnotation(String name,
@@ -51,5 +51,5 @@ public class RosieAnnotation {
     public RosiePosition getEnd() {
         return this.end;
     }
-    
+
 }
