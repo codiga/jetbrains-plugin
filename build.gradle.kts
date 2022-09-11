@@ -36,7 +36,7 @@ kotlin {
  
 dependencies {
     // GraphQL API
-    implementation("com.apollographql.apollo:apollo-runtime:2.5.12")
+    implementation("com.apollographql.apollo:apollo-runtime:2.5.13")
 
     // OS detection
     implementation("org.apache.commons:commons-lang3:3.12.0")
