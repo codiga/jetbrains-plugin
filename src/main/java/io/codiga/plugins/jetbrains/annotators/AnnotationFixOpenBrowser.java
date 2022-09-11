@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.net.URL;
 
+/**
+ * Fix to open the browser to learn more about a violation and a rule.
+ */
 public class AnnotationFixOpenBrowser implements IntentionAction {
 
     private RosieAnnotationJetBrains rosieAnnotation;

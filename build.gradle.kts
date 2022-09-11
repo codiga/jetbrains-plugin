@@ -27,8 +27,13 @@ repositories {
     mavenCentral()
 }
 
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
 
-
+ 
 dependencies {
     // GraphQL API
     implementation("com.apollographql.apollo:apollo-runtime:2.5.12")

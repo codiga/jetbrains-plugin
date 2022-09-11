@@ -3,10 +3,8 @@ package io.codiga.plugins.jetbrains.topics;
 import com.intellij.util.messages.Topic;
 
 /**
- * Topic that represent what a change of the API key.
- * <p>
- * We subscribe to this topic in the preferences when the API key change in order to refresh the list
- * of projects.
+ * Represent if Codiga is active at all.
+ * This topic is synced between the preferences and the status bar icon.
  */
 public interface CodigaEnabledStatusNotifier {
 

@@ -19,7 +19,7 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.*;
 
 /**
- * An updated  version of the annotation that contains an offset for JetBrains
+ * This is an [[IntentionAction]] to apply a fix with the series of edit on the code.
  */
 public class RosieAnnotationFix implements IntentionAction {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
