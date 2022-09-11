@@ -8,11 +8,11 @@ plugins {
     // Kotlin support
     id("org.jetbrains.kotlin.jvm") version "1.7.10"
     // GraphQL
-    id("com.apollographql.apollo") version "2.5.12"
+    id("com.apollographql.apollo") version "2.5.13"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
 
     // DO NOT UPGRADE UNTIL THE SNIPPET SEARCH LAUNCHES!!!
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.9.0"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.3.1"
 }
@@ -36,7 +36,7 @@ kotlin {
  
 dependencies {
     // GraphQL API
-    implementation("com.apollographql.apollo:apollo-runtime:2.5.12")
+    implementation("com.apollographql.apollo:apollo-runtime:2.5.13")
 
     // OS detection
     implementation("org.apache.commons:commons-lang3:3.12.0")

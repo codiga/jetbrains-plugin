@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
-import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.ROSIE_SEVERITY_CRITICAL;
-import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.ROSIE_SEVERITY_ERROR;
+import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.*;
 import static io.codiga.plugins.jetbrains.ui.UIConstants.ANNOTATION_PREFIX;
 
 class RosieAnnotatorInformation {
@@ -105,7 +104,10 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
         if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_ERROR)) {
             return ProblemHighlightType.WARNING;
         }
-        return ProblemHighlightType.INFO;
+        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_WARNING)) {
+            return ProblemHighlightType.WEAK_WARNING;
+        }
+        return ProblemHighlightType.INFORMATION;
     }
 
     /**
