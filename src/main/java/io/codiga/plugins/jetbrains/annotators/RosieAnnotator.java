@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
+import io.codiga.plugins.jetbrains.model.rosie.RosieViolationFix;
 import io.codiga.plugins.jetbrains.services.Rosie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,6 +81,7 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
                 annotation.getCategory(),
                 annotation.getStart(),
                 annotation.getEnd(),
+                annotation.getFixes(),
                 rosieAnnotatorInformation.editor))
             .collect(Collectors.toList());
         long endTime = System.currentTimeMillis();
@@ -118,6 +120,14 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
             .newAnnotation(HighlightSeverity.ERROR, message)
             .highlightType(ProblemHighlightType.ERROR)
             .range(annotationRange);
+
+        annotationBuilder.withFix(new AnnotationFixOpenBrowser(annotation));
+        
+        for (RosieViolationFix rosieViolationFix : annotation.getFixes()) {
+            annotationBuilder.withFix(new RosieAnnotationFix(rosieViolationFix));
+        }
+
+
         LOGGER.info("Creating annotation with range: " + annotationRange);
         annotationBuilder.create();
     }

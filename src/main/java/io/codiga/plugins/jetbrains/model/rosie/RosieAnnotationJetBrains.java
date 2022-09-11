@@ -3,6 +3,8 @@ package io.codiga.plugins.jetbrains.model.rosie;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 
+import java.util.List;
+
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 /**
@@ -15,16 +17,18 @@ public class RosieAnnotationJetBrains {
     private final String severity;
     private final int start;
     private final int end;
+    List<RosieViolationFix> fixes;
     private String category;
 
 
-    public RosieAnnotationJetBrains(String ruleName, String message, String severity, String category, RosiePosition start, RosiePosition end, Editor editor) {
+    public RosieAnnotationJetBrains(String ruleName, String message, String severity, String category, RosiePosition start, RosiePosition end, List<RosieViolationFix> fixes, Editor editor) {
         this.ruleName = ruleName;
         this.message = message;
         this.severity = severity;
         this.category = category;
         this.start = start.getOffset(editor);
         this.end = end.getOffset(editor);
+        this.fixes = List.copyOf(fixes);
     }
 
 
@@ -50,5 +54,9 @@ public class RosieAnnotationJetBrains {
 
     public int getEnd() {
         return this.end;
+    }
+
+    public List<RosieViolationFix> getFixes() {
+        return this.fixes;
     }
 }

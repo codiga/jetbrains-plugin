@@ -2,6 +2,8 @@ package io.codiga.plugins.jetbrains.model.rosie;
 
 import com.intellij.openapi.diagnostic.Logger;
 
+import java.util.List;
+
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 public class RosieAnnotation {
@@ -12,6 +14,7 @@ public class RosieAnnotation {
     private final String category;
     private final RosiePosition start;
     private final RosiePosition end;
+    List<RosieViolationFix> fixes;
 
 
     public RosieAnnotation(String name,
@@ -19,13 +22,15 @@ public class RosieAnnotation {
                            String severity,
                            String category,
                            RosiePosition positionStart,
-                           RosiePosition positionEnd) {
+                           RosiePosition positionEnd,
+                           List<RosieViolationFix> fixes) {
         this.ruleName = name;
         this.message = message;
         this.severity = severity;
         this.category = category;
         this.start = positionStart;
         this.end = positionEnd;
+        this.fixes = fixes;
     }
 
     public String getMessage() {
@@ -50,6 +55,10 @@ public class RosieAnnotation {
 
     public RosiePosition getEnd() {
         return this.end;
+    }
+
+    public List<RosieViolationFix> getFixes() {
+        return this.fixes;
     }
 
 }
