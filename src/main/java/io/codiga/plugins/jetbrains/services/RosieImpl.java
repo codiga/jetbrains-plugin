@@ -149,7 +149,8 @@ public class RosieImpl implements Rosie {
                     violation.severity,
                     violation.category,
                     violation.start,
-                    violation.end
+                    violation.end,
+                    violation.fixes
                 ))).collect(Collectors.toList());
             }
             client.close();
