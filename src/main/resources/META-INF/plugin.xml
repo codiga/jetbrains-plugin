@@ -55,10 +55,13 @@
         <toolWindow id="Snippet Search" secondary="true" icon="CodigaIcons.Codiga_default_icon" anchor="right"
                     factoryClass="io.codiga.plugins.jetbrains.actions.snippet_search.SnippetToolWindowFactory"/>
 
-        <editorActionHandler action="EditorEscape" implementationClass="io.codiga.plugins.jetbrains.completion.inline.EscapeHandler" id="previewEscape" order="before hide-hints"/>
-        <editorFactoryDocumentListener implementation="io.codiga.plugins.jetbrains.completion.inline.InlineDocumentListener"/>
+        <editorActionHandler action="EditorEscape"
+                             implementationClass="io.codiga.plugins.jetbrains.completion.inline.EscapeHandler"
+                             id="previewEscape" order="before hide-hints"/>
+        <editorFactoryDocumentListener
+                implementation="io.codiga.plugins.jetbrains.completion.inline.InlineDocumentListener"/>
 
-        <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.AppStarter" />
+        <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.AppStarter"/>
         <notificationGroup
                 id="Codiga API"
                 displayType="BALLOON"
@@ -68,6 +71,11 @@
                 serviceInterface="io.codiga.plugins.jetbrains.graphql.CodigaApi"
                 serviceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiImpl"
                 testServiceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiTest"
+        />
+        <applicationService
+                serviceInterface="io.codiga.plugins.jetbrains.services.Rosie"
+                serviceImplementation="io.codiga.plugins.jetbrains.services.RosieImpl"
+                testServiceImplementation="io.codiga.plugins.jetbrains.services.RosieTest"
         />
         <applicationService
                 serviceImplementation="io.codiga.plugins.jetbrains.settings.application.AppSettingsState"/>
@@ -84,6 +92,17 @@
         <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
         <statusBarWidgetFactory implementation="io.codiga.plugins.jetbrains.ui.StatusBar"/>
         <typedHandler implementation="io.codiga.plugins.jetbrains.cache.TypedKeyHandler"/>
+
+        <externalAnnotator
+                language="TEXT"
+                implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
+        <externalAnnotator
+                language="Python"
+                implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
+        <externalAnnotator
+                language=""
+                implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
+
     </extensions>
     <projectListeners>
         <listener class="io.codiga.plugins.jetbrains.cache.CacheRefreshEditorListener"
@@ -113,7 +132,7 @@
                 text="Create Codiga Snippet" description="Use the selected code to create a snippet"
                 icon="CodigaIcons.Codiga_default_icon">
 
-            <add-to-group group-id="EditorPopupMenu"  anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <override-text place="MainMenu" text="Codiga Assistant"/>
         </action>
 
@@ -121,10 +140,12 @@
                 id="io.codiga.ApplySnippet" text="Apply Snippet">
             <keyboard-shortcut first-keystroke="TAB" keymap="$default"/>
         </action>
-        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowPreviousInlineCompletion" id="io.codiga.ShowPreviousSnippetCompletionAction" text="Show Previous Snippet">
+        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowPreviousInlineCompletion"
+                id="io.codiga.ShowPreviousSnippetCompletionAction" text="Show Previous Snippet">
             <keyboard-shortcut first-keystroke="alt OPEN_BRACKET" keymap="$default"/>
         </action>
-        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowNextInlineCompletion" id="io.codiga.ShowNextSnippetCompletionAction" text="Show Previous Snippet">
+        <action class="io.codiga.plugins.jetbrains.completion.inline.ShowNextInlineCompletion"
+                id="io.codiga.ShowNextSnippetCompletionAction" text="Show Previous Snippet">
             <keyboard-shortcut first-keystroke="alt CLOSE_BRACKET" keymap="$default"/>
         </action>
     </actions>

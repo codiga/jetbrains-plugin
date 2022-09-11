@@ -27,8 +27,13 @@ repositories {
     mavenCentral()
 }
 
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
 
-
+ 
 dependencies {
     // GraphQL API
     implementation("com.apollographql.apollo:apollo-runtime:2.5.12")
@@ -36,15 +41,17 @@ dependencies {
     // OS detection
     implementation("org.apache.commons:commons-lang3:3.12.0")
 
+    implementation("com.google.code.gson:gson:2.9.1")
+
     // markdown support
     implementation("com.github.rjeschke:txtmark:0.13")
 
     // For rollbar support
     implementation("com.rollbar:rollbar-java:1.8.1") {
-        exclude(group="org.slf4j", module="slf4j-api")
+        exclude(group = "org.slf4j", module = "slf4j-api")
     }
     implementation("org.slf4j:slf4j-log4j12:1.7.36") {
-        exclude(group="org.slf4j", module="slf4j-api")
+        exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
     // testing

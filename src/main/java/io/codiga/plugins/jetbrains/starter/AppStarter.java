@@ -42,9 +42,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * ask the user to configure them in the preferences.
  */
 public class AppStarter implements StartupActivity {
+    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
     private final AppSettingsState appSettingsState = AppSettingsState.getInstance();
-    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private Notification notification;
 
     @Override
@@ -95,7 +95,7 @@ public class AppStarter implements StartupActivity {
          * Make sure one editor is being opened at the file. Otherwise, the Coding Assistant cannot get the context
          * and will crash.
          */
-        if(appSettingsState.getShowDialogOnboarding() &&
+        if (appSettingsState.getShowDialogOnboarding() &&
             FileEditorManager.getInstance(project) != null &&
             FileEditorManager.getInstance(project).getSelectedEditor() != null) {
             notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
@@ -159,14 +159,19 @@ public class AppStarter implements StartupActivity {
                     return;
                 }
 
-                if(!settings.getUseInlineCompletion()) {
-                    LOGGER.debug("do not refresh cache, completion disabled");
+                if (!settings.getCodigaEnabled()) {
+                    LOGGER.debug("Codiga disabled, not refreshing cache");
                     return;
                 }
 
-                for(Project project: ProjectManager.getInstance().getOpenProjects()) {
+                if (!settings.getUseInlineCompletion()) {
+                    LOGGER.debug("Completion are disabled, not refreshing cache");
+                    return;
+                }
 
-                    for(FileEditor fileEditor: FileEditorManager.getInstance(project).getAllEditors()) {
+                for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+
+                    for (FileEditor fileEditor : FileEditorManager.getInstance(project).getAllEditors()) {
                         if (fileEditor.getFile() == null) {
                             continue;
                         }
@@ -180,6 +185,6 @@ public class AppStarter implements StartupActivity {
                 ShortcutCache.getInstance().garbageCollect();
 
             }
-        }, 1, 10L , SECONDS);
+        }, 1, 10L, SECONDS);
     }
 }
