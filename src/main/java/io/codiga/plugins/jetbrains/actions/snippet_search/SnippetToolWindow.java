@@ -45,8 +45,11 @@ public class SnippetToolWindow {
     private final JPanel noRecipePanel = new JPanel();
     private final JPanel languageNotSupportedPanel = new JPanel();
     private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
+<<<<<<< HEAD
     private final Project project;
     private final ToolWindow toolWindow;
+=======
+>>>>>>> 54c6cca7a6fc96154871d929b8d8dbfec6223327
     AppSettingsState settings = AppSettingsState.getInstance();
     private JPanel mainPanel;
     private JTextField searchTerm;
@@ -93,6 +96,7 @@ public class SnippetToolWindow {
          */
         searchTerm.getDocument().addDocumentListener(new DocumentListener() {
             private void updateResult() {
+<<<<<<< HEAD
 
                 FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
@@ -102,6 +106,10 @@ public class SnippetToolWindow {
                 }
 
                 VirtualFile virtualFile = fileEditorManager.getSelectedEditor().getFile();
+=======
+                Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
+                VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
+>>>>>>> 54c6cca7a6fc96154871d929b8d8dbfec6223327
 
                 if (project == null || virtualFile == null) {
                     LOGGER.info("project or file are null");
@@ -397,7 +405,11 @@ public class SnippetToolWindow {
         java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, onlyPublic, onlyPrivate, onlyFavorite);
 
         // Create the snippet panel.
+<<<<<<< HEAD
         java.util.List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext, toolWindow, project)).collect(Collectors.toList());
+=======
+        java.util.List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext)).collect(Collectors.toList());
+>>>>>>> 54c6cca7a6fc96154871d929b8d8dbfec6223327
 
         snippetsPanel.removeAll();
         snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));
