@@ -38,6 +38,12 @@ import static io.codiga.plugins.jetbrains.utils.LanguageUtils.getLanguageName;
  * This implements the main tool window for the snippets.
  */
 public class SnippetToolWindow {
+    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
+    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final JPanel noRecipePanel = new JPanel();
+    private final JPanel languageNotSupportedPanel = new JPanel();
+    private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
+    AppSettingsState settings = AppSettingsState.getInstance();
     private JPanel mainPanel;
     private JTextField searchTerm;
     private JRadioButton radioAllSnippets;
@@ -58,52 +64,6 @@ public class SnippetToolWindow {
     private boolean searchPrivateSnippetsOnlyEnabled;
     private boolean searchPublicSnippetsOnlyEnabled;
     private boolean searchFavoriteSnippetsOnlyEnabled;
-
-    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
-
-    private final JPanel noRecipePanel = new JPanel();
-    private final JPanel languageNotSupportedPanel = new JPanel();
-    private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
-
-    AppSettingsState settings = AppSettingsState.getInstance();
-
-    public void updateSearchPreferences(boolean _allSnippets, boolean _privateOnly, boolean _publicOnly, boolean _favoriteOnly) {
-        this.searchFavoriteSnippetsOnly = _favoriteOnly;
-        this.searchPublicSnippetsOnly = _publicOnly;
-        this.searchAllSnippets = _allSnippets;
-        this.searchPrivateSnippetsOnly = _privateOnly;
-        radioAllSnippets.setSelected(this.searchAllSnippets);
-        radioPrivateOnly.setSelected(this.searchPrivateSnippetsOnly);
-        radioPublicOnly.setSelected(this.searchPublicSnippetsOnly);
-        checkboxFavoritesOnly.setSelected(this.searchFavoriteSnippetsOnly);
-
-        radioPrivateOnly.setEnabled(searchPrivateSnippetsOnlyEnabled);
-        radioPublicOnly.setEnabled(searchPublicSnippetsOnlyEnabled);
-        checkboxFavoritesOnly.setEnabled(searchFavoriteSnippetsOnlyEnabled);
-    }
-
-    /**
-     * Set the default value for all checkboxes (e.g. public search by default).
-     */
-    private void setDefaultValuesForSearchPreferences() {
-        searchAllSnippets = true;
-        searchPrivateSnippetsOnly = false;
-        searchPublicSnippetsOnly = false;
-        searchFavoriteSnippetsOnly = false;
-        searchPrivateSnippetsOnlyEnabled = false;
-        searchPublicSnippetsOnlyEnabled = false;
-        searchFavoriteSnippetsOnlyEnabled = false;
-    }
-
-    private void getVisibilityFromSettings() {
-        this.searchAllSnippets = !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
-        this.searchPrivateSnippetsOnly = settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
-        this.searchPublicSnippetsOnly = !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly();
-        this.searchFavoriteSnippetsOnly = settings.getFavoriteSnippetsOnly();
-    }
-
 
     public SnippetToolWindow(ToolWindow toolWindow, Project project) {
         setDefaultValuesForSearchPreferences();
@@ -126,7 +86,7 @@ public class SnippetToolWindow {
          * request if no key has not been typed within 500 ms.
          */
         searchTerm.getDocument().addDocumentListener(new DocumentListener() {
-            private void updateResult () {
+            private void updateResult() {
                 Project project = SnippetToolWindowFileEditorManagerListener.getCurrentProject();
                 VirtualFile virtualFile = SnippetToolWindowFileEditorManagerListener.getCurrentVirtualFile();
 
@@ -140,7 +100,7 @@ public class SnippetToolWindow {
                 searchTermAlarm.addRequest(() -> {
                     final String searchTermString = searchTerm.getText();
                     Optional<String> searchArgument = Optional.empty();
-                    if(searchTermString.length() > 0) {
+                    if (searchTermString.length() > 0) {
                         searchArgument = Optional.of(searchTermString);
                     }
                     updateEditor(project, virtualFile, searchArgument, false);
@@ -228,16 +188,73 @@ public class SnippetToolWindow {
 //        });
 
         searchTermAlarm.addRequest(() -> {
-            try{
+            try {
                 FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
                 FileEditor fileEditor = fileEditorManager.getSelectedEditor();
                 if (fileEditor != null && fileEditor.getFile() != null) {
                     updateEditor(project, fileEditor.getFile(), Optional.empty(), false);
                 }
-            } catch (AlreadyDisposedException ade){
+            } catch (AlreadyDisposedException ade) {
                 LOGGER.debug("Cannot create new panel", ade);
             }
         }, 500);
+    }
+
+    /**
+     * By default, the scrollpanes are *very* slow. This function
+     * fix the scroll pane passed as parameter and makes
+     * the scroll speed faster.
+     *
+     * @param scrollpane
+     */
+    public static void fixScrolling(JScrollPane scrollpane) {
+        JLabel systemLabel = new JLabel();
+        FontMetrics metrics = systemLabel.getFontMetrics(systemLabel.getFont());
+        int lineHeight = metrics.getHeight();
+        int charWidth = metrics.getMaxAdvance();
+
+        JScrollBar systemVBar = new JScrollBar(JScrollBar.VERTICAL);
+        JScrollBar systemHBar = new JScrollBar(JScrollBar.HORIZONTAL);
+        int verticalIncrement = systemVBar.getUnitIncrement();
+        int horizontalIncrement = systemHBar.getUnitIncrement();
+
+        scrollpane.getVerticalScrollBar().setUnitIncrement(lineHeight * verticalIncrement);
+        scrollpane.getHorizontalScrollBar().setUnitIncrement(charWidth * horizontalIncrement);
+    }
+
+    public void updateSearchPreferences(boolean _allSnippets, boolean _privateOnly, boolean _publicOnly, boolean _favoriteOnly) {
+        this.searchFavoriteSnippetsOnly = _favoriteOnly;
+        this.searchPublicSnippetsOnly = _publicOnly;
+        this.searchAllSnippets = _allSnippets;
+        this.searchPrivateSnippetsOnly = _privateOnly;
+        radioAllSnippets.setSelected(this.searchAllSnippets);
+        radioPrivateOnly.setSelected(this.searchPrivateSnippetsOnly);
+        radioPublicOnly.setSelected(this.searchPublicSnippetsOnly);
+        checkboxFavoritesOnly.setSelected(this.searchFavoriteSnippetsOnly);
+
+        radioPrivateOnly.setEnabled(searchPrivateSnippetsOnlyEnabled);
+        radioPublicOnly.setEnabled(searchPublicSnippetsOnlyEnabled);
+        checkboxFavoritesOnly.setEnabled(searchFavoriteSnippetsOnlyEnabled);
+    }
+
+    /**
+     * Set the default value for all checkboxes (e.g. public search by default).
+     */
+    private void setDefaultValuesForSearchPreferences() {
+        searchAllSnippets = true;
+        searchPrivateSnippetsOnly = false;
+        searchPublicSnippetsOnly = false;
+        searchFavoriteSnippetsOnly = false;
+        searchPrivateSnippetsOnlyEnabled = false;
+        searchPublicSnippetsOnlyEnabled = false;
+        searchFavoriteSnippetsOnlyEnabled = false;
+    }
+
+    private void getVisibilityFromSettings() {
+        this.searchAllSnippets = !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
+        this.searchPrivateSnippetsOnly = settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
+        this.searchPublicSnippetsOnly = !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly();
+        this.searchFavoriteSnippetsOnly = settings.getFavoriteSnippetsOnly();
     }
 
     /**
@@ -269,33 +286,17 @@ public class SnippetToolWindow {
         }
     }
 
-    /**
-     * By default, the scrollpanes are *very* slow. This function
-     * fix the scroll pane passed as parameter and makes
-     * the scroll speed faster.
-     * @param scrollpane
-     */
-    public static void fixScrolling(JScrollPane scrollpane) {
-        JLabel systemLabel = new JLabel();
-        FontMetrics metrics = systemLabel.getFontMetrics(systemLabel.getFont());
-        int lineHeight = metrics.getHeight();
-        int charWidth = metrics.getMaxAdvance();
-
-        JScrollBar systemVBar = new JScrollBar(JScrollBar.VERTICAL);
-        JScrollBar systemHBar = new JScrollBar(JScrollBar.HORIZONTAL);
-        int verticalIncrement = systemVBar.getUnitIncrement();
-        int horizontalIncrement = systemHBar.getUnitIncrement();
-
-        scrollpane.getVerticalScrollBar().setUnitIncrement(lineHeight * verticalIncrement);
-        scrollpane.getHorizontalScrollBar().setUnitIncrement(charWidth * horizontalIncrement);
+    public JPanel getContent() {
+        return mainPanel;
     }
 
-    public JPanel getContent() { return mainPanel;};
+    ;
 
     /**
      * Set the loading panel, hides all current snippets
      * This should then be reversed by the updateEditor
      * function when snippets are found.
+     *
      * @param resetLanguage
      */
     public void setLoading(boolean resetLanguage) {
@@ -340,12 +341,12 @@ public class SnippetToolWindow {
         Optional<Boolean> onlyPrivate = Optional.empty();
         Optional<Boolean> onlyFavorite = Optional.empty();
 
-        if(this.searchPublicSnippetsOnly) {
+        if (this.searchPublicSnippetsOnly) {
             onlyPublic = Optional.of(true);
             onlyPrivate = Optional.empty();
         }
 
-        if(this.searchPrivateSnippetsOnly) {
+        if (this.searchPrivateSnippetsOnly) {
             onlyPrivate = Optional.of(true);
             onlyPublic = Optional.empty();
         }
@@ -360,12 +361,12 @@ public class SnippetToolWindow {
         LOGGER.info("found snippets: " + snippets.size());
 
         // Create the snippet panel.
-        java.util.List<SnippetPanel> panels =  snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext)).collect(Collectors.toList());
+        java.util.List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext)).collect(Collectors.toList());
 
         snippetsPanel.removeAll();
         snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));
 
-        if(snippets.isEmpty()) {
+        if (snippets.isEmpty()) {
             snippetsPanel.add(noRecipePanel);
         } else {
             panels.forEach(p -> {
@@ -381,7 +382,7 @@ public class SnippetToolWindow {
         fixScrolling(scrollPane);
         // scroll back to the top
         SwingUtilities.invokeLater(() -> {
-            scrollPane.getViewport().setViewPosition(new Point(0,0 ));
+            scrollPane.getViewport().setViewPosition(new Point(0, 0));
             snippetsPanel.revalidate();
             snippetsPanel.repaint();
         });

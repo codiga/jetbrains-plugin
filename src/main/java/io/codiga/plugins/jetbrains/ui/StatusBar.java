@@ -8,7 +8,7 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.Consumer;
 import icons.CodigaIcons;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
-import io.codiga.plugins.jetbrains.topics.InlineCompletionStatusNotifier;
+import io.codiga.plugins.jetbrains.topics.CodigaEnabledStatusNotifier;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 
-import static io.codiga.plugins.jetbrains.topics.InlineCompletionStatusNotifier.CODIGA_INLINE_COMPLETION_CHANGE;
+import static io.codiga.plugins.jetbrains.topics.CodigaEnabledStatusNotifier.CODIGA_ENABLED_CHANGE_TOPIC;
 
 
 public class StatusBar implements StatusBarWidgetFactory {
@@ -46,19 +46,19 @@ public class StatusBar implements StatusBarWidgetFactory {
         com.intellij.openapi.wm.StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
         if (statusBar != null) {
             ApplicationManager.getApplication()
-                    .getMessageBus().connect()
-                    .subscribe(InlineCompletionStatusNotifier.CODIGA_INLINE_COMPLETION_CHANGE, new InlineCompletionStatusNotifier(){
+                .getMessageBus().connect()
+                .subscribe(CodigaEnabledStatusNotifier.CODIGA_ENABLED_CHANGE_TOPIC, new CodigaEnabledStatusNotifier() {
 
-                        @Override
-                        public void beforeAction(Object context) {
-                            // no need any before action
-                        }
+                    @Override
+                    public void beforeAction(Object context) {
+                        // no need any before action
+                    }
 
-                        @Override
-                        public void afterAction(Object context) {
-                            statusBar.updateWidget(getId());
-                        }
-                    });
+                    @Override
+                    public void afterAction(Object context) {
+                        statusBar.updateWidget(getId());
+                    }
+                });
         }
         return new CodigaStatusWidget();
     }
@@ -99,7 +99,7 @@ public class StatusBar implements StatusBarWidgetFactory {
 
         @Override
         public @Nullable String getTooltipText() {
-            if(settings.getUseInlineCompletion()) {
+            if (settings.getUseInlineCompletion()) {
                 return "Codiga completion is enabled";
             } else {
                 return "Codiga completion is disabled";
@@ -110,20 +110,18 @@ public class StatusBar implements StatusBarWidgetFactory {
         @Override
         public @Nullable Consumer<MouseEvent> getClickConsumer() {
             return __ -> {
-                if (settings.getUseInlineCompletion()) {
-                    settings.setUseInlineCompletion(false);
-                    settings.setUseCompletion(false);
+                if (settings.getCodigaEnabled()) {
+                    settings.setCodigaEnabled(false);
                 } else {
-                    settings.setUseInlineCompletion(true);
-                    settings.setUseCompletion(true);
+                    settings.setCodigaEnabled(true);
                 }
-                ApplicationManager.getApplication().getMessageBus().syncPublisher(CODIGA_INLINE_COMPLETION_CHANGE).afterAction(null);
+                ApplicationManager.getApplication().getMessageBus().syncPublisher(CODIGA_ENABLED_CHANGE_TOPIC).afterAction(null);
             };
         }
 
         @Override
         public @Nullable Icon getIcon() {
-            if (settings.getUseInlineCompletion()) {
+            if (settings.getCodigaEnabled()) {
                 return CodigaIcons.Codiga_enabled_icon;
             } else {
                 return CodigaIcons.Codiga_disabled_icon;

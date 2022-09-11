@@ -1,10 +1,10 @@
 package io.codiga.plugins.jetbrains.settings.application;
-import com.intellij.openapi.diagnostic.Logger;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Tag;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -19,8 +19,8 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
  * the instance, just use AppSettingsState.getInstance();
  */
 @State(
-        name = "com.code_inspector.plugins.intellij.settings.application.AppSettingsState",
-        storages = {@Storage("CodeInspectorApplicationSettings.xml")}
+    name = "com.code_inspector.plugins.intellij.settings.application.AppSettingsState",
+    storages = {@Storage("CodeInspectorApplicationSettings.xml")}
 )
 public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
@@ -47,13 +47,15 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     private Boolean privateSnippetsOnly = false;
     @Tag
     private Boolean favoriteSnippetsOnly = false;
+    @Tag
+    private Boolean codigaEnabled = true;
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
     }
 
     public String getFingerprint() {
-        if(this.fingerprint == null || this.fingerprint.length() == 0) {
+        if (this.fingerprint == null || this.fingerprint.length() == 0) {
             this.fingerprint = RandomStringUtils.randomAlphanumeric(20);
         }
         return this.fingerprint;
@@ -63,9 +65,25 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         return this.useCompletion;
     }
 
-    public Boolean getShowDialogApiNotification() { return this.showDialogApiNotification; }
+    public void setUseCompletion(Boolean b) {
+        this.useCompletion = b;
+    }
 
-    public Boolean getShowDialogOnboarding() { return this.showDialogOnboarding; }
+    public Boolean getShowDialogApiNotification() {
+        return this.showDialogApiNotification;
+    }
+
+    public void setShowDialogApiNotification(Boolean b) {
+        this.showDialogApiNotification = b;
+    }
+
+    public Boolean getShowDialogOnboarding() {
+        return this.showDialogOnboarding;
+    }
+
+    public void setShowDialogOnboarding(Boolean b) {
+        this.showDialogOnboarding = b;
+    }
 
     public String getAccessKey() {
         return this.accessKey;
@@ -79,43 +97,38 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         return this.apiToken;
     }
 
-    public boolean getPublicSnippetsOnly() { return this.publicSnippetsOnly; }
-
-    public boolean getPrivateSnippetsOnly() { return this.privateSnippetsOnly; }
-
-    public boolean getFavoriteSnippetsOnly() { return this.favoriteSnippetsOnly; }
-
-    public boolean getUseInlineCompletion() { return this.useInlineCompletion; }
-
     public void setApiToken(String s) {
         this.apiToken = s;
     }
 
-    public void setUseCompletion(Boolean b) {
-        this.useCompletion = b;
+    public boolean getPublicSnippetsOnly() {
+        return this.publicSnippetsOnly;
     }
-
-
-
-    public boolean hasApiKeys() {
-        return getAccessKey().length() > 0 && getSecretKey().length() > 0;
-    }
-
-    public boolean hasApiToken() {
-        return getApiToken().length() > 0 ;
-    }
-
-    public void setShowDialogApiNotification(Boolean b) { this.showDialogApiNotification = b;}
-
-    public void setShowDialogOnboarding(Boolean b) { this.showDialogOnboarding = b;}
 
     public void setPublicSnippetsOnly(Boolean b) {
         LOGGER.debug("[AppSettingsState] setPublicSnippetsOnly: " + b);
-        this.publicSnippetsOnly = b;}
+        this.publicSnippetsOnly = b;
+    }
 
-    public void setPrivateSnippetsOnly(Boolean b){
+    public boolean getPrivateSnippetsOnly() {
+        return this.privateSnippetsOnly;
+    }
+
+    public void setPrivateSnippetsOnly(Boolean b) {
         LOGGER.debug("[AppSettingsState] setPrivateSnippetsOnly: " + b);
         this.privateSnippetsOnly = b;
+    }
+
+    public boolean getCodigaEnabled() {
+        return this.codigaEnabled;
+    }
+
+    public void setCodigaEnabled(Boolean b) {
+        this.codigaEnabled = b;
+    }
+
+    public boolean getFavoriteSnippetsOnly() {
+        return this.favoriteSnippetsOnly;
     }
 
     public void setFavoriteSnippetsOnly(Boolean favoriteSnippetsOnly) {
@@ -123,11 +136,22 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         this.favoriteSnippetsOnly = favoriteSnippetsOnly;
     }
 
+    public boolean getUseInlineCompletion() {
+        return this.useInlineCompletion;
+    }
+
     public void setUseInlineCompletion(Boolean b) {
         LOGGER.debug("[AppSettingsState] useInlineCompletion: " + b);
         this.useInlineCompletion = b;
     }
 
+    public boolean hasApiKeys() {
+        return getAccessKey().length() > 0 && getSecretKey().length() > 0;
+    }
+
+    public boolean hasApiToken() {
+        return getApiToken().length() > 0;
+    }
 
     @Nullable
     @Override
