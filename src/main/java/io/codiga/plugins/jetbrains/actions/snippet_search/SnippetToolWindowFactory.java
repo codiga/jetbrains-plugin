@@ -18,7 +18,7 @@ public class SnippetToolWindowFactory implements ToolWindowFactory {
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         snippetToolWindow = new SnippetToolWindow(toolWindow, project);
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(snippetToolWindow.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);
     }
