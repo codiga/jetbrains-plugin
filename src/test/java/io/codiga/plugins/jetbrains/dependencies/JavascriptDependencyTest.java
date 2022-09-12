@@ -2,10 +2,8 @@ package io.codiga.plugins.jetbrains.dependencies;
 
 import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
-import org.junit.jupiter.api.Assertions;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +13,6 @@ import java.util.List;
 
 public class JavascriptDependencyTest extends TestBase {
     JavascriptDependency javascriptDependency = new JavascriptDependency();
-    private static Logger LOGGER = LoggerFactory.getLogger(JavascriptDependencyTest.class);
 
     @Test
     public void testParsePackageFrontendJsonValid() throws IOException {
