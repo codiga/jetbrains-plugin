@@ -33,12 +33,12 @@ kotlin {
     }
 }
 
- 
+
 dependencies {
     // GraphQL API
     implementation("com.apollographql.apollo:apollo-runtime:2.5.13")
 
-    // OS detection
+    // OS detection and file handling
     implementation("org.apache.commons:commons-lang3:3.12.0")
 
     implementation("com.google.code.gson:gson:2.9.1")
@@ -81,13 +81,18 @@ changelog {
 
 
 tasks {
-    // Set the compatibility versions to 1.8
+
+    wrapper {
+        gradleVersion = properties("gradleVersion")
+    }
+
+    // Set the compatibility versions to 1.11
     withType<JavaCompile> {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
 

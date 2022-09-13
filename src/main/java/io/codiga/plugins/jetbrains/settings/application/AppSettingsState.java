@@ -1,5 +1,9 @@
 package io.codiga.plugins.jetbrains.settings.application;
 
+import com.intellij.credentialStore.CredentialAttributes;
+import com.intellij.credentialStore.CredentialAttributesKt;
+import com.intellij.credentialStore.Credentials;
+import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -11,7 +15,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.Constants.*;
 
 /**
  * Represents the API parameters (access key and secret key) to access the
@@ -25,12 +29,8 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    @Tag
-    private String accessKey = "";
-    @Tag
-    private String secretKey = "";
-    @Tag
-    private String apiToken = "";
+    // See https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#retrieve-stored-credentials
+    CredentialAttributes credentialAttributes = createCredentialAttributes(CREDENTIALS_KEY);
     @Tag
     private String fingerprint = "";
     @Tag
@@ -52,6 +52,12 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
+    }
+
+    private CredentialAttributes createCredentialAttributes(String key) {
+        return new CredentialAttributes(
+            CredentialAttributesKt.generateServiceName(CREDENTIALS_SERVICE, key)
+        );
     }
 
     public String getFingerprint() {
@@ -85,20 +91,19 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         this.showDialogOnboarding = b;
     }
 
-    public String getAccessKey() {
-        return this.accessKey;
-    }
-
-    public String getSecretKey() {
-        return this.secretKey;
-    }
 
     public String getApiToken() {
-        return this.apiToken;
+        Credentials credentials = PasswordSafe.getInstance().get(credentialAttributes);
+        if (credentials != null) {
+            return credentials.getPasswordAsString();
+        }
+        return null;
     }
 
     public void setApiToken(String s) {
-        this.apiToken = s;
+        Credentials credentials = new Credentials(CREDENTIALS_KEY, s);
+        PasswordSafe.getInstance().set(credentialAttributes, credentials);
+
     }
 
     public boolean getPublicSnippetsOnly() {
@@ -145,9 +150,6 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         this.useInlineCompletion = b;
     }
 
-    public boolean hasApiKeys() {
-        return getAccessKey().length() > 0 && getSecretKey().length() > 0;
-    }
 
     public boolean hasApiToken() {
         return getApiToken().length() > 0;

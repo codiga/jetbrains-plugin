@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
-import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
@@ -28,7 +27,7 @@ public class AppSettingsComponent {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final JPanel myMainPanel;
-    private final JBTextField apiToken = new JBTextField();
+    private final JPasswordField apiToken = new JPasswordField(20);
     private final JCheckBox useCompletationCheckbox;
     private JBRadioButton snippetsVisibilityAll = new JBRadioButton();
     private JBRadioButton snippetsVisibilityPublic = new JBRadioButton();
