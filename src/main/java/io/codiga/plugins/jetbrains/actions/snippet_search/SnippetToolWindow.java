@@ -195,19 +195,23 @@ public class SnippetToolWindow {
             @Override
             public void afterAction(Object context) {
                 updateUser();
-                FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-                if (fileEditorManager == null) {
-                    return;
+                try {
+                    FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+                    if (fileEditorManager == null) {
+                        return;
+                    }
+                    FileEditor fileEditor = fileEditorManager.getSelectedEditor();
+                    if (fileEditor == null) {
+                        return;
+                    }
+                    VirtualFile virtualFile = fileEditor.getFile();
+                    if (virtualFile == null) {
+                        return;
+                    }
+                    updateEditor(project, virtualFile, Optional.empty(), true);
+                } catch (AlreadyDisposedException alreadyDisposedException) {
+                    LOGGER.error("Cannot update snippet view", alreadyDisposedException);
                 }
-                FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-                if (fileEditor == null) {
-                    return;
-                }
-                VirtualFile virtualFile = fileEditor.getFile();
-                if (virtualFile == null) {
-                    return;
-                }
-                updateEditor(project, virtualFile, Optional.empty(), true);
             }
         });
 
