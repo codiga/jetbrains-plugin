@@ -97,7 +97,7 @@ public class SnippetToolWindow {
 
                 FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
-                if (fileEditorManager == null) {
+                if (fileEditorManager == null || fileEditorManager.getSelectedEditor() == null) {
                     LOGGER.info("cannot find editor manager");
                     return;
                 }
