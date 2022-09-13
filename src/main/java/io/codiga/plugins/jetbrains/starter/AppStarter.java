@@ -167,8 +167,7 @@ public class AppStarter implements StartupActivity {
                     LOGGER.debug("Completion are disabled, not refreshing cache");
                     return;
                 }
-
-
+                
                 for (FileEditor fileEditor : FileEditorManager.getInstance(project).getAllEditors()) {
                     if (fileEditor.getFile() == null) {
                         continue;
