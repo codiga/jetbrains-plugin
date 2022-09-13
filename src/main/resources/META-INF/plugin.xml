@@ -92,13 +92,7 @@
         <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
         <statusBarWidgetFactory implementation="io.codiga.plugins.jetbrains.ui.StatusBar"/>
         <typedHandler implementation="io.codiga.plugins.jetbrains.cache.TypedKeyHandler"/>
-
-        <externalAnnotator
-                language="TEXT"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
-        <externalAnnotator
-                language="Python"
-                implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
+        
         <externalAnnotator
                 language=""
                 implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>

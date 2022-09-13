@@ -27,7 +27,7 @@ public class AppSettingsComponent {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final JPanel myMainPanel;
-    private final JPasswordField apiToken = new JPasswordField(20);
+    private final JPasswordField apiToken = new JPasswordField(40);
     private final JCheckBox useCompletationCheckbox;
     private JBRadioButton snippetsVisibilityAll = new JBRadioButton();
     private JBRadioButton snippetsVisibilityPublic = new JBRadioButton();
