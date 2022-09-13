@@ -1,2 +1,2 @@
-spawn <caret>
+<caret>
 

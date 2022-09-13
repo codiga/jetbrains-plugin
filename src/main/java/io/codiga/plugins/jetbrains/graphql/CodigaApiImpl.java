@@ -49,13 +49,12 @@ public final class CodigaApiImpl implements CodigaApi {
     private RequestHeaders getHeaders() {
         AppSettingsState settings = AppSettingsState.getInstance();
 
-        final String apiToken = settings == null || settings.getApiToken() == null ? "" : settings.getApiToken();
 
         /**
-         * If the API token is available, and defined, use them. Otherwise, use the old
-         * method to connect with the ACCESS_KEY and SECRET_KEY.
+         * Use the API token
          */
-        if (settings != null && settings.getApiToken() != null && settings.getApiToken().length() > 0) {
+        final String apiToken = settings == null || settings.getApiToken() == null ? "" : settings.getApiToken();
+        if (apiToken != null && apiToken.length() > 0) {
             return RequestHeaders
                 .builder()
                 .addHeader(Constants.API_TOKEN_HEADER, apiToken)

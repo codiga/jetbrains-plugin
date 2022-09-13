@@ -56,7 +56,7 @@ public class InlineDocumentListener implements DocumentListener {
             LOGGER.debug("editor is null");
             return;
         }
-        
+
         Project project = editor.getProject();
 
         if (project == null) {
@@ -98,10 +98,19 @@ public class InlineDocumentListener implements DocumentListener {
                 LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
 
                 int lineStart = editor.getCaretModel().getVisualLineStart();
-                int lineEnd = editor.getCaretModel().getVisualLineEnd();
                 int caretOfset = editor.getCaretModel().getCurrentCaret().getOffset();
 
-                String currentLine = document.getText(new TextRange(lineStart, caretOfset));
+
+                String currentLine = null;
+                try {
+                    currentLine = document.getText(new TextRange(lineStart, caretOfset));
+                } catch (IllegalArgumentException e) {
+                    return;
+                }
+
+                if (currentLine == null) {
+                    return;
+                }
 
 
                 if (!lineStartsWithComment(language, currentLine)) {
