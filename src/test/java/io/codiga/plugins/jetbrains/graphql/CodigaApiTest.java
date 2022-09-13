@@ -8,6 +8,7 @@ import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.testutils.Constants;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,30 +54,59 @@ public final class CodigaApiTest implements CodigaApi {
                                                                         String jetbrainsFormat,
                                                                         List<String> keywords,
                                                                         LanguageEnumeration language) {
-      // typename
-      String typename = "AssistantRecipe";
-      // id
-      int id = 42069;
-      // imports
-      List<String> imports = new ArrayList<>();
-      imports.add("use std::thread;");
-      // description
-      String description = "Quickly spawn a thread using the std library";
-      // shortcut
-      String shortcut = "st";
+        // typename
+        String typename = "AssistantRecipe";
+        // id
+        int id = 42069;
+        // imports
+        List<String> imports = new ArrayList<>();
+        imports.add("use std::thread;");
+        // description
+        String description = "Quickly spawn a thread using the std library";
+        // shortcut
+        String shortcut = "st";
 
-      return new GetRecipesForClientQuery.GetRecipesForClient(
-        typename,
-        id,
-        name,
-        jetbrainsFormat,
-        jetbrainsFormat,
-        keywords,
-        imports,
-        language,
-        description,
-        shortcut
-      );
+        return new GetRecipesForClientQuery.GetRecipesForClient(
+            typename,
+            id,
+            name,
+            jetbrainsFormat,
+            jetbrainsFormat,
+            keywords,
+            imports,
+            language,
+            description,
+            shortcut
+        );
+    }
+
+    private GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut generateRecipeByShortcut(String name,
+                                                                                                      String jetbrainsFormat,
+                                                                                                      List<String> keywords,
+                                                                                                      LanguageEnumeration language,
+                                                                                                      String shortcut) {
+        String typename = "AssistantRecipe";
+        // id
+        long id = 42069;
+        // imports
+        List<String> imports = new ArrayList<>();
+        imports.add("use std::thread;");
+        // description
+        String description = "Quickly spawn a thread using the std library";
+        // shortcut
+
+        return new GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut(
+            typename,
+            BigDecimal.valueOf(id),
+            name,
+            jetbrainsFormat,
+            jetbrainsFormat,
+            keywords,
+            imports,
+            language,
+            description,
+            shortcut
+        );
     }
 
     @Override
@@ -85,48 +115,48 @@ public final class CodigaApiTest implements CodigaApi {
                                                                                   Optional<String> parameters,
                                                                                   LanguageEnumeration language,
                                                                                   String filename) {
-      List<GetRecipesForClientQuery.GetRecipesForClient> recipes = new ArrayList<>();
+        List<GetRecipesForClientQuery.GetRecipesForClient> recipes = new ArrayList<>();
 
-      if (keywords.contains("testOneAutoCompleteSuggestion")) {
-        recipes.add(generateRecipe("Spawn a thread",
-          Constants.RECIPE_SAMPLE,
-          keywords,
-          language));
+        if (keywords.contains("testOneAutoCompleteSuggestion")) {
+            recipes.add(generateRecipe("Spawn a thread",
+                Constants.RECIPE_SAMPLE,
+                keywords,
+                language));
 
-        return recipes;
-      }
+            return recipes;
+        }
 
-      if (keywords.contains("testMultipleAutoCompleteSuggestion")) {
-        recipes.add(generateRecipe("Spawn a thread",
-          Constants.RECIPE_SAMPLE,
-          keywords,
-          language));
-        recipes.add(generateRecipe("Spawn a thread 2",
-          Constants.RECIPE_SAMPLE,
-          keywords,
-          language));
+        if (keywords.contains("testMultipleAutoCompleteSuggestion")) {
+            recipes.add(generateRecipe("Spawn a thread",
+                Constants.RECIPE_SAMPLE,
+                keywords,
+                language));
+            recipes.add(generateRecipe("Spawn a thread 2",
+                Constants.RECIPE_SAMPLE,
+                keywords,
+                language));
 
-        return recipes;
-      }
+            return recipes;
+        }
 
-      if (keywords.contains("testAcceptRecipeSuggestion")) {
-        recipes.add(generateRecipe("Spawn a thread",
-          Constants.RECIPE_SAMPLE,
-          keywords,
-          language));
+        if (keywords.contains("testAcceptRecipeSuggestion")) {
+            recipes.add(generateRecipe("Spawn a thread",
+                Constants.RECIPE_SAMPLE,
+                keywords,
+                language));
 
-        return recipes;
-      }
+            return recipes;
+        }
 
-      // The recipe here only contains `&[CODIGA_INDENT]` transform variable.
-      if (keywords.contains("testIndentation")) {
-        recipes.add(generateRecipe("Spawn a thread",
-          "dGhyZWFkOjpzcGF3bihtb3ZlIHx8IHsKJltDT0RJR0FfSU5ERU5UXS8vIHRocmVhZCBjb2RlIGhlcmUKJltDT0RJR0FfSU5ERU5UXTQyCn0pOw==",
-          keywords,
-          language));
+        // The recipe here only contains `&[CODIGA_INDENT]` transform variable.
+        if (keywords.contains("testIndentation")) {
+            recipes.add(generateRecipe("Spawn a thread",
+                "dGhyZWFkOjpzcGF3bihtb3ZlIHx8IHsKJltDT0RJR0FfSU5ERU5UXS8vIHRocmVhZCBjb2RlIGhlcmUKJltDT0RJR0FfSU5ERU5UXTQyCn0pOw==",
+                keywords,
+                language));
 
-        return recipes;
-      }
+            return recipes;
+        }
 
       /*
         The recipe in this section contains all the possible Variable Transformations at once,
@@ -134,14 +164,14 @@ public final class CodigaApiTest implements CodigaApi {
 
         It doesn't contain `&[CODIGA_INDENT]`.
        */
-      if (keywords.contains("testTransformer")) {
-        recipes.add(generateRecipe("Spawn a thread",
-          "dGhyZWFkOjpzcGF3bihtb3ZlIHx8IHsKICAvLyB0aHJlYWQgY29kZSBoZXJlCiAgJltEQVRFX0NVUlJFTlRfREFZXQogICZbREFURV9NT05USF9UV09fRElHSVRTXQogICZbREFURV9DVVJSRU5UX1NFQ09ORF9VTklYXQogICZbREFURV9DVVJSRU5UX1NFQ09ORF0KICAmW0RBVEVfQ1VSUkVOVF9NSU5VVEVdCiAgJltEQVRFX0NVUlJFTlRfSE9VUl0KICAmW0RBVEVfQ1VSUkVOVF9ZRUFSX1NIT1JUXQogICZbREFURV9DVVJSRU5UX1lFQVJdCiAgJltSQU5ET01fQkFTRV8xNl0KICAmW1JBTkRPTV9CQVNFXzEwXQogICZbREFURV9NT05USF9OQU1FX1NIT1JUXQogICZbREFURV9NT05USF9OQU1FXQogICZbREFURV9EQVlfTkFNRV9TSE9SVF0KICAmW0RBVEVfREFZX05BTUVdCiAgJltSQU5ET01fVVVJRF0KfSk7",
-          keywords,
-          language));
+        if (keywords.contains("testTransformer")) {
+            recipes.add(generateRecipe("Spawn a thread",
+                "dGhyZWFkOjpzcGF3bihtb3ZlIHx8IHsKICAvLyB0aHJlYWQgY29kZSBoZXJlCiAgJltEQVRFX0NVUlJFTlRfREFZXQogICZbREFURV9NT05USF9UV09fRElHSVRTXQogICZbREFURV9DVVJSRU5UX1NFQ09ORF9VTklYXQogICZbREFURV9DVVJSRU5UX1NFQ09ORF0KICAmW0RBVEVfQ1VSUkVOVF9NSU5VVEVdCiAgJltEQVRFX0NVUlJFTlRfSE9VUl0KICAmW0RBVEVfQ1VSUkVOVF9ZRUFSX1NIT1JUXQogICZbREFURV9DVVJSRU5UX1lFQVJdCiAgJltSQU5ET01fQkFTRV8xNl0KICAmW1JBTkRPTV9CQVNFXzEwXQogICZbREFURV9NT05USF9OQU1FX1NIT1JUXQogICZbREFURV9NT05USF9OQU1FXQogICZbREFURV9EQVlfTkFNRV9TSE9SVF0KICAmW0RBVEVfREFZX05BTUVdCiAgJltSQU5ET01fVVVJRF0KfSk7",
+                keywords,
+                language));
 
-        return recipes;
-      }
+            return recipes;
+        }
 
       /*
         The recipe in this section contains all the possible Variable Macros at once,
@@ -149,16 +179,16 @@ public final class CodigaApiTest implements CodigaApi {
 
         It doesn't contain `&[CODIGA_INDENT]`.
        */
-      if (keywords.contains("testMacro")) {
-        recipes.add(generateRecipe("Spawn a thread",
-          "dGhyZWFkOjpzcGF3bihtb3ZlIHx8IHsKICAvLyB0aHJlYWQgY29kZSBoZXJlCiAgJFNlbGVjdGVkVGV4dCQKICAkTGluZU51bWJlciQKICAkRmlsZU5hbWUkCiAgJEZpbGVOYW1lV2l0aG91dEV4dGVuc2lvbiQKICAkRmlsZURpciQKICAkRmlsZVBhdGgkCiAgJEZpbGVSZWxhdGl2ZVBhdGgkCiAgJENsaXBib2FyZENvbnRlbnQkCiAgJFByb2plY3ROYW1lJAogICRQcm9qZWN0RmlsZURpciQKfSk7",
-          keywords,
-          language));
+        if (keywords.contains("testMacro")) {
+            recipes.add(generateRecipe("Spawn a thread",
+                "dGhyZWFkOjpzcGF3bihtb3ZlIHx8IHsKICAvLyB0aHJlYWQgY29kZSBoZXJlCiAgJFNlbGVjdGVkVGV4dCQKICAkTGluZU51bWJlciQKICAkRmlsZU5hbWUkCiAgJEZpbGVOYW1lV2l0aG91dEV4dGVuc2lvbiQKICAkRmlsZURpciQKICAkRmlsZVBhdGgkCiAgJEZpbGVSZWxhdGl2ZVBhdGgkCiAgJENsaXBib2FyZENvbnRlbnQkCiAgJFByb2plY3ROYW1lJAogICRQcm9qZWN0RmlsZURpciQKfSk7",
+                keywords,
+                language));
+
+            return recipes;
+        }
 
         return recipes;
-      }
-
-      return recipes;
     }
 
     @Override
@@ -170,12 +200,20 @@ public final class CodigaApiTest implements CodigaApi {
                                                                                                                 Optional<Boolean> onlyPublic,
                                                                                                                 Optional<Boolean> onlyPrivate,
                                                                                                                 Optional<Boolean> onlySubscribed) {
-        return null;
+        return (
+            List.of(
+                generateRecipeByShortcut("Spawn a thread",
+                    "dGhyZWFkOjpzcGF3bihtb3ZlIHx8IHsKJltDT0RJR0FfSU5ERU5UXS8vIHRocmVhZCBjb2RlIGhlcmUKJltDT0RJR0FfSU5ERU5UXTQyCn0pOw==",
+                    List.of("spawn", "thread"),
+                    language,
+                    "spawn")
+            )
+        );
     }
 
     @Override
     public Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language) {
-        return Optional.empty();
+        return Optional.of(System.currentTimeMillis());
     }
 
     @Override

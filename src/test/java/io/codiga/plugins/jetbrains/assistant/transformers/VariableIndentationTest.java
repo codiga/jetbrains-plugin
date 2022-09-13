@@ -5,8 +5,7 @@ import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy;
-
-import java.util.List;
+import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 
 public class VariableIndentationTest extends BasePlatformTestCase {
 
@@ -20,15 +19,15 @@ public class VariableIndentationTest extends BasePlatformTestCase {
     return "src/test/data/transformers";
   }
 
+
   public void testIndentation() {
+    AppSettingsState.getInstance().setUseInlineCompletion(false);
     myFixture.testCompletionVariants("spawn_thread.rs");
-    myFixture.type("testIndentation");
+    myFixture.type(".spawn");
     myFixture.complete(CompletionType.BASIC);
-    List<String> lookupElementStrings = myFixture.getLookupElementStrings();
 
-    assertNotNull(lookupElementStrings);
 
-    myFixture.type('\t');
     myFixture.checkResultByFile("spawn_thread_indent_result.rs");
+    AppSettingsState.getInstance().setUseInlineCompletion(true);
   }
 }

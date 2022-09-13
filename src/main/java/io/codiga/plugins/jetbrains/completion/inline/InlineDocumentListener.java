@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.TextRange;
@@ -33,15 +34,15 @@ import static io.codiga.plugins.jetbrains.utils.LanguageUtils.*;
 public class InlineDocumentListener implements DocumentListener {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final int TIMEOUT_REQUEST_POLLING_MILLISECONDS = 500;
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
     private final DependencyManagement dependencyManagement = new DependencyManagement();
-    private final AppSettingsState settings = AppSettingsState.getInstance();
     private final Alarm updateListAlarm = new Alarm();
 
     private long lastRequestTimestamp = 0;
 
     @Override
     public void documentChanged(@NotNull DocumentEvent documentEvent) {
+        final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+        final AppSettingsState settings = AppSettingsState.getInstance();
         if (documentEvent.getDocument().isInBulkUpdate()) {
             LOGGER.debug("bulk update - skipping");
             return;
@@ -50,8 +51,16 @@ public class InlineDocumentListener implements DocumentListener {
         Document document = documentEvent.getDocument();
         Editor editor = getActiveEditor(document);
 
+
         if (editor == null) {
             LOGGER.debug("editor is null");
+            return;
+        }
+
+        Project project = editor.getProject();
+
+        if (project == null) {
+            LOGGER.debug("project is null");
             return;
         }
 
@@ -89,10 +98,19 @@ public class InlineDocumentListener implements DocumentListener {
                 LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
 
                 int lineStart = editor.getCaretModel().getVisualLineStart();
-                int lineEnd = editor.getCaretModel().getVisualLineEnd();
                 int caretOfset = editor.getCaretModel().getCurrentCaret().getOffset();
 
-                String currentLine = document.getText(new TextRange(lineStart, caretOfset));
+
+                String currentLine = null;
+                try {
+                    currentLine = document.getText(new TextRange(lineStart, caretOfset));
+                } catch (IllegalArgumentException e) {
+                    return;
+                }
+
+                if (currentLine == null) {
+                    return;
+                }
 
 
                 if (!lineStartsWithComment(language, currentLine)) {
@@ -113,8 +131,6 @@ public class InlineDocumentListener implements DocumentListener {
                     .stream().map(Dependency::getName)
                     .collect(Collectors.toList());
                 String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(editor.getProject(), virtualFile);
-
-                AppSettingsState settings = AppSettingsState.getInstance();
 
                 // Finally, make the request. We make a request periodically and then
                 // only get the latest request. We poll
@@ -155,7 +171,7 @@ public class InlineDocumentListener implements DocumentListener {
                     SnippetPreview snippetPreview = new SnippetPreview(editor, offset, snippets);
                     snippetPreview.display();
                 }, TIMEOUT_REQUEST_POLLING_MILLISECONDS);
-            });
+            }, project.getDisposed());
     }
 
 }

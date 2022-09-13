@@ -35,7 +35,6 @@ public class Constants {
     // PHP constants
     public static final String PHP_DEPENDENCY_FILE = "composer.json";
 
-    public static final long REAL_TIME_FEEDBACK_TIMEOUT_MILLIS = 15 * 1000 ; // 15 seconds
-    public static final long SLEEP_BETWEEN_FILE_ANALYSIS_MILLIS = 200;
-    public static final long FILE_ANALYSIS_INITIAL_SLEEP_MILLIS = 1200;
+    public static final String CREDENTIALS_SERVICE = "Codiga";
+    public static final String CREDENTIALS_KEY = "API_TOKEN";
 }

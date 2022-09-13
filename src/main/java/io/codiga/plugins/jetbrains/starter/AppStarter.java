@@ -12,7 +12,6 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import io.codiga.api.type.LanguageEnumeration;
@@ -168,20 +167,18 @@ public class AppStarter implements StartupActivity {
                     LOGGER.debug("Completion are disabled, not refreshing cache");
                     return;
                 }
-
-                for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-
-                    for (FileEditor fileEditor : FileEditorManager.getInstance(project).getAllEditors()) {
-                        if (fileEditor.getFile() == null) {
-                            continue;
-                        }
-                        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, fileEditor.getFile());
-                        java.util.List<String> dependencies = DependencyManagement.getInstance().getDependencies(project, fileEditor.getFile()).stream().map(v -> v.getName()).collect(Collectors.toList());
-                        LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(fileEditor.getFile());
-                        ShortcutCacheKey shortcutCacheKey = new ShortcutCacheKey(languageEnumeration, filename, dependencies);
-                        ShortcutCache.getInstance().refreshCacheKey(shortcutCacheKey);
+                
+                for (FileEditor fileEditor : FileEditorManager.getInstance(project).getAllEditors()) {
+                    if (fileEditor.getFile() == null) {
+                        continue;
                     }
+                    String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, fileEditor.getFile());
+                    java.util.List<String> dependencies = DependencyManagement.getInstance().getDependencies(project, fileEditor.getFile()).stream().map(v -> v.getName()).collect(Collectors.toList());
+                    LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(fileEditor.getFile());
+                    ShortcutCacheKey shortcutCacheKey = new ShortcutCacheKey(languageEnumeration, filename, dependencies);
+                    ShortcutCache.getInstance().refreshCacheKey(shortcutCacheKey);
                 }
+
                 ShortcutCache.getInstance().garbageCollect();
 
             }
