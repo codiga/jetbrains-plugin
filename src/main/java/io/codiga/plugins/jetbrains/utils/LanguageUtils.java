@@ -62,6 +62,14 @@ public final class LanguageUtils {
                 return "Go";
             case JAVA:
                 return "Java";
+            case MARKDOWN:
+                return "Markdown";
+            case SCSS:
+                return "Scss";
+            case SASS:
+                return "Sass";
+            case TWIG:
+                return "Twig";
             default:
                 return "Unknown";
         }
@@ -90,6 +98,8 @@ public final class LanguageUtils {
             case SWIFT:
             case SOLIDITY:
             case RUST:
+            case SCSS:
+            case SASS:
                 return filteredLine.startsWith("//");
             case PYTHON:
             case SHELL:
@@ -105,6 +115,8 @@ public final class LanguageUtils {
                 return filteredLine.startsWith("--");
             case CSS:
                 return filteredLine.startsWith("/*");
+            case TWIG:
+                return filteredLine.startsWith("{#");
             default:
                 return false;
         }
