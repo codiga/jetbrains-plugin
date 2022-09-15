@@ -62,7 +62,10 @@ public class AppSettingsConfigurable implements Configurable {
     @Override
     public void apply() {
         AppSettingsState settings = AppSettingsState.getInstance();
+
+        mySettingsComponent.getApiToken();
         settings.setApiToken(mySettingsComponent.getApiToken());
+
         settings.setUseCompletion(mySettingsComponent.useCompletion());
         settings.setPublicSnippetsOnly(mySettingsComponent.usePublicSnippetsOnly());
         settings.setPrivateSnippetsOnly(mySettingsComponent.usePrivateSnippetsOnly());
@@ -79,7 +82,9 @@ public class AppSettingsConfigurable implements Configurable {
     @Override
     public void reset() {
         AppSettingsState settings = AppSettingsState.getInstance();
-        mySettingsComponent.setApiToken(settings.getApiToken());
+        if (settings.getApiToken() != null) {
+            mySettingsComponent.setApiToken(settings.getApiToken());
+        }
         mySettingsComponent.setUseEnabledCheckbox(settings.getUseCompletion());
         mySettingsComponent.setSnippetsVisiliblity(settings.getPrivateSnippetsOnly(), settings.getPublicSnippetsOnly(), settings.getFavoriteSnippetsOnly());
         mySettingsComponent.setUseInlineComplextion(settings.getUseInlineCompletion());

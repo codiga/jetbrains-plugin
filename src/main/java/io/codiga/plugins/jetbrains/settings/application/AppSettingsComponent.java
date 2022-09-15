@@ -160,7 +160,13 @@ public class AppSettingsComponent {
 
     @NotNull
     public String getApiToken() {
-        return apiToken.getText();
+        if (apiToken.getPassword() == null){
+            return "";
+        }
+        if (apiToken.getPassword().length == 0){
+            return "";
+        }
+        return new String(apiToken.getPassword());
     }
 
     public void setApiToken(@NotNull String newText) {
