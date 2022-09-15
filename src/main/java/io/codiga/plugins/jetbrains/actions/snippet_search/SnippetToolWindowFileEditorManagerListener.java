@@ -31,5 +31,6 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
          * we want to refresh the content.
          */
         newFileTopic.afterAction(null);
+
     }
 }
