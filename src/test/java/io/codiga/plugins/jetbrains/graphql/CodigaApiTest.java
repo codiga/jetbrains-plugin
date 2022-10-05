@@ -217,8 +217,15 @@ public final class CodigaApiTest implements CodigaApi {
     }
 
     @Override
-    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term, List<String> dependencies, Optional<String> parameters, LanguageEnumeration language, String filename, Optional<Boolean> onlyPublic, Optional<Boolean> onlyPrivate, Optional<Boolean> onlySubscribed) {
-        return null;
+    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term,
+                                                                                                    List<String> dependencies,
+                                                                                                    Optional<String> parameters,
+                                                                                                    LanguageEnumeration language,
+                                                                                                    String filename,
+                                                                                                    Optional<Boolean> onlyPublic,
+                                                                                                    Optional<Boolean> onlyPrivate,
+                                                                                                    Optional<Boolean> onlySubscribed) {
+        return RecipesSemanticTestSupport.getRecipesSemanticForLanguage(language);
     }
 
     @Override

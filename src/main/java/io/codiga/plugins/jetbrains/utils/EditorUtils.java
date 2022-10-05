@@ -6,6 +6,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.IdeFocusManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +23,16 @@ public final class EditorUtils {
 
     @Nullable
     public static Editor getActiveEditor(@NotNull Document document) {
+        //The Editor instance created in the test fixture cannot be found via the focusOwner,
+        // thus we rely on the fact that there is a known amount of projects and editors open
+        // during test execution.
+        if (ApplicationManager.getApplication().isUnitTestMode()) {
+            Project openProject = ProjectManager.getInstance().getOpenProjects()[0];
+            if (!openProject.isDisposed()) {
+                return FileEditorManager.getInstance(openProject).getSelectedTextEditor();
+            }
+        }
+
         if (!ApplicationManager.getApplication().isDispatchThread()) {
             return null;
         }
