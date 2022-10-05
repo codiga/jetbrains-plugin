@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -51,7 +50,6 @@ public class InlineDocumentListener implements DocumentListener {
         Document document = documentEvent.getDocument();
         Editor editor = getActiveEditor(document);
 
-
         if (editor == null) {
             LOGGER.debug("editor is null");
             return;
@@ -77,101 +75,112 @@ public class InlineDocumentListener implements DocumentListener {
         this.lastRequestTimestamp = System.currentTimeMillis();
         long requestTimestamp = this.lastRequestTimestamp;
 
-
-        ApplicationManager.getApplication()
-            .invokeLater(() -> {
-                int offset = editor.getCaretModel().getOffset();
-
-                SnippetPreview previousPreview = SnippetPreview.getInstance(editor);
-
-                if (previousPreview != null) {
-                    Disposer.dispose(previousPreview);
-                }
-
-                VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
-                ProjectManager.getInstance().getDefaultProject();
-
-                if (virtualFile == null) {
-                    return;
-                }
-
-                LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
-
-                int lineStart = editor.getCaretModel().getVisualLineStart();
-                int caretOfset = editor.getCaretModel().getCurrentCaret().getOffset();
-
-
-                String currentLine = null;
-                try {
-                    currentLine = document.getText(new TextRange(lineStart, caretOfset));
-                } catch (IllegalArgumentException e) {
-                    return;
-                }
-
-                if (currentLine == null) {
-                    return;
-                }
-
-
-                if (!lineStartsWithComment(language, currentLine)) {
-                    LOGGER.debug("line is not a comment");
-                    return;
-                }
-
-                long numberOfWords = numberOfWordsInComment(currentLine);
-                if (numberOfWords <= 1) {
-                    LOGGER.debug("not enough keywords: " + numberOfWords);
-                    return;
-                }
-
-                // what we are looking for on the API
-                Optional<String> searchTerm = Optional.of(removeLineFromCommentsSymbols(currentLine));
-
-                List<String> dependenciesName = dependencyManagement.getDependencies(editor.getProject(), virtualFile)
-                    .stream().map(Dependency::getName)
-                    .collect(Collectors.toList());
-                String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(editor.getProject(), virtualFile);
-
-                // Finally, make the request. We make a request periodically and then
-                // only get the latest request. We poll
-                updateListAlarm.addRequest(() -> {
-                    if (requestTimestamp != this.lastRequestTimestamp) {
-                        return;
-                    }
-                    Optional<Boolean> onlyPublic = Optional.empty();
-                    Optional<Boolean> onlyPrivate = Optional.empty();
-                    Optional<Boolean> onlyFavorite = Optional.empty();
-
-                    if (settings.getPublicSnippetsOnly()) {
-                        onlyPublic = Optional.of(true);
-                        onlyPrivate = Optional.empty();
-                    }
-                    if (settings.getPrivateSnippetsOnly()) {
-                        onlyPrivate = Optional.of(true);
-                        onlyPublic = Optional.empty();
-                    }
-                    if (settings.getFavoriteSnippetsOnly()) {
-                        onlyFavorite = Optional.of(true);
-                    }
-                    LOGGER.debug(String.format("[InlineDocumentListener] initiate search with onlyPublic %s, onlyPrivate %s, onlyFavorite %s", onlyPublic, onlyPrivate, onlyFavorite));
-
-                    List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(searchTerm,
-                        dependenciesName,
-                        Optional.empty(),
-                        language,
-                        filename,
-                        onlyPublic,
-                        onlyPrivate,
-                        onlyFavorite);
-
-                    if (snippets.isEmpty()) {
-                        return;
-                    }
-
-                    SnippetPreview snippetPreview = new SnippetPreview(editor, offset, snippets);
-                    snippetPreview.display();
-                }, TIMEOUT_REQUEST_POLLING_MILLISECONDS);
-            }, project.getDisposed());
+        //Using Application.invokeLater() as delay, the logic would run only after tests' tearDown() methods.
+        if (ApplicationManager.getApplication().isUnitTestMode()) {
+            checkDocumentAndInitiateSnippetPreview(codigaApi, document, editor, requestTimestamp);
+        } else {
+            ApplicationManager.getApplication()
+                .invokeLater(
+                    () -> checkDocumentAndInitiateSnippetPreview(codigaApi, document, editor, requestTimestamp),
+                    project.getDisposed());
+        }
     }
 
+    private void checkDocumentAndInitiateSnippetPreview(CodigaApi codigaApi,
+                                                        Document document,
+                                                        Editor editor,
+                                                        long requestTimestamp) {
+        SnippetPreview previousPreview = SnippetPreview.getInstance(editor);
+
+        if (previousPreview != null) {
+            Disposer.dispose(previousPreview);
+        }
+
+        VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
+
+        if (virtualFile == null) {
+            return;
+        }
+
+        LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
+
+        int lineStart = editor.getCaretModel().getVisualLineStart();
+        int caretOffset = editor.getCaretModel().getOffset();
+
+        String currentLine;
+        try {
+            currentLine = document.getText(new TextRange(lineStart, caretOffset));
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+
+        if (currentLine == null) {
+            return;
+        }
+
+        if (!lineStartsWithComment(language, currentLine)) {
+            LOGGER.debug("line is not a comment");
+            return;
+        }
+
+        long numberOfWords = numberOfWordsInComment(currentLine);
+        if (numberOfWords <= 1) {
+            LOGGER.debug("not enough keywords: " + numberOfWords);
+            return;
+        }
+
+        // what we are looking for on the API
+        Optional<String> searchTerm = Optional.of(removeLineFromCommentsSymbols(currentLine));
+
+        List<String> dependenciesName = dependencyManagement.getDependencies(editor.getProject(), virtualFile)
+            .stream().map(Dependency::getName)
+            .collect(Collectors.toList());
+        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(editor.getProject(), virtualFile);
+
+        //Using 'Alarm.addRequest()' as delay, the logic would be executed only after tests' tearDown() methods.
+        if (ApplicationManager.getApplication().isUnitTestMode()) {
+            queryRecipesAndShowSnippetPreview(codigaApi, editor, requestTimestamp, caretOffset, language, searchTerm, dependenciesName, filename);
+        } else {
+            // Finally, make the request. We make a request periodically and then
+            // only get the latest request. We poll
+            updateListAlarm.addRequest(
+                () -> queryRecipesAndShowSnippetPreview(codigaApi, editor, requestTimestamp, caretOffset, language, searchTerm, dependenciesName, filename),
+                TIMEOUT_REQUEST_POLLING_MILLISECONDS);
+        }
+    }
+
+    private void queryRecipesAndShowSnippetPreview(CodigaApi codigaApi,
+                                                   Editor editor,
+                                                   long requestTimestamp,
+                                                   int caretOffset,
+                                                   LanguageEnumeration language,
+                                                   Optional<String> searchTerm,
+                                                   List<String> dependenciesName,
+                                                   String filename) {
+        if (requestTimestamp != this.lastRequestTimestamp) {
+            return;
+        }
+
+        var snippetVisibility = new SnippetVisibility();
+
+        LOGGER.debug(String.format("[InlineDocumentListener] initiate search with onlyPublic %s, onlyPrivate %s, onlyFavorite %s",
+            snippetVisibility.getOnlyPublic(),
+            snippetVisibility.getOnlyPrivate(),
+            snippetVisibility.getOnlyFavorite()));
+
+        List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(
+            searchTerm,
+            dependenciesName,
+            Optional.empty(),
+            language,
+            filename,
+            snippetVisibility.getOnlyPublic(),
+            snippetVisibility.getOnlyPrivate(),
+            snippetVisibility.getOnlyFavorite());
+
+        if (!snippets.isEmpty()) {
+            SnippetPreview snippetPreview = new SnippetPreview(editor, caretOffset, snippets);
+            snippetPreview.display();
+        }
+    }
 }
