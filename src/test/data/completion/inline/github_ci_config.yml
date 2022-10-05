@@ -1,0 +1,6 @@
+jobs:
+  test:
+    name: Test
+    needs: gradleValidation
+    runs-on: ubuntu-latest
+    #<caret>

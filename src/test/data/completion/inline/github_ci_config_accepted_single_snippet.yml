@@ -1,0 +1,9 @@
+jobs:
+  test:
+    name: Test
+    needs: gradleValidation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v2
+    <caret>
