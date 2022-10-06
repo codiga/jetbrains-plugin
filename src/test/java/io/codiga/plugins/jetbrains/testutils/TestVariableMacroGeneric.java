@@ -1,11 +1,7 @@
 package io.codiga.plugins.jetbrains.testutils;
 
 import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
-import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy;
-import org.junit.Ignore;
 
 import java.util.List;
 
@@ -17,17 +13,7 @@ import java.util.List;
  * This approach prevents extensive code re definition per test file and easier
  * maintainability. Only to test variables in the format `$_$`.
  */
-@Ignore
-public class TestVariableMacroGeneric extends BasePlatformTestCase {
-
-  public TestVariableMacroGeneric() {
-    super();
-  }
-
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-  }
+public abstract class TestVariableMacroGeneric extends TestBase {
 
   public void performTest(String variable, CodeInsightTestFixture fixture) {
     fixture.testCompletionVariants("spawn_thread.rs");
@@ -45,12 +31,8 @@ public class TestVariableMacroGeneric extends BasePlatformTestCase {
   }
 
   @Override
-  protected String getTestDataPath() {
-    String communityPath = PlatformTestUtil.getCommunityPath();
-    String homePath = IdeaTestExecutionPolicy.getHomePathWithPolicy();
-    if (communityPath.startsWith(homePath)) {
-      return communityPath.substring(homePath.length()) + "src/test/data/transformers";
-    }
+  protected String getTestDataRelativePath() {
     return "src/test/data/transformers";
   }
+
 }

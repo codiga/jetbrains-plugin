@@ -1,23 +1,15 @@
 package io.codiga.plugins.jetbrains.completion;
 
 import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
+import io.codiga.plugins.jetbrains.testutils.TestBase;
 
-public class CodigaCompletionProviderTest extends BasePlatformTestCase {
+public class CodigaCompletionProviderTest extends TestBase {
 
     @Override
-    protected String getTestDataPath() {
-        String communityPath = PlatformTestUtil.getCommunityPath();
-        String homePath = IdeaTestExecutionPolicy.getHomePathWithPolicy();
-        if (communityPath.startsWith(homePath)) {
-            return communityPath.substring(homePath.length()) + "src/test/data/completion";
-        }
+    protected String getTestDataRelativePath() {
         return "src/test/data/completion";
     }
-
 
     public void testAcceptRecipeSuggestion() {
         AppSettingsState.getInstance().setUseInlineCompletion(true);
