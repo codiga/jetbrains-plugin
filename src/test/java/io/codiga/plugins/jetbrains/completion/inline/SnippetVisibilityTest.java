@@ -1,6 +1,7 @@
 package io.codiga.plugins.jetbrains.completion.inline;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import io.codiga.plugins.jetbrains.SnippetVisibility;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 
 /**
@@ -19,7 +20,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
     }
 
     public void testDefaultState() {
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().isEmpty());
@@ -30,7 +31,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         var settings = AppSettingsState.getInstance();
         settings.setPublicSnippetsOnly(true);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().get());
         assertTrue(snippetVisibility.getOnlyPrivate().isEmpty());
@@ -41,7 +42,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         var settings = AppSettingsState.getInstance();
         settings.setPublicSnippetsOnly(false);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().isEmpty());
@@ -52,7 +53,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         var settings = AppSettingsState.getInstance();
         settings.setPrivateSnippetsOnly(true);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().get());
@@ -63,7 +64,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         var settings = AppSettingsState.getInstance();
         settings.setPrivateSnippetsOnly(false);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().isEmpty());
@@ -75,7 +76,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         settings.setPublicSnippetsOnly(true);
         settings.setPrivateSnippetsOnly(true);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().get());
@@ -86,7 +87,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         var settings = AppSettingsState.getInstance();
         settings.setFavoriteSnippetsOnly(true);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().isEmpty());
@@ -97,7 +98,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         var settings = AppSettingsState.getInstance();
         settings.setFavoriteSnippetsOnly(false);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().isEmpty());
@@ -109,7 +110,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         settings.setPublicSnippetsOnly(true);
         settings.setFavoriteSnippetsOnly(true);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().get());
         assertTrue(snippetVisibility.getOnlyPrivate().isEmpty());
@@ -121,7 +122,7 @@ public class SnippetVisibilityTest extends BasePlatformTestCase {
         settings.setPrivateSnippetsOnly(true);
         settings.setFavoriteSnippetsOnly(true);
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         assertTrue(snippetVisibility.getOnlyPublic().isEmpty());
         assertTrue(snippetVisibility.getOnlyPrivate().get());

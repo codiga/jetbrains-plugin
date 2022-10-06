@@ -13,6 +13,7 @@ import com.intellij.util.ui.AsyncProcessIcon;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.actions.CodeInsertionContext;
+import io.codiga.plugins.jetbrains.SnippetVisibility;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
@@ -25,6 +26,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -62,30 +64,22 @@ public class SnippetToolWindow {
     private JPanel scrollPanePanel;
     private JLabel languageLabel;
     private JPanel noEditorPanel;
-    private boolean searchAllSnippets;
-    private boolean searchPrivateSnippetsOnly;
-    private boolean searchPublicSnippetsOnly;
-    private boolean searchFavoriteSnippetsOnly;
+    private SnippetVisibility snippetVisibility;
     private boolean searchPrivateSnippetsOnlyEnabled;
     private boolean searchPublicSnippetsOnlyEnabled;
     private boolean searchFavoriteSnippetsOnlyEnabled;
 
     public SnippetToolWindow(ToolWindow toolWindow, Project project) {
         setDefaultValuesForSearchPreferences();
-        getVisibilityFromSettings();
         Alarm searchTermAlarm = new Alarm();
 
         this.project = project;
         this.toolWindow = toolWindow;
-        this.searchAllSnippets = !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
-        this.searchPrivateSnippetsOnly = settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
-        this.searchPublicSnippetsOnly = !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly();
-        this.searchFavoriteSnippetsOnly = settings.getFavoriteSnippetsOnly();
-
-        radioAllSnippets.addActionListener(e -> updateSearchPreferences(true, false, false, searchFavoriteSnippetsOnly));
-        radioPrivateOnly.addActionListener(e -> updateSearchPreferences(false, true, false, searchFavoriteSnippetsOnly));
-        radioPublicOnly.addActionListener(e -> updateSearchPreferences(false, false, true, searchFavoriteSnippetsOnly));
-        checkboxFavoritesOnly.addActionListener(e -> updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, !searchFavoriteSnippetsOnly));
+        initVisibilityFromSettings();
+        radioAllSnippets.addActionListener(e -> updateSearchPreferences(true, false, false, snippetVisibility.isOnlyFavorite()));
+        radioPrivateOnly.addActionListener(e -> updateSearchPreferences(false, true, false, snippetVisibility.isOnlyFavorite()));
+        radioPublicOnly.addActionListener(e -> updateSearchPreferences(false, false, true, snippetVisibility.isOnlyFavorite()));
+        checkboxFavoritesOnly.addActionListener(e -> updateSearchPreferences(snippetVisibility.isAllSnippets(), snippetVisibility.isOnlyPrivate(), snippetVisibility.isOnlyPublic(), !snippetVisibility.isOnlyFavorite()));
 
         /**
          * The search term is triggered a new search. We wait 500 ms before doing the search
@@ -153,7 +147,7 @@ public class SnippetToolWindow {
         noEditorPanel.setVisible(false);
 
         updateUser();
-        updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
+        updateSearchPreferences();
 
         /**
          * Listen to message bus if the user added their API keys. If that is the
@@ -168,7 +162,7 @@ public class SnippetToolWindow {
             @Override
             public void afterAction(Object context) {
                 updateUser();
-                updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
+                updateSearchPreferences();
             }
         });
 
@@ -181,8 +175,8 @@ public class SnippetToolWindow {
             @Override
             public void afterAction(Object context) {
                 updateUser();
-                getVisibilityFromSettings();
-                updateSearchPreferences(searchAllSnippets, searchPrivateSnippetsOnly, searchPublicSnippetsOnly, searchFavoriteSnippetsOnly);
+                initVisibilityFromSettings();
+                updateSearchPreferences();
             }
         });
 
@@ -269,15 +263,16 @@ public class SnippetToolWindow {
         scrollpane.getHorizontalScrollBar().setUnitIncrement(charWidth * horizontalIncrement);
     }
 
-    public void updateSearchPreferences(boolean _allSnippets, boolean _privateOnly, boolean _publicOnly, boolean _favoriteOnly) {
-        this.searchFavoriteSnippetsOnly = _favoriteOnly;
-        this.searchPublicSnippetsOnly = _publicOnly;
-        this.searchAllSnippets = _allSnippets;
-        this.searchPrivateSnippetsOnly = _privateOnly;
-        radioAllSnippets.setSelected(this.searchAllSnippets);
-        radioPrivateOnly.setSelected(this.searchPrivateSnippetsOnly);
-        radioPublicOnly.setSelected(this.searchPublicSnippetsOnly);
-        checkboxFavoritesOnly.setSelected(this.searchFavoriteSnippetsOnly);
+    private void updateSearchPreferences() {
+        updateSearchPreferences(snippetVisibility.isAllSnippets(), snippetVisibility.isOnlyPrivate(), snippetVisibility.isOnlyPublic(), snippetVisibility.isOnlyFavorite());
+    }
+
+    private void updateSearchPreferences(boolean _allSnippets, boolean _privateOnly, boolean _publicOnly, boolean _favoriteOnly) {
+        snippetVisibility.setVisibilities(_allSnippets, _privateOnly, _publicOnly, _favoriteOnly);
+        radioAllSnippets.setSelected(_allSnippets);
+        radioPrivateOnly.setSelected(_privateOnly);
+        radioPublicOnly.setSelected(_publicOnly);
+        checkboxFavoritesOnly.setSelected(_favoriteOnly);
 
         radioPrivateOnly.setEnabled(searchPrivateSnippetsOnlyEnabled);
         radioPublicOnly.setEnabled(searchPublicSnippetsOnlyEnabled);
@@ -288,20 +283,17 @@ public class SnippetToolWindow {
      * Set the default value for all checkboxes (e.g. public search by default).
      */
     private void setDefaultValuesForSearchPreferences() {
-        searchAllSnippets = true;
-        searchPrivateSnippetsOnly = false;
-        searchPublicSnippetsOnly = false;
-        searchFavoriteSnippetsOnly = false;
         searchPrivateSnippetsOnlyEnabled = false;
         searchPublicSnippetsOnlyEnabled = false;
         searchFavoriteSnippetsOnlyEnabled = false;
     }
 
-    private void getVisibilityFromSettings() {
-        this.searchAllSnippets = !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
-        this.searchPrivateSnippetsOnly = settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly();
-        this.searchPublicSnippetsOnly = !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly();
-        this.searchFavoriteSnippetsOnly = settings.getFavoriteSnippetsOnly();
+    private void initVisibilityFromSettings() {
+        this.snippetVisibility = new SnippetVisibility(
+            !settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly(),
+            settings.getPrivateSnippetsOnly() && !settings.getPublicSnippetsOnly(),
+            !settings.getPrivateSnippetsOnly() && settings.getPublicSnippetsOnly(),
+            settings.getFavoriteSnippetsOnly());
     }
 
     /**
@@ -328,6 +320,7 @@ public class SnippetToolWindow {
             loggedInLabel.setText(htmlLoginLabel);
             loggedInLabel.addMouseListener(new LoginMouseListener());
         } else {
+            snippetVisibility.setVisibilities(true, false, false, false);
             setDefaultValuesForSearchPreferences();
             loggedInLabel.setText("not logged in");
         }
@@ -336,8 +329,6 @@ public class SnippetToolWindow {
     public JPanel getContent() {
         return mainPanel;
     }
-
-    ;
 
     /**
      * Set the loading panel, hides all current snippets
@@ -384,29 +375,14 @@ public class SnippetToolWindow {
 
         languageLabel.setText(getLanguageName(languageEnumeration));
 
-        Optional<Boolean> onlyPublic = Optional.empty();
-        Optional<Boolean> onlyPrivate = Optional.empty();
-        Optional<Boolean> onlyFavorite = Optional.empty();
-
-        if (this.searchPublicSnippetsOnly) {
-            onlyPublic = Optional.of(true);
-            onlyPrivate = Optional.empty();
-        }
-
-        if (this.searchPrivateSnippetsOnly) {
-            onlyPrivate = Optional.of(true);
-            onlyPublic = Optional.empty();
-        }
-
-        if (this.searchFavoriteSnippetsOnly) {
-            onlyFavorite = Optional.of(true);
-        }
+        var visibilityForQuery = snippetVisibility.prepareForQuery();
 
         // Make the request to get snippets from Codiga
-        java.util.List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, onlyPublic, onlyPrivate, onlyFavorite);
+        List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets =
+            codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, visibilityForQuery.getOnlyPublic(), visibilityForQuery.getOnlyPrivate(), visibilityForQuery.getOnlyFavorite());
 
         // Create the snippet panel.
-        java.util.List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext, toolWindow, project)).collect(Collectors.toList());
+        List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext, toolWindow, project)).collect(Collectors.toList());
 
         snippetsPanel.removeAll();
         snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));
