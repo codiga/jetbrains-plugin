@@ -1,22 +1,15 @@
 package io.codiga.plugins.jetbrains.completion.inline;
 
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
+import io.codiga.plugins.jetbrains.testutils.TestBase;
 
 /**
  * Integration test for {@link AcceptInlineAction}, {@link ShowNextInlineCompletion} and {@link ShowPreviousInlineCompletion}.
  */
-public class InlineCompletionTest extends BasePlatformTestCase {
+public class InlineCompletionTest extends TestBase {
 
     @Override
-    protected String getTestDataPath() {
-        String communityPath = PlatformTestUtil.getCommunityPath();
-        String homePath = IdeaTestExecutionPolicy.getHomePathWithPolicy();
-        if (communityPath.startsWith(homePath)) {
-            return communityPath.substring(homePath.length()) + "src/test/data/completion/inline";
-        }
+    protected String getTestDataRelativePath() {
         return "src/test/data/completion/inline";
     }
 

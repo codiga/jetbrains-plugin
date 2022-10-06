@@ -1,24 +1,18 @@
 package io.codiga.plugins.jetbrains.testutils;
 
+import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.junit.Ignore;
+import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 
-@Ignore
-public class TestBase extends BasePlatformTestCase {
-
-    public TestBase() {
-        super();
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+/**
+ * Base test class for integration tests.
+ */
+public abstract class TestBase extends BasePlatformTestCase {
 
     public final String readFile(String path){
         String completePath = this.getTestDataPath() + "/" + path;
@@ -55,6 +49,21 @@ public class TestBase extends BasePlatformTestCase {
 
     @Override
     protected String getTestDataPath() {
+        String communityPath = PlatformTestUtil.getCommunityPath();
+        String homePath = IdeaTestExecutionPolicy.getHomePathWithPolicy();
+        if (communityPath.startsWith(homePath)) {
+            return communityPath.substring(homePath.length()) + getTestDataRelativePath();
+        }
+        return getTestDataRelativePath();
+    }
+
+    /**
+     * Returns the path of the test data folder relative to the project root.
+     * <p>
+     * Override in test classes if you work with another test data folder.
+     */
+    protected String getTestDataRelativePath() {
         return "src/test/data";
     }
+
 }

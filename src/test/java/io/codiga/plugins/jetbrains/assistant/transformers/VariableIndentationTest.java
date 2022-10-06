@@ -1,24 +1,15 @@
 package io.codiga.plugins.jetbrains.assistant.transformers;
 
-
 import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
+import io.codiga.plugins.jetbrains.testutils.TestBase;
 
-public class VariableIndentationTest extends BasePlatformTestCase {
+public class VariableIndentationTest extends TestBase {
 
   @Override
-  protected String getTestDataPath() {
-    String communityPath = PlatformTestUtil.getCommunityPath();
-    String homePath = IdeaTestExecutionPolicy.getHomePathWithPolicy();
-    if (communityPath.startsWith(homePath)) {
-      return communityPath.substring(homePath.length()) + "src/test/data/transformers";
-    }
+  protected String getTestDataRelativePath() {
     return "src/test/data/transformers";
   }
-
 
   public void testIndentation() {
     AppSettingsState.getInstance().setUseInlineCompletion(false);
