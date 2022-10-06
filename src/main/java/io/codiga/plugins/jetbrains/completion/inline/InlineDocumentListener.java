@@ -14,6 +14,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Alarm;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.SnippetVisibility;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
@@ -161,7 +162,7 @@ public class InlineDocumentListener implements DocumentListener {
             return;
         }
 
-        var snippetVisibility = new SnippetVisibility();
+        var snippetVisibility = new SnippetVisibility().prepareForQuery();
 
         LOGGER.debug(String.format("[InlineDocumentListener] initiate search with onlyPublic %s, onlyPrivate %s, onlyFavorite %s",
             snippetVisibility.getOnlyPublic(),
