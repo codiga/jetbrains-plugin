@@ -39,6 +39,7 @@ dependencies {
 
     // OS detection and file handling
     implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("commons-io:commons-io:2.11.0")
 
     implementation("com.google.code.gson:gson:2.9.1")
 
