@@ -12,6 +12,19 @@
 ### Removed
 
 ### Fixed
+
+### Security
+
+## [1.7.16]
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
 - [#150](https://github.com/codiga/jetbrains-plugin/issues/150): Added a missing library dependency and fixed `NoClassDefFoundError`s in some IDEs. 
 
 ### Security
