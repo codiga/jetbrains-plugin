@@ -28,6 +28,7 @@ import static io.codiga.plugins.jetbrains.Constants.*;
 )
 public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
+    public static final String INVALID_RECORD_ERROR_MESSAGE = "find: An invalid record was encountered. (-67701)";
 
     // See https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#retrieve-stored-credentials
     CredentialAttributes credentialAttributes = createCredentialAttributes(CREDENTIALS_KEY);
@@ -93,7 +94,17 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
 
     public String getApiToken() {
-        Credentials credentials = PasswordSafe.getInstance().get(credentialAttributes);
+        Credentials credentials = null;
+        try {
+            credentials = PasswordSafe.getInstance().get(credentialAttributes);
+        } catch (Throwable e) {
+            //Prevents an issue related to macOS keychain credentials store to be surfaced to users,
+            // but still logging it to not lose sight of it.
+            // See https://github.com/codiga/jetbrains-plugin/issues/151
+            if (e.getMessage().contains(INVALID_RECORD_ERROR_MESSAGE)) {
+                LOGGER.debug("[AppSettingsState] macOS credentials store: An invalid record was encountered.");
+            }
+        }
         if (credentials != null) {
             return credentials.getPasswordAsString();
         }
@@ -103,7 +114,6 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public void setApiToken(String s) {
         Credentials credentials = new Credentials(CREDENTIALS_KEY, s);
         PasswordSafe.getInstance().set(credentialAttributes, credentials);
-
     }
 
     public boolean getPublicSnippetsOnly() {
