@@ -382,7 +382,7 @@ public class SnippetToolWindow {
             codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, visibilityForQuery.getOnlyPublic(), visibilityForQuery.getOnlyPrivate(), visibilityForQuery.getOnlyFavorite());
 
         // Create the snippet panel.
-        List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext, toolWindow, project)).collect(Collectors.toList());
+        List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext, project)).collect(Collectors.toList());
 
         snippetsPanel.removeAll();
         snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));

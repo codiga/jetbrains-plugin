@@ -9,7 +9,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.ui.EditorTextField;
@@ -66,14 +65,11 @@ public class SnippetPanel {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
-    private final ToolWindow toolWindow;
 
     public SnippetPanel(GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet,
                         CodeInsertionContext _codeInsertionContext,
-                        ToolWindow toolWindow,
                         Project project) {
         codeInsertionContext = _codeInsertionContext;
-        this.toolWindow = toolWindow;
 
         // The description is in Markdown, we need to decode it into HTML.
         String htmlDescription = Processor.process(snippet.description(), markdownDecorator, true);
