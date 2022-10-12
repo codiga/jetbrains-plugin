@@ -397,7 +397,7 @@ public class SnippetToolWindow {
         }
 
         loadingPanel.setVisible(false);
-        snippetsPanel.setVisible(true);
+        snippetsPanel.setVisible(false);
         noEditorPanel.setVisible(false);
 
         fixScrolling(scrollPane);
@@ -406,6 +406,13 @@ public class SnippetToolWindow {
             scrollPane.getViewport().setViewPosition(new Point(0, 0));
             snippetsPanel.revalidate();
             snippetsPanel.repaint();
+            //Notes regarding rendering the code snippet EditorTextFields:
+            //1. Making the snippets panel not visible before repainting, and visible again after it,
+            // helps to render all (not just the first) code snippet fields upon GUI update.
+            //2. 'setVisible()' must be inside 'invokeLater()' and after repainting,
+            // otherwise it'd be called before repaint, and the rendering would be broken.
+            //3. Leave 'SwingUtilities.invokeLater()', using 'Application.invokeLater()' the rendering is broken.
+            snippetsPanel.setVisible(true);
         });
     }
 }

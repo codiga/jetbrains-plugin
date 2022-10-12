@@ -1,0 +1,6 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="io.codiga.plugins.jetbrains.actions.snippet_search.service.PythonFileTypeService"/>
+    </extensions>
+</idea-plugin>

@@ -4,30 +4,12 @@
 
 ## [Unreleased]
 ### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
+- [#142](https://github.com/codiga/jetbrains-plugin/issues/142): Added syntax highlighting for the code snippets in the Snippet Search
+  tool window. Currently supported languages are Python and Java.
 
 ## [1.7.16]
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
 ### Fixed
-- [#150](https://github.com/codiga/jetbrains-plugin/issues/150): Added a missing library dependency and fixed `NoClassDefFoundError`s in some IDEs. 
-
-### Security
+- [#150](https://github.com/codiga/jetbrains-plugin/issues/150): Added a missing library dependency and fixed `NoClassDefFoundError`s in some IDEs.
 
 ## [1.7.15]
 
