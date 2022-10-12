@@ -50,6 +50,9 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="java-features.xml">com.intellij.modules.java</depends>
+    <!-- See https://plugins.jetbrains.com/docs/intellij/pycharm.html -->
+    <depends optional="true" config-file="python-features.xml">com.intellij.modules.python</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Snippet Search" secondary="true" icon="CodigaIcons.Codiga_default_icon" anchor="right"

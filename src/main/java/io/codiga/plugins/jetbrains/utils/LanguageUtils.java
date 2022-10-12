@@ -1,13 +1,32 @@
 package io.codiga.plugins.jetbrains.utils;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileTypes.FileType;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.actions.snippet_search.service.DefaultFileTypeService;
+import io.codiga.plugins.jetbrains.actions.snippet_search.service.JavaFileTypeService;
+import io.codiga.plugins.jetbrains.actions.snippet_search.service.PythonFileTypeService;
+import io.codiga.plugins.jetbrains.actions.snippet_search.service.SyntaxHighlightFileTypeService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
 
 public final class LanguageUtils {
 
-    private LanguageUtils() {}
+    /**
+     * Used for providing file types and related information for code syntax highlighting.
+     *
+     * @see io.codiga.plugins.jetbrains.actions.snippet_search.SnippetPanel
+     */
+    private static final Map<LanguageEnumeration, Class<? extends SyntaxHighlightFileTypeService>> LANGUAGE_TO_SERVICE = Map.of(
+        LanguageEnumeration.JAVA, JavaFileTypeService.class,
+        LanguageEnumeration.PYTHON, PythonFileTypeService.class
+    );
+
+    private LanguageUtils() {
+    }
 
 
     public static String getLanguageName(LanguageEnumeration languageEnumeration) {
@@ -77,13 +96,14 @@ public final class LanguageUtils {
 
     /**
      * Indicate if a line of code starts as a comment.
+     *
      * @param languageEnumeration
      * @param line
      * @return
      */
     public static boolean lineStartsWithComment(@NotNull LanguageEnumeration languageEnumeration, @NotNull String line) {
         String filteredLine = line.replaceAll(" ", "");
-        switch (languageEnumeration){
+        switch (languageEnumeration) {
             case JAVASCRIPT:
             case TYPESCRIPT:
             case C:
@@ -128,5 +148,19 @@ public final class LanguageUtils {
 
     public static long numberOfWordsInComment(@NotNull String line) {
         return Arrays.asList(removeLineFromCommentsSymbols(line).split(" ")).stream().filter(s -> s.length() > 0).count();
+    }
+
+    /**
+     * Returns the {@link FileType} associated with the argument language.
+     * <p>
+     * It looks up the appropriate file type provider application service, and returns its file type. If no service is
+     * found for the given language, it falls back to {@link DefaultFileTypeService}.
+     */
+    @NotNull
+    public static FileType getFileTypeForLanguage(LanguageEnumeration language) {
+        return Optional.ofNullable(LANGUAGE_TO_SERVICE.get(language))
+            .map(cls -> ApplicationManager.getApplication().getService(cls))
+            .map(SyntaxHighlightFileTypeService::getFileType)
+            .orElseGet(() -> ApplicationManager.getApplication().getService(DefaultFileTypeService.class).getFileType());
     }
 }

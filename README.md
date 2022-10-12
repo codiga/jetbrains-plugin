@@ -40,7 +40,9 @@ Accept a snippet using either Enter ↩ or Tab ↹. Go through the snippet varia
 
 ## Snippet Search
 
-Use the Codiga Snippets panel on the right to find code snippets that matches your environment.
+Use the Codiga Snippets panel on the right to find code snippets that match your environment.
+
+Syntax highlighting is available for Python and Java snippets.
 
 ![Code Snippet Search](images/snippet-search.gif "Code Snippet Search")
 
