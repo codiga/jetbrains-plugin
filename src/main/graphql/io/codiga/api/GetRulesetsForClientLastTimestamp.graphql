@@ -1,0 +1,3 @@
+query GetRulesetsForClientLastTimestamp($names: [String!]!, $fingerprint: String){
+    ruleSetsLastUpdatedTimestamp(names: $names, fingerprint: $fingerprint)
+}
