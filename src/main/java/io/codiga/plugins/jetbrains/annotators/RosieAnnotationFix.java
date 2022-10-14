@@ -21,7 +21,7 @@ import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.*;
 /**
  * This is an Intention Action to apply a fix with the series of edits on the code.
  * <p>
- * It is used and instantiated by {@link RosieAnnotator} via {@link AnnotationBuilder}.
+ * It is used and instantiated by {@link RosieAnnotator} via {@link com.intellij.lang.annotation.AnnotationBuilder}.
  */
 public class RosieAnnotationFix implements IntentionAction {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);

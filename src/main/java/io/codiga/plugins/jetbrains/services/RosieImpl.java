@@ -1,6 +1,7 @@
 package io.codiga.plugins.jetbrains.services;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.utils.RosieUtils.getRosieLanguage;
@@ -40,6 +42,7 @@ import static java.util.stream.Collectors.toList;
 public class RosieImpl implements Rosie {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final String ROSIE_POST_URL = "https://analysis.codiga.io/analyze";
+    private static final Gson GSON = new Gson();
 
     /**
      * Current supported languages by Rosie.
@@ -111,9 +114,6 @@ public class RosieImpl implements Rosie {
     @Override
     @NotNull
     public List<RosieAnnotation> getAnnotations(@NotNull PsiFile psiFile, @NotNull Project project) {
-        List<RosieAnnotation> annotations = List.of();
-        Gson gson = new Gson();
-
         if (psiFile.getVirtualFile() == null) {
             return List.of();
         }
@@ -131,13 +131,13 @@ public class RosieImpl implements Rosie {
             if (rulesString == null) {
                 return List.of();
             }
-            RosieRuleFile rosieRuleFile = gson.fromJson(rulesString, RosieRuleFile.class);
+            RosieRuleFile rosieRuleFile = GSON.fromJson(rulesString, RosieRuleFile.class);
             String codeBase64 = Base64.getEncoder().encodeToString(psiFile.getText().getBytes());
 
-            // Preapare the reqeust
+            // Prepare the request
             RosieRequest request = new RosieRequest(psiFile.getName(), getRosieLanguage(language), "utf8", codeBase64, rosieRuleFile.rules, true);
-            String requestString = gson.toJson(request);
-            StringEntity postingString = new StringEntity(requestString);//gson.tojson() converts your pojo to json
+            String requestString = GSON.toJson(request);
+            StringEntity postingString = new StringEntity(requestString); //gson.toJson() converts your pojo to json
             HttpPost httpPost = new HttpPost(ROSIE_POST_URL);
             httpPost.addHeader("User-Agent", getUserAgent());
             httpPost.addHeader("Content-Type", "application/json");
@@ -145,10 +145,11 @@ public class RosieImpl implements Rosie {
 
             CloseableHttpClient client = HttpClients.createDefault();
             HttpResponse response = client.execute(httpPost);
+            List<RosieAnnotation> annotations = List.of();
             if (response.getEntity() != null) {
 
                 String result = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                RosieResponse rosieResponse = gson.fromJson(result, RosieResponse.class);
+                RosieResponse rosieResponse = GSON.fromJson(result, RosieResponse.class);
                 LOGGER.debug("rosie response: " + rosieResponse);
 
                 annotations = rosieResponse.ruleResponses.stream()
@@ -160,7 +161,7 @@ public class RosieImpl implements Rosie {
         } catch (IOException unsupportedEncodingException) {
             LOGGER.error("[RosieImpl] ClientProtocolException", unsupportedEncodingException);
             return List.of();
-        } catch (com.google.gson.JsonSyntaxException jsonSyntaxException) {
+        } catch (JsonSyntaxException jsonSyntaxException) {
             LOGGER.error("[RosieImpl] cannot decode JSON", jsonSyntaxException);
             return List.of();
         }
