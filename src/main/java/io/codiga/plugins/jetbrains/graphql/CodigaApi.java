@@ -3,6 +3,7 @@ package io.codiga.plugins.jetbrains.graphql;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.api.GetRecipesForClientQuery;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
+import io.codiga.api.GetRulesetsForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 
 import java.util.List;
@@ -67,4 +68,8 @@ public interface CodigaApi {
                                                                                                      Optional<Boolean> onlySubscribed);
 
     public void recordRecipeUse(Long recipeId);
+
+    public Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames);
+
+    public List<GetRulesetsForClientQuery.RuleSetsForClient> getRulesetsForClient(List<String> ruleNames);
 }

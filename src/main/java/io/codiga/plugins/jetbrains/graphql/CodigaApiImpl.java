@@ -311,4 +311,75 @@ public final class CodigaApiImpl implements CodigaApi {
                 }
             });
     }
+
+    @Override
+    public Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames) {
+        ApiRequest<Optional<Long>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+
+
+        ApolloQueryCall<GetRulesetsForClientLastTimestampQuery.Data> queryCall = apolloClient.query(
+                new GetRulesetsForClientLastTimestampQuery(ruleNames, fingerprint))
+            .toBuilder()
+            .requestHeaders(getHeaders())
+            .build();
+        queryCall.enqueue(
+            new ApolloCall.Callback<GetRulesetsForClientLastTimestampQuery.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<GetRulesetsForClientLastTimestampQuery.Data> response) {
+                    if (response.getData() == null) {
+                        apiRequest.setError();
+                    } else {
+                        Object responseObject = response.getData().ruleSetsLastUpdatedTimestamp();
+                        if (responseObject == null) {
+                            apiRequest.setData(Optional.empty());
+                        } else {
+                            Long longValue = ((BigDecimal) responseObject).longValue();
+                            apiRequest.setData(Optional.of(longValue));
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    apiRequest.setError();
+                }
+            });
+
+        return apiRequest.getData().orElse(Optional.empty());
+    }
+
+    @Override
+    public List<GetRulesetsForClientQuery.RuleSetsForClient> getRulesetsForClient(List<String> ruleNames) {
+        ApiRequest<List<GetRulesetsForClientQuery.RuleSetsForClient>> apiRequest = new ApiRequest();
+        AppSettingsState settings = AppSettingsState.getInstance();
+        String fingerPrintText = settings.getFingerprint();
+
+
+        ApolloQueryCall<GetRulesetsForClientQuery.Data> queryCall = apolloClient.query(
+                new GetRulesetsForClientQuery(ruleNames, fingerPrintText))
+            .toBuilder()
+            .requestHeaders(getHeaders())
+            .build();
+        queryCall.enqueue(
+            new ApolloCall.Callback<GetRulesetsForClientQuery.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<GetRulesetsForClientQuery.Data> response) {
+                    if (response.getData() == null) {
+                        apiRequest.setError();
+                    } else {
+                        apiRequest.setData(response.getData().ruleSetsForClient());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    apiRequest.setError();
+                }
+            });
+
+        return apiRequest.getData().orElse(ImmutableList.of());
+    }
 }

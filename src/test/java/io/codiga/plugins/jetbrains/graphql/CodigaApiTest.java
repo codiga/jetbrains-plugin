@@ -1,10 +1,7 @@
 package io.codiga.plugins.jetbrains.graphql;
 
 import com.google.common.collect.ImmutableList;
-import io.codiga.api.GetProjectsQuery;
-import io.codiga.api.GetRecipesForClientByShortcutQuery;
-import io.codiga.api.GetRecipesForClientQuery;
-import io.codiga.api.GetRecipesForClientSemanticQuery;
+import io.codiga.api.*;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.testutils.Constants;
 
@@ -231,5 +228,15 @@ public final class CodigaApiTest implements CodigaApi {
     @Override
     public void recordRecipeUse(Long recipeId) {
 
+    }
+
+    @Override
+    public Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<GetRulesetsForClientQuery.RuleSetsForClient> getRulesetsForClient(List<String> ruleNames) {
+        return List.of();
     }
 }
