@@ -8,7 +8,11 @@ import java.util.List;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 /**
- * An updated  version of the annotation that contains an offset for JetBrains
+ * An updated version of {@link RosieAnnotation}. It stores the start and end offsets based
+ * on the current Editor. This is used in {@link io.codiga.plugins.jetbrains.annotators.RosieAnnotator}
+ * to provide the annotation information.
+ *
+ * @see RosieAnnotation
  */
 public class RosieAnnotationJetBrains {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
@@ -21,14 +25,14 @@ public class RosieAnnotationJetBrains {
     private String category;
 
 
-    public RosieAnnotationJetBrains(String ruleName, String message, String severity, String category, RosiePosition start, RosiePosition end, List<RosieViolationFix> fixes, Editor editor) {
-        this.ruleName = ruleName;
-        this.message = message;
-        this.severity = severity;
-        this.category = category;
-        this.start = start.getOffset(editor);
-        this.end = end.getOffset(editor);
-        this.fixes = List.copyOf(fixes);
+    public RosieAnnotationJetBrains(RosieAnnotation annotation, Editor editor) {
+        this.ruleName = annotation.getRuleName();
+        this.message = annotation.getMessage();
+        this.severity = annotation.getSeverity();
+        this.category = annotation.getCategory();
+        this.start = annotation.getStart().getOffset(editor);
+        this.end = annotation.getEnd().getOffset(editor);
+        this.fixes = List.copyOf(annotation.getFixes());
     }
 
 

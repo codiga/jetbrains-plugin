@@ -1,9 +1,9 @@
 package io.codiga.plugins.jetbrains.annotators;
 
-
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -19,12 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.*;
 import static io.codiga.plugins.jetbrains.ui.UIConstants.ANNOTATION_PREFIX;
+import static java.util.stream.Collectors.toList;
 
+/**
+ * Source type for {@code RosieAnnotator#collectInformation()}.
+ */
 class RosieAnnotatorInformation {
     public Project project;
     public PsiFile psiFile;
@@ -37,12 +40,23 @@ class RosieAnnotatorInformation {
     }
 }
 
-public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotator<RosieAnnotatorInformation, List<RosieAnnotationJetBrains>> {
-
+/**
+ * Annotates the current Editor with information returned by the Rosie service,
+ * and when applicable, provides quick fixes for those code violations.
+ * <p>
+ * Type hierarchy of an annotation fix:
+ * <pre>
+ * - {@link RosieAnnotator}
+ *   - {@link RosieAnnotationFix}
+ *     - {@link RosieViolationFix}
+ *       - {@link io.codiga.plugins.jetbrains.model.rosie.RosieViolationFixEdit}
+ *         - {@link io.codiga.plugins.jetbrains.model.rosie.RosiePosition}
+ * </pre>
+ */
+public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation, List<RosieAnnotationJetBrains>> {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final Rosie rosieService = ApplicationManager.getApplication().getService(Rosie.class);
     private final AppSettingsState settings = AppSettingsState.getInstance();
-
 
     /**
      * This function collects all the information at startup (see the doc of the abstract class).
@@ -81,16 +95,9 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
         long startTime = System.currentTimeMillis();
         List<RosieAnnotationJetBrains> annotations = rosieService
             .getAnnotations(rosieAnnotatorInformation.psiFile, rosieAnnotatorInformation.project)
-            .stream().map(annotation -> new RosieAnnotationJetBrains(
-                annotation.getRuleName(),
-                annotation.getMessage(),
-                annotation.getSeverity(),
-                annotation.getCategory(),
-                annotation.getStart(),
-                annotation.getEnd(),
-                annotation.getFixes(),
-                rosieAnnotatorInformation.editor))
-            .collect(Collectors.toList());
+            .stream()
+            .map(annotation -> new RosieAnnotationJetBrains(annotation, rosieAnnotatorInformation.editor))
+            .collect(toList());
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
         LOGGER.info(String.format("rosie call time roundtrip: %s", executionTime));
@@ -111,7 +118,9 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
     }
 
     /**
-     * Generate an annotation for a violation
+     * Generate an annotation for a violation.
+     * <p>
+     * A "fix" for opening the rule information in the browser is always added.
      *
      * @param psiFile    - the file to annotate
      * @param annotation - the annotation we need
