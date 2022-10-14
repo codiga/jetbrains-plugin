@@ -29,10 +29,10 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.utils.RosieUtils.getRosieLanguage;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Default implementation of the Rosie API.
@@ -150,15 +150,9 @@ public class RosieImpl implements Rosie {
                 RosieResponse rosieResponse = gson.fromJson(result, RosieResponse.class);
                 LOGGER.debug("rosie response: " + rosieResponse);
 
-                annotations = rosieResponse.ruleResponses.stream().flatMap(res -> res.violations.stream().map(violation -> new RosieAnnotation(
-                    res.identifier,
-                    violation.message,
-                    violation.severity,
-                    violation.category,
-                    violation.start,
-                    violation.end,
-                    violation.fixes
-                ))).collect(Collectors.toList());
+                annotations = rosieResponse.ruleResponses.stream()
+                    .flatMap(res -> res.violations.stream().map(violation -> new RosieAnnotation(res.identifier, violation)))
+                    .collect(toList());
             }
             client.close();
             return annotations;

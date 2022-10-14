@@ -23,20 +23,14 @@ public class RosieAnnotation {
     List<RosieViolationFix> fixes;
 
 
-    public RosieAnnotation(String name,
-                           String message,
-                           String severity,
-                           String category,
-                           RosiePosition positionStart,
-                           RosiePosition positionEnd,
-                           List<RosieViolationFix> fixes) {
+    public RosieAnnotation(String name, RosieViolation violation) {
         this.ruleName = name;
-        this.message = message;
-        this.severity = severity;
-        this.category = category;
-        this.start = positionStart;
-        this.end = positionEnd;
-        this.fixes = fixes;
+        this.message = violation.message;
+        this.severity = violation.severity;
+        this.category = violation.category;
+        this.start = violation.start;
+        this.end = violation.end;
+        this.fixes = violation.fixes;
     }
 
     public String getMessage() {
