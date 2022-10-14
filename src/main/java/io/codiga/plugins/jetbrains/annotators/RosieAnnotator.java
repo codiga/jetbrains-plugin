@@ -25,6 +25,9 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.*;
 import static io.codiga.plugins.jetbrains.ui.UIConstants.ANNOTATION_PREFIX;
 
+/**
+ * Source type for {@code RosieAnnotator#collectInformation()}.
+ */
 class RosieAnnotatorInformation {
     public Project project;
     public PsiFile psiFile;
@@ -37,8 +40,20 @@ class RosieAnnotatorInformation {
     }
 }
 
-public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotator<RosieAnnotatorInformation, List<RosieAnnotationJetBrains>> {
-
+/**
+ * Annotates the current Editor with information returned by the Rosie service,
+ * and when applicable, provides quick fixes for those code violations.
+ * <p>
+ * Type hierarchy of an annotation fix:
+ * <pre>
+ * - {@link RosieAnnotator}
+ *   - {@link RosieAnnotationFix}
+ *     - {@link RosieViolationFix}
+ *       - {@link io.codiga.plugins.jetbrains.model.rosie.RosieViolationFixEdit}
+ *         - {@link io.codiga.plugins.jetbrains.model.rosie.RosiePosition}
+ * </pre>
+ */
+public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation, List<RosieAnnotationJetBrains>> {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final Rosie rosieService = ApplicationManager.getApplication().getService(Rosie.class);
     private final AppSettingsState settings = AppSettingsState.getInstance();
@@ -111,7 +126,9 @@ public class RosieAnnotator extends com.intellij.lang.annotation.ExternalAnnotat
     }
 
     /**
-     * Generate an annotation for a violation
+     * Generate an annotation for a violation.
+     * <p>
+     * A "fix" for opening the rule information in the browser is always added.
      *
      * @param psiFile    - the file to annotate
      * @param annotation - the annotation we need

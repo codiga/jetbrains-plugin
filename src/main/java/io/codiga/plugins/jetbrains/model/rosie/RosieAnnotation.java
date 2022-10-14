@@ -6,6 +6,12 @@ import java.util.List;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
+/**
+ * Annotation information created by {@link io.codiga.plugins.jetbrains.services.RosieImpl} based on the
+ * information retrieved in {@link RosieResponse} from the Codiga API.
+ *
+ * @see RosieAnnotationJetBrains
+ */
 public class RosieAnnotation {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final String ruleName;

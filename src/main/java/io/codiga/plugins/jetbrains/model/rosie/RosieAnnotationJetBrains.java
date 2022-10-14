@@ -8,7 +8,11 @@ import java.util.List;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 /**
- * An updated  version of the annotation that contains an offset for JetBrains
+ * An updated version of {@link RosieAnnotation}. It stores the start and end offsets based
+ * on the current Editor. This is used in {@link io.codiga.plugins.jetbrains.annotators.RosieAnnotator}
+ * to provide the annotation information.
+ *
+ * @see RosieAnnotation
  */
 public class RosieAnnotationJetBrains {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);

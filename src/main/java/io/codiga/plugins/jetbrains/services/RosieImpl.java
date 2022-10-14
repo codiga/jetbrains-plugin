@@ -34,11 +34,18 @@ import java.util.stream.Collectors;
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.utils.RosieUtils.getRosieLanguage;
 
+/**
+ * Default implementation of the Rosie API.
+ */
 public class RosieImpl implements Rosie {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final String ROSIE_POST_URL = "https://analysis.codiga.io/analyze";
 
-    // Current supported languages by Rosie
+    /**
+     * Current supported languages by Rosie.
+     * <p>
+     * See also {@link io.codiga.plugins.jetbrains.utils.RosieUtils#getRosieLanguage(LanguageEnumeration)}.
+     */
     private static final List<LanguageEnumeration> SUPPORTED_LANGUAGES = List.of(LanguageEnumeration.PYTHON);
 
     public RosieImpl() {
