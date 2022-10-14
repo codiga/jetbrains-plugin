@@ -109,6 +109,7 @@ public class RosieImpl implements Rosie {
     }
 
     @Override
+    @NotNull
     public List<RosieAnnotation> getAnnotations(@NotNull PsiFile psiFile, @NotNull Project project) {
         List<RosieAnnotation> annotations = List.of();
         Gson gson = new Gson();

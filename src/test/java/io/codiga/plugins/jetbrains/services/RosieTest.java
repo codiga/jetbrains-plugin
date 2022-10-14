@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class RosieTest implements Rosie {
     @Override
+    @NotNull
     public List<RosieAnnotation> getAnnotations(@NotNull PsiFile psiFile, @NotNull Project project) {
         return List.of();
     }
