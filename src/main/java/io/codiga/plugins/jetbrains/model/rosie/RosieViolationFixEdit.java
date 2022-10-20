@@ -1,10 +1,11 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
 
 /**
  * Represents a single quick fix edit in an Editor.
  */
+@EqualsAndHashCode
 public class RosieViolationFixEdit {
     /**
      * The position of the edit from where the fix will begin.
@@ -30,18 +31,5 @@ public class RosieViolationFixEdit {
         this.end = end;
         this.content = content;
         this.editType = editType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RosieViolationFixEdit that = (RosieViolationFixEdit) o;
-        return Objects.equals(start, that.start) && Objects.equals(end, that.end) && Objects.equals(content, that.content) && Objects.equals(editType, that.editType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(start, end, content, editType);
     }
 }

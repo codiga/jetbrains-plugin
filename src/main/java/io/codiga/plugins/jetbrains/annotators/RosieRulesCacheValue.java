@@ -5,15 +5,16 @@ import static java.util.stream.Collectors.toMap;
 
 import io.codiga.api.GetRulesetsForClientQuery;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRule;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 /**
  * Cache value for the {@link RosieRulesCache}.
  */
+@EqualsAndHashCode
 public final class RosieRulesCacheValue {
 
     /**
@@ -47,19 +48,7 @@ public final class RosieRulesCacheValue {
         return rosieRules;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RosieRulesCacheValue that = (RosieRulesCacheValue) o;
-        return Objects.equals(rules, that.rules);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(rules);
-    }
-
+    @EqualsAndHashCode
     public static final class RuleWithNames {
         public final String rulesetName;
         public final String ruleName;
@@ -69,19 +58,6 @@ public final class RosieRulesCacheValue {
             this.rulesetName = rulesetName;
             this.ruleName = rule.name();
             this.rosieRule = new RosieRule(rule);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            RuleWithNames that = (RuleWithNames) o;
-            return Objects.equals(rulesetName, that.rulesetName) && Objects.equals(ruleName, that.ruleName) && Objects.equals(rosieRule, that.rosieRule);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(rulesetName, ruleName, rosieRule);
         }
     }
 }

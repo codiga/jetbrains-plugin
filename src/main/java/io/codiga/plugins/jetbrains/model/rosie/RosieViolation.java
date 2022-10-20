@@ -1,11 +1,13 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents a code violation found by Rosie.
  */
+@EqualsAndHashCode
 public class RosieViolation {
     public String message;
     /**
@@ -31,19 +33,6 @@ public class RosieViolation {
         this.severity = severity;
         this.category = category;
         this.fixes = fixes;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RosieViolation that = (RosieViolation) o;
-        return Objects.equals(message, that.message) && Objects.equals(start, that.start) && Objects.equals(end, that.end) && Objects.equals(severity, that.severity) && Objects.equals(category, that.category) && Objects.equals(fixes, that.fixes);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(message, start, end, severity, category, fixes);
     }
 }
 

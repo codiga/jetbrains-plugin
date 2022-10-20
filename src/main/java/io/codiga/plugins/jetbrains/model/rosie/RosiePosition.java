@@ -3,15 +3,15 @@ package io.codiga.plugins.jetbrains.model.rosie;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
-import java.util.Objects;
-
 /**
  * Represents a position in an editor by its line number and its column number within that line.
  */
+@EqualsAndHashCode
 public final class RosiePosition {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     public int line;
@@ -43,18 +43,5 @@ public final class RosiePosition {
      */
     private int adjustColumnOffset(int columnOffset) {
         return columnOffset != 0 ? (columnOffset - 1) : columnOffset;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RosiePosition that = (RosiePosition) o;
-        return line == that.line && col == that.col;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(line, col);
     }
 }
