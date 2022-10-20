@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
+import java.util.Objects;
+
 /**
  * Represents a position in an editor by its line number and its column number within that line.
  */
@@ -32,4 +34,16 @@ public final class RosiePosition {
         return offset;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RosiePosition that = (RosiePosition) o;
+        return line == that.line && col == that.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, col);
+    }
 }

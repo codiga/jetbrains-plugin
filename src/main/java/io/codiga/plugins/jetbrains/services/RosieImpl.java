@@ -98,7 +98,11 @@ public class RosieImpl implements Rosie {
                 LOGGER.debug("rosie response: " + rosieResponse);
 
                 annotations = rosieResponse.ruleResponses.stream()
-                    .flatMap(res -> res.violations.stream().map(violation -> new RosieAnnotation(res.identifier, violation)))
+                    .flatMap(res -> res.violations.stream()
+                        //distinct()' makes sure that if multiple, completely identical, violations are returned
+                        // for the same problem from Rosie, only one instance is shown by RosieAnnotator.
+                        .distinct()
+                        .map(violation -> new RosieAnnotation(res.identifier, violation)))
                     .collect(toList());
             }
             client.close();
