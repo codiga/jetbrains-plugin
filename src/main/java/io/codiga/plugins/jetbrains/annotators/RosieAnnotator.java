@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
@@ -66,7 +67,6 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
      * @param psiFile   - the file where information is being collected
      * @param editor    - the editor where the function is triggered
      * @param hasErrors - report if it has error
-     * @return the PsiFile - return the initial file, no modification is being done.
      */
     @Override
     @Nullable
@@ -104,62 +104,6 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         return annotations;
     }
 
-    private ProblemHighlightType getProblemHighlightType(String rosieSeverity) {
-        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_CRITICAL)) {
-            return ProblemHighlightType.ERROR;
-        }
-        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_ERROR)) {
-            return ProblemHighlightType.WARNING;
-        }
-        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_WARNING)) {
-            return ProblemHighlightType.WEAK_WARNING;
-        }
-        return ProblemHighlightType.INFORMATION;
-    }
-
-    /**
-     * Generate an annotation for a violation.
-     * <p>
-     * A "fix" for opening the rule information in the browser is always added.
-     *
-     * @param psiFile    - the file to annotate
-     * @param annotation - the annotation we need
-     * @param holder     - the holder of the annotation
-     */
-    private void generateAnnotationForViolation(
-        @NotNull final PsiFile psiFile,
-        @NotNull final RosieAnnotationJetBrains annotation,
-        @NotNull AnnotationHolder holder) {
-
-        final String message = String.format("%s (%s)", annotation.getMessage(), ANNOTATION_PREFIX);
-
-        final TextRange textRange = psiFile.getTextRange();
-
-        TextRange annotationRange = new TextRange(annotation.getStart(), annotation.getEnd());
-        LOGGER.debug("annotation range: " + annotationRange);
-
-        if (!textRange.contains(annotationRange.getEndOffset()) ||
-            !textRange.contains(annotationRange.getStartOffset())) {
-            LOGGER.debug("range outside of the scope");
-            return;
-        }
-
-        AnnotationBuilder annotationBuilder = holder
-            .newAnnotation(HighlightSeverity.ERROR, message)
-            .highlightType(ProblemHighlightType.ERROR)
-            .range(annotationRange);
-
-
-        for (RosieViolationFix rosieViolationFix : annotation.getFixes()) {
-            annotationBuilder.withFix(new RosieAnnotationFix(rosieViolationFix));
-        }
-        annotationBuilder.withFix(new AnnotationFixOpenBrowser(annotation));
-
-
-        LOGGER.info("Creating annotation with range: " + annotationRange);
-        annotationBuilder.create();
-    }
-
     /**
      * Create all the UI elements to create an annotation.
      *
@@ -182,5 +126,61 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         for (RosieAnnotationJetBrains annotation : annotations) {
             generateAnnotationForViolation(psiFile, annotation, holder);
         }
+    }
+
+    /**
+     * Generate an annotation for a violation.
+     * <p>
+     * A "fix" for opening the rule information in the browser is always added.
+     *
+     * @param psiFile    - the file to annotate
+     * @param annotation - the annotation we need
+     * @param holder     - the holder of the annotation
+     */
+    private void generateAnnotationForViolation(
+        @NotNull final PsiFile psiFile,
+        @NotNull final RosieAnnotationJetBrains annotation,
+        @NotNull AnnotationHolder holder) {
+
+        final String message = String.format("%s (%s)", annotation.getMessage(), ANNOTATION_PREFIX);
+
+        final TextRange fileRange = psiFile.getTextRange();
+
+        TextRange annotationRange = new TextRange(annotation.getStart(), annotation.getEnd());
+        LOGGER.debug("annotation range: " + annotationRange);
+
+        if (!fileRange.contains(annotationRange.getEndOffset()) ||
+            !fileRange.contains(annotationRange.getStartOffset())) {
+            LOGGER.debug("range outside of the scope");
+            return;
+        }
+
+        var highlightTypes = getHighlightTypes(annotation.getSeverity());
+        AnnotationBuilder annotationBuilder = holder
+            .newAnnotation(highlightTypes.first, message)
+            .highlightType(highlightTypes.second)
+            .range(annotationRange);
+
+        for (RosieViolationFix rosieViolationFix : annotation.getFixes()) {
+            annotationBuilder.withFix(new RosieAnnotationFix(rosieViolationFix));
+        }
+        annotationBuilder.withFix(new AnnotationFixOpenBrowser(annotation));
+
+
+        LOGGER.info("Creating annotation with range: " + annotationRange);
+        annotationBuilder.create();
+    }
+
+    private Pair<HighlightSeverity, ProblemHighlightType> getHighlightTypes(String rosieSeverity) {
+        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_CRITICAL)) {
+            return Pair.create(HighlightSeverity.ERROR, ProblemHighlightType.ERROR);
+        }
+        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_ERROR)) {
+            return Pair.create(HighlightSeverity.WARNING, ProblemHighlightType.WARNING);
+        }
+        if (rosieSeverity.equalsIgnoreCase(ROSIE_SEVERITY_WARNING)) {
+            return Pair.create(HighlightSeverity.WEAK_WARNING, ProblemHighlightType.WEAK_WARNING);
+        }
+        return Pair.create(HighlightSeverity.WEAK_WARNING, ProblemHighlightType.INFORMATION);
     }
 }
