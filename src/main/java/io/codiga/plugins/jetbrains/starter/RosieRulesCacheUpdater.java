@@ -101,7 +101,7 @@ public class RosieRulesCacheUpdater implements StartupActivity {
                             codigaApi.getRulesetsForClient(rulesetNames).ifPresent(rulesets -> {
                                 rulesCache.updateCacheFrom(rulesets);
                                 rulesCache.setLastUpdatedTimeStamp(timestamp);
-                                LOGGER.debug("[AppStarter] Updated rulesets and timestamp in local Rosie cache for project: " + project.getName());
+                                LOGGER.debug("[RosieRulesCacheUpdater] Updated rulesets and timestamp in local Rosie cache for project: " + project.getName());
                             }));
                 }
             }
@@ -124,7 +124,7 @@ public class RosieRulesCacheUpdater implements StartupActivity {
                         RosieRulesCacheUpdater.this.rosieCacheUpdaters.remove(project);
                         AppExecutorUtil.getAppScheduledExecutorService()
                             .schedule(() -> updater.cancel(true), 500, MILLISECONDS);
-                        LOGGER.debug("[AppStarter] Cancelled Rosie rules cache updater for project: " + project.getName());
+                        LOGGER.debug("[RosieRulesCacheUpdater] Cancelled Rosie rules cache updater for project: " + project.getName());
                     }
                 }
             });
