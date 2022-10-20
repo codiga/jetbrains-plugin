@@ -2,6 +2,7 @@ package io.codiga.plugins.jetbrains.services;
 
 import static java.util.stream.Collectors.toList;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
@@ -58,45 +59,53 @@ public final class CodigaConfigFileUtil {
 
     /**
      * Returns the list of ruleset names configured in the codiga.yml file.
+     * <p>
+     * In case of integration tests the caching is dropped. For some reason they fail with the following error,
+     * that doesn't occur outside test execution:
+     * <p>
+     * <i>"... is retaining PSI, causing memory leaks and possible invalid element access"</i>
      *
      * @param codigaConfigFile the codiga.yml file in the current project
      * @return the list of ruleset names, or empty list if the codiga.yml file is configured incorrectly
      */
     @NotNull
     public static List<String> collectRulesetNames(@NotNull YAMLFile codigaConfigFile) {
-        return CachedValuesManager.getManager(codigaConfigFile.getProject()).getCachedValue(codigaConfigFile.getProject(), () -> {
-            //Since 'RosieRulesCacheUpdater' is not DumbAware, it is executed on EDT, thus needed to wrap the PSI operation in a ReadAction.
-            List<String> configuredRulesetNames = ReadAction.compute(() -> {
-                var documents = codigaConfigFile.getDocuments();
+        return ApplicationManager.getApplication().isUnitTestMode()
+            ? readRulesetNames(codigaConfigFile)
+            : CachedValuesManager.getManager(codigaConfigFile.getProject()).getCachedValue(codigaConfigFile.getProject(),
+            () -> CachedValueProvider.Result.create(readRulesetNames(codigaConfigFile), codigaConfigFile));
+    }
 
-                if (documents.size() == 1) {
-                    var topLevelValue = documents.get(0).getTopLevelValue();
+    private static List<String> readRulesetNames(@NotNull YAMLFile codigaConfigFile) {
+        //Since 'RosieRulesCacheUpdater' is not DumbAware, it is executed on EDT, thus needed to wrap the PSI operation in a ReadAction.
+        return ReadAction.compute(() -> {
+            var documents = codigaConfigFile.getDocuments();
 
-                    if (topLevelValue instanceof YAMLBlockMappingImpl) {
-                        var rulesetsKeyValue = ((YAMLBlockMappingImpl) topLevelValue).getFirstKeyValue();
-                        //If the top level mapping is called "rulesets"
-                        if (RULESETS.equals(rulesetsKeyValue.getName())) {
-                            var rulesetsValue = rulesetsKeyValue.getValue();
-                            if (rulesetsValue instanceof YAMLSequence) {
-                                var rulesetNames = (YAMLSequence) rulesetsValue;
+            if (documents.size() == 1) {
+                var topLevelValue = documents.get(0).getTopLevelValue();
 
-                                //Return the list of ruleset names.
-                                // If the list contains items other than plain text ones, they are not included.
-                                return rulesetNames.getItems()
-                                    .stream()
-                                    .map(YAMLSequenceItem::getValue)
-                                    .filter(YAMLPlainTextImpl.class::isInstance) //this handles items as well that have an empty value
-                                    .map(YAMLPlainTextImpl.class::cast)
-                                    .map(YAMLScalarImpl::getTextValue)
-                                    .collect(toList());
-                            }
+                if (topLevelValue instanceof YAMLBlockMappingImpl) {
+                    var rulesetsKeyValue = ((YAMLBlockMappingImpl) topLevelValue).getFirstKeyValue();
+                    //If the top level mapping is called "rulesets"
+                    if (RULESETS.equals(rulesetsKeyValue.getName())) {
+                        var rulesetsValue = rulesetsKeyValue.getValue();
+                        if (rulesetsValue instanceof YAMLSequence) {
+                            var rulesetNames = (YAMLSequence) rulesetsValue;
+
+                            //Return the list of ruleset names.
+                            // If the list contains items other than plain text ones, they are not included.
+                            return rulesetNames.getItems()
+                                .stream()
+                                .map(YAMLSequenceItem::getValue)
+                                .filter(YAMLPlainTextImpl.class::isInstance) //this handles items as well that have an empty value
+                                .map(YAMLPlainTextImpl.class::cast)
+                                .map(YAMLScalarImpl::getTextValue)
+                                .collect(toList());
                         }
                     }
                 }
-                return List.of();
-            });
-
-            return CachedValueProvider.Result.create(configuredRulesetNames, codigaConfigFile);
+            }
+            return List.of();
         });
     }
 
