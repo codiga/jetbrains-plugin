@@ -71,5 +71,11 @@ public interface CodigaApi {
 
     public Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames);
 
-    public List<GetRulesetsForClientQuery.RuleSetsForClient> getRulesetsForClient(List<String> ruleNames);
+    /**
+     * Retrieves the rulesets from the Codiga server for the provided ruleset names configured in {@code codiga.yml}.
+     *
+     * @param ruleNames the ruleset names
+     * @return the list of rulesets, or empty optional if there was an error during data retrieval
+     */
+    Optional<List<GetRulesetsForClientQuery.RuleSetsForClient>> getRulesetsForClient(List<String> ruleNames);
 }

@@ -352,7 +352,7 @@ public final class CodigaApiImpl implements CodigaApi {
     }
 
     @Override
-    public List<GetRulesetsForClientQuery.RuleSetsForClient> getRulesetsForClient(List<String> ruleNames) {
+    public Optional<List<GetRulesetsForClientQuery.RuleSetsForClient>> getRulesetsForClient(List<String> ruleNames) {
         ApiRequest<List<GetRulesetsForClientQuery.RuleSetsForClient>> apiRequest = new ApiRequest();
         AppSettingsState settings = AppSettingsState.getInstance();
         String fingerPrintText = settings.getFingerprint();
@@ -380,6 +380,6 @@ public final class CodigaApiImpl implements CodigaApi {
                 }
             });
 
-        return apiRequest.getData().orElse(ImmutableList.of());
+        return apiRequest.getData();
     }
 }
