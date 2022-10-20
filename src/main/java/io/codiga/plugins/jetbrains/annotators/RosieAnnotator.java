@@ -96,7 +96,7 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         List<RosieAnnotationJetBrains> annotations = rosieService
             .getAnnotations(rosieAnnotatorInformation.psiFile, rosieAnnotatorInformation.project)
             .stream()
-            .map(annotation -> new RosieAnnotationJetBrains(annotation, rosieAnnotatorInformation.editor))
+            .map(annotation -> new RosieAnnotationJetBrains(annotation, annotation.getRulesetName(), rosieAnnotatorInformation.editor))
             .collect(toList());
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;

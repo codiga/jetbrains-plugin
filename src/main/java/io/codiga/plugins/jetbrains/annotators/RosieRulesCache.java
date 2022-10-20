@@ -4,8 +4,8 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import io.codiga.api.GetRulesetsForClientQuery;
-import io.codiga.api.GetRulesetsForClientQuery.Rule;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.annotators.RosieRulesCacheValue.RuleWithNames;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRule;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLFile;
@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -80,24 +79,15 @@ public final class RosieRulesCache implements Disposable {
      */
     public void updateCacheFrom(List<GetRulesetsForClientQuery.RuleSetsForClient> rulesetsFromCodigaAPI) {
         var rulesByLanguage = rulesetsFromCodigaAPI.stream()
-            .flatMap(ruleset -> ruleset.rules().stream())
-            .collect(groupingBy(GetRulesetsForClientQuery.Rule::language))
+            .flatMap(ruleset -> ruleset.rules().stream().map(rule -> new RuleWithNames(ruleset.name(), rule)))
+            .collect(groupingBy(rule -> rule.rosieRule.language))
             .entrySet()
             .stream()
-            .collect(toMap(Map.Entry::getKey, entry -> new RosieRulesCacheValue(toRosieRule(entry.getValue()))));
+            .collect(toMap(entry -> LanguageEnumeration.safeValueOf(entry.getKey()), entry -> new RosieRulesCacheValue(entry.getValue())));
         //Clearing and repopulating the cache is easier than picking out one by one
         // the ones that remain, and the ones that have to be removed.
         cache.clear();
         cache.putAll(rulesByLanguage);
-    }
-
-    /**
-     * Converts the argument list of GraphQL {@link Rule}s to {@link RosieRule}s.
-     *
-     * @param rules the rules to map
-     */
-    private List<RosieRule> toRosieRule(List<GetRulesetsForClientQuery.Rule> rules) {
-        return rules.stream().map(RosieRule::new).collect(toList());
     }
 
     /**
@@ -107,9 +97,22 @@ public final class RosieRulesCache implements Disposable {
      * @param language the language to return the rules for, or empty list if there is no rule cached for the
      *                 provided language
      */
-    public List<RosieRule> getRulesForLanguage(LanguageEnumeration language) {
-        var cachedValue = cache.get(language);
-        return cachedValue != null ? cachedValue.getRules() : List.of();
+    public List<RosieRule> getRosieRulesForLanguage(LanguageEnumeration language) {
+        var cachedRules = cache.get(language);
+        return cachedRules != null ? cachedRules.getRosieRules() : List.of();
+    }
+
+    /**
+     * Returns the cached rules for the provided language and rule id.
+     * <p>
+     * Null value for non-existent mapping for a language is already handled in {@link #getRosieRulesForLanguage(LanguageEnumeration)}.
+     * <p>
+     * It should not return null when retrieving the rule for the rule id, since in {@code RosieImpl#getAnnotations()}
+     * the {@link io.codiga.plugins.jetbrains.model.rosie.RosieRuleResponse}s and their ids are based on the values
+     * cached here.
+     */
+    public RuleWithNames getRuleWithNamesFor(LanguageEnumeration language, String ruleId) {
+        return cache.get(language).getRules().get(ruleId);
     }
 
     /**

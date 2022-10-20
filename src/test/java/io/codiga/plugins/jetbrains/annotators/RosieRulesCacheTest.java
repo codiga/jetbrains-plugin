@@ -22,7 +22,7 @@ public class RosieRulesCacheTest extends TestBase {
 
         cache.updateCacheFrom(rulesets.get());
 
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.PYTHON), 3, "10", "11", "12");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON), 3, "10", "11", "12");
     }
 
     public void testStoresRulesFromSingleRulesetForAMultipleLanguagesInEmptyCache() {
@@ -32,8 +32,8 @@ public class RosieRulesCacheTest extends TestBase {
 
         cache.updateCacheFrom(rulesets.get());
 
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.PYTHON), 2, "10", "12");
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.JAVA), 1, "20");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON), 2, "10", "12");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.JAVA), 1, "20");
     }
 
     public void testStoresRulesFromMultipleRulesetsForSingleLanguageGroupedByLanguageInEmptyCache() {
@@ -47,7 +47,7 @@ public class RosieRulesCacheTest extends TestBase {
 
         cache.updateCacheFrom(rulesets.get());
 
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.PYTHON), 3, "10", "11", "12");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON), 3, "10", "11", "12");
     }
 
     public void testStoresRulesFromMultipleRulesetsForMultipleLanguagesGroupedByLanguageInEmptyCache() {
@@ -61,8 +61,8 @@ public class RosieRulesCacheTest extends TestBase {
 
         cache.updateCacheFrom(rulesets.get());
 
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.PYTHON), 2, "30", "31");
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.JAVA), 1, "20");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON), 2, "30", "31");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.JAVA), 1, "20");
     }
 
     public void testOverridesCacheWithNewRules() {
@@ -74,8 +74,8 @@ public class RosieRulesCacheTest extends TestBase {
 
         cache.updateCacheFrom(rulesets.get());
 
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.PYTHON), 2, "30", "31");
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.JAVA), 1, "20");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON), 2, "30", "31");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.JAVA), 1, "20");
 
         //Cache refresh
 
@@ -84,8 +84,8 @@ public class RosieRulesCacheTest extends TestBase {
 
         cache.updateCacheFrom(rulesetsNew.get());
 
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.PYTHON), 3, "10", "11", "12");
-        validateRuleCountAndRuleIds(cache.getRulesForLanguage(LanguageEnumeration.JAVA), 0);
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON), 3, "10", "11", "12");
+        validateRuleCountAndRuleIds(cache.getRosieRulesForLanguage(LanguageEnumeration.JAVA), 0);
     }
 
     public void testReturnsRulesForLanguage() {
@@ -95,10 +95,10 @@ public class RosieRulesCacheTest extends TestBase {
 
         cache.updateCacheFrom(rulesets.get());
 
-        var pythonRules = cache.getRulesForLanguage(LanguageEnumeration.PYTHON);
+        var pythonRules = cache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON);
         assertTrue(pythonRules.stream().allMatch(rule -> LanguageEnumeration.PYTHON.rawValue().equals(rule.language)));
 
-        var javaRules = cache.getRulesForLanguage(LanguageEnumeration.JAVA);
+        var javaRules = cache.getRosieRulesForLanguage(LanguageEnumeration.JAVA);
         assertTrue(javaRules.stream().allMatch(rule -> LanguageEnumeration.JAVA.rawValue().equals(rule.language)));
     }
 

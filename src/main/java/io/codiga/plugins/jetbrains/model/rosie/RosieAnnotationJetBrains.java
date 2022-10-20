@@ -12,6 +12,7 @@ import java.util.List;
  * @see RosieAnnotation
  */
 public class RosieAnnotationJetBrains {
+    private final String rulesetName;
     private final String ruleName;
     private final String message;
     private final String severity;
@@ -21,7 +22,8 @@ public class RosieAnnotationJetBrains {
     private final List<RosieViolationFix> fixes;
 
 
-    public RosieAnnotationJetBrains(RosieAnnotation annotation, Editor editor) {
+    public RosieAnnotationJetBrains(RosieAnnotation annotation, String rulesetName, Editor editor) {
+        this.rulesetName = rulesetName;
         this.ruleName = annotation.getRuleName();
         this.message = annotation.getMessage();
         this.severity = annotation.getSeverity();
@@ -31,6 +33,9 @@ public class RosieAnnotationJetBrains {
         this.fixes = List.copyOf(annotation.getFixes());
     }
 
+    public String getRulesetName() {
+        return rulesetName;
+    }
 
     public String getMessage() {
         return this.message;

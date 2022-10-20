@@ -74,13 +74,13 @@ public class RosieImpl implements Rosie {
             String codeBase64 = Base64.getEncoder().encodeToString(psiFile.getText().getBytes());
 
             // Prepare the request
-            var rules = RosieRulesCache.getInstance(project).getRulesForLanguage(language);
+            var rosieRules = RosieRulesCache.getInstance(project).getRosieRulesForLanguage(language);
             //If there is no rule for the target language, then Rosie is not called, and no annotation is performed
-            if (rules.isEmpty()) {
+            if (rosieRules.isEmpty()) {
                 return List.of();
             }
 
-            RosieRequest request = new RosieRequest(psiFile.getName(), getRosieLanguage(language), "utf8", codeBase64, rules, true);
+            RosieRequest request = new RosieRequest(psiFile.getName(), getRosieLanguage(language), "utf8", codeBase64, rosieRules, true);
             String requestString = GSON.toJson(request);
             StringEntity postingString = new StringEntity(requestString); //gson.toJson() converts your pojo to json
             HttpPost httpPost = new HttpPost(ROSIE_POST_URL);
@@ -102,7 +102,10 @@ public class RosieImpl implements Rosie {
                         //distinct()' makes sure that if multiple, completely identical, violations are returned
                         // for the same problem from Rosie, only one instance is shown by RosieAnnotator.
                         .distinct()
-                        .map(violation -> new RosieAnnotation(res.identifier, violation)))
+                        .map(violation -> {
+                            var rule = RosieRulesCache.getInstance(project).getRuleWithNamesFor(language, res.identifier);
+                            return new RosieAnnotation(rule.ruleName, rule.rulesetName, violation);
+                        }))
                     .collect(toList());
             }
             client.close();
