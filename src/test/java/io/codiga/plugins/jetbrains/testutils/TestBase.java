@@ -14,6 +14,8 @@ import java.util.Arrays;
  */
 public abstract class TestBase extends BasePlatformTestCase {
 
+    protected static final String TEST_DATA_BASE_PATH = "src/test/data";
+
     public final String readFile(String path){
         String completePath = this.getTestDataPath() + "/" + path;
 
@@ -63,7 +65,7 @@ public abstract class TestBase extends BasePlatformTestCase {
      * Override in test classes if you work with another test data folder.
      */
     protected String getTestDataRelativePath() {
-        return "src/test/data";
+        return TEST_DATA_BASE_PATH;
     }
 
 }
