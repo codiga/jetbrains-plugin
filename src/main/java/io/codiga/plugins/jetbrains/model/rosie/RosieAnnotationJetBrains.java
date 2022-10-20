@@ -1,11 +1,8 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 
 import java.util.List;
-
-import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 /**
  * An updated version of {@link RosieAnnotation}. It stores the start and end offsets based
@@ -15,14 +12,13 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
  * @see RosieAnnotation
  */
 public class RosieAnnotationJetBrains {
-    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final String ruleName;
     private final String message;
     private final String severity;
+    private final String category;
     private final int start;
     private final int end;
     private final List<RosieViolationFix> fixes;
-    private String category;
 
 
     public RosieAnnotationJetBrains(RosieAnnotation annotation, Editor editor) {

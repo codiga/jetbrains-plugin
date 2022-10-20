@@ -1,10 +1,6 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
-import com.intellij.openapi.diagnostic.Logger;
-
 import java.util.List;
-
-import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 
 /**
  * Annotation information created by {@link io.codiga.plugins.jetbrains.services.RosieImpl} based on the
@@ -13,14 +9,13 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
  * @see RosieAnnotationJetBrains
  */
 public class RosieAnnotation {
-    public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final String ruleName;
     private final String message;
     private final String severity;
     private final String category;
     private final RosiePosition start;
     private final RosiePosition end;
-    List<RosieViolationFix> fixes;
+    private final List<RosieViolationFix> fixes;
 
 
     public RosieAnnotation(String name, RosieViolation violation) {
