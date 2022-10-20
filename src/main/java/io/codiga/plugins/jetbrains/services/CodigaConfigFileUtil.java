@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
@@ -71,42 +72,46 @@ public final class CodigaConfigFileUtil {
     @NotNull
     public static List<String> collectRulesetNames(@NotNull YAMLFile codigaConfigFile) {
         return ApplicationManager.getApplication().isUnitTestMode()
-            ? readRulesetNames(codigaConfigFile)
-            : CachedValuesManager.getManager(codigaConfigFile.getProject()).getCachedValue(codigaConfigFile.getProject(),
-            () -> CachedValueProvider.Result.create(readRulesetNames(codigaConfigFile), codigaConfigFile));
+            ? compute(() -> readRulesetNames(codigaConfigFile))
+            : compute(() -> CachedValuesManager.getManager(codigaConfigFile.getProject())
+            .getCachedValue(
+                codigaConfigFile.getProject(),
+                () -> CachedValueProvider.Result.create(readRulesetNames(codigaConfigFile), codigaConfigFile)));
+    }
+
+    private static List<String> compute(@NotNull Computable<List<String>> computation) {
+        //Since 'RosieRulesCacheUpdater' is not DumbAware, it is executed on EDT, thus needed to wrap the PSI operation in a ReadAction.
+        return ApplicationManager.getApplication().runReadAction(computation);
     }
 
     private static List<String> readRulesetNames(@NotNull YAMLFile codigaConfigFile) {
-        //Since 'RosieRulesCacheUpdater' is not DumbAware, it is executed on EDT, thus needed to wrap the PSI operation in a ReadAction.
-        return ReadAction.compute(() -> {
-            var documents = codigaConfigFile.getDocuments();
+        var documents = codigaConfigFile.getDocuments();
 
-            if (documents.size() == 1) {
-                var topLevelValue = documents.get(0).getTopLevelValue();
+        if (documents.size() == 1) {
+            var topLevelValue = documents.get(0).getTopLevelValue();
 
-                if (topLevelValue instanceof YAMLBlockMappingImpl) {
-                    var rulesetsKeyValue = ((YAMLBlockMappingImpl) topLevelValue).getFirstKeyValue();
-                    //If the top level mapping is called "rulesets"
-                    if (RULESETS.equals(rulesetsKeyValue.getName())) {
-                        var rulesetsValue = rulesetsKeyValue.getValue();
-                        if (rulesetsValue instanceof YAMLSequence) {
-                            var rulesetNames = (YAMLSequence) rulesetsValue;
+            if (topLevelValue instanceof YAMLBlockMappingImpl) {
+                var rulesetsKeyValue = ((YAMLBlockMappingImpl) topLevelValue).getFirstKeyValue();
+                //If the top level mapping is called "rulesets"
+                if (RULESETS.equals(rulesetsKeyValue.getName())) {
+                    var rulesetsValue = rulesetsKeyValue.getValue();
+                    if (rulesetsValue instanceof YAMLSequence) {
+                        var rulesetNames = (YAMLSequence) rulesetsValue;
 
-                            //Return the list of ruleset names.
-                            // If the list contains items other than plain text ones, they are not included.
-                            return rulesetNames.getItems()
-                                .stream()
-                                .map(YAMLSequenceItem::getValue)
-                                .filter(YAMLPlainTextImpl.class::isInstance) //this handles items as well that have an empty value
-                                .map(YAMLPlainTextImpl.class::cast)
-                                .map(YAMLScalarImpl::getTextValue)
-                                .collect(toList());
-                        }
+                        //Return the list of ruleset names.
+                        // If the list contains items other than plain text ones, they are not included.
+                        return rulesetNames.getItems()
+                            .stream()
+                            .map(YAMLSequenceItem::getValue)
+                            .filter(YAMLPlainTextImpl.class::isInstance) //this handles items as well that have an empty value
+                            .map(YAMLPlainTextImpl.class::cast)
+                            .map(YAMLScalarImpl::getTextValue)
+                            .collect(toList());
                     }
                 }
             }
-            return List.of();
-        });
+        }
+        return List.of();
     }
 
     private CodigaConfigFileUtil() {
