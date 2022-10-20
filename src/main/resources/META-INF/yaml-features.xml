@@ -1,0 +1,5 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.RosieRulesCacheUpdater"/>
+    </extensions>
+</idea-plugin>

@@ -1,5 +1,6 @@
 package io.codiga.plugins.jetbrains.graphql;
 
+import com.intellij.openapi.application.ApplicationManager;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.api.GetRecipesForClientQuery;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -22,6 +23,10 @@ import java.util.Optional;
  * See https://plugins.jetbrains.com/docs/intellij/plugin-services.html#declaring-a-service
  */
 public interface CodigaApi {
+
+    static CodigaApi getInstance() {
+        return ApplicationManager.getApplication().getService(CodigaApi.class);
+    }
 
     /**
      * Indicate of the API is working, which means we have a correct access and secret key.
