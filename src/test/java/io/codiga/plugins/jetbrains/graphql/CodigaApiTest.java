@@ -236,7 +236,7 @@ public final class CodigaApiTest implements CodigaApi {
     }
 
     @Override
-    public List<GetRulesetsForClientQuery.RuleSetsForClient> getRulesetsForClient(List<String> ruleNames) {
-        return List.of();
+    public Optional<List<GetRulesetsForClientQuery.RuleSetsForClient>> getRulesetsForClient(List<String> ruleNames) {
+        return RulesetsForClientTestSupport.getRulesetsForClient(ruleNames);
     }
 }

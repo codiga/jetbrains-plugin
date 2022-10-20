@@ -53,6 +53,8 @@
     <depends optional="true" config-file="java-features.xml">com.intellij.modules.java</depends>
     <!-- See https://plugins.jetbrains.com/docs/intellij/pycharm.html -->
     <depends optional="true" config-file="python-features.xml">com.intellij.modules.python</depends>
+    <!-- YAML plugin is mandatory, because codiga.yml is parsed using this plugin. See https://plugins.jetbrains.com/plugin/13126-yaml -->
+    <depends config-file="yaml-features.xml">org.jetbrains.plugins.yaml</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Snippet Search" secondary="true" icon="CodigaIcons.Codiga_default_icon" anchor="right"
@@ -73,13 +75,7 @@
         <applicationService
                 serviceInterface="io.codiga.plugins.jetbrains.graphql.CodigaApi"
                 serviceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiImpl"
-                testServiceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiTest"
-        />
-        <applicationService
-                serviceInterface="io.codiga.plugins.jetbrains.services.Rosie"
-                serviceImplementation="io.codiga.plugins.jetbrains.services.RosieImpl"
-                testServiceImplementation="io.codiga.plugins.jetbrains.services.RosieTest"
-        />
+                testServiceImplementation="io.codiga.plugins.jetbrains.graphql.CodigaApiTest"/>
         <applicationService
                 serviceImplementation="io.codiga.plugins.jetbrains.settings.application.AppSettingsState"/>
         <applicationConfigurable
@@ -95,10 +91,6 @@
         <errorHandler implementation="io.codiga.plugins.jetbrains.errorreporter.CodigaErrorReporter"/>
         <statusBarWidgetFactory implementation="io.codiga.plugins.jetbrains.ui.StatusBar"/>
         <typedHandler implementation="io.codiga.plugins.jetbrains.cache.TypedKeyHandler"/>
-
-        <externalAnnotator
-                language=""
-                implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
 
     </extensions>
     <projectListeners>

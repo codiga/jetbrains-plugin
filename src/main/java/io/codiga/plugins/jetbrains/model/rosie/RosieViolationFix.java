@@ -1,5 +1,7 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,7 @@ import java.util.List;
  * <p>
  * {@link io.codiga.plugins.jetbrains.annotators.RosieAnnotationFix} works based on the information stored here.
  */
+@EqualsAndHashCode
 public final class RosieViolationFix {
     public String description;
     public List<RosieViolationFixEdit> edits;

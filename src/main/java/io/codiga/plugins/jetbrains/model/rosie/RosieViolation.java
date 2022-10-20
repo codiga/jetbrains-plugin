@@ -1,10 +1,13 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
 
 /**
  * Represents a code violation found by Rosie.
  */
+@EqualsAndHashCode
 public class RosieViolation {
     public String message;
     /**

@@ -1,8 +1,11 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
+import lombok.EqualsAndHashCode;
+
 /**
  * Represents a single quick fix edit in an Editor.
  */
+@EqualsAndHashCode
 public class RosieViolationFixEdit {
     /**
      * The position of the edit from where the fix will begin.

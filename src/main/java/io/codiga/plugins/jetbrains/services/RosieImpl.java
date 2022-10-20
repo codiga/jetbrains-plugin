@@ -5,16 +5,13 @@ import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import io.codiga.api.type.LanguageEnumeration;
+import io.codiga.plugins.jetbrains.annotators.RosieRulesCache;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotation;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRequest;
 import io.codiga.plugins.jetbrains.model.rosie.RosieResponse;
-import io.codiga.plugins.jetbrains.model.rosie.RosieRuleFile;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -24,13 +21,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.utils.RosieUtils.getRosieLanguage;
@@ -62,55 +55,6 @@ public class RosieImpl implements Rosie {
             ApplicationInfo.getInstance().getMinorVersion());
     }
 
-    /**
-     * This is a way to debug Rosie. To enable Rosie, put a rosie.debug at the root of your project.
-     * No file = no rosie
-     * Then, the file should be like this
-     * {
-     * "rules": [
-     * {
-     * "id": "empty-parameters",
-     * "contentBase64": "<rule-content-base64>=",
-     * "language": "python",
-     * "type": "ast",
-     * "entityChecked": "functiondefinition"
-     * },
-     * {
-     * "id": "timeout-request",
-     * "contentBase64": "<rule-content-base64>",
-     * "language": "python",
-     * "type": "ast",
-     * "entityChecked": "functioncall"
-     * }
-     * ]
-     * }
-     *
-     * @param project
-     * @return
-     */
-    public String getRosieDebugContent(@NotNull Project project) {
-        List<VirtualFile> rootFiles = Arrays.stream(ProjectRootManager.getInstance(project)
-                .getContentRoots())
-            .flatMap(v -> Arrays.stream(VfsUtil.getChildren(v)))
-            .collect(Collectors.toList());
-
-        // Find package.json in these files
-        Optional<VirtualFile> packageFileOptional = rootFiles.stream().filter(v -> v.getName().equalsIgnoreCase("rosie.debug")).findFirst();
-        String content = null;
-        if (packageFileOptional.isPresent()) {
-            try {
-                InputStream inputStream = packageFileOptional.get().getInputStream();
-                content = new String(inputStream.readAllBytes());
-                inputStream.close();
-                return content;
-            } catch (IOException e) {
-                LOGGER.error("cannot open rosie.debug", e);
-                return null;
-            }
-        }
-        return null;
-    }
-
     @Override
     @NotNull
     public List<RosieAnnotation> getAnnotations(@NotNull PsiFile psiFile, @NotNull Project project) {
@@ -127,15 +71,16 @@ public class RosieImpl implements Rosie {
         }
 
         try {
-            String rulesString = getRosieDebugContent(project);
-            if (rulesString == null) {
-                return List.of();
-            }
-            RosieRuleFile rosieRuleFile = GSON.fromJson(rulesString, RosieRuleFile.class);
             String codeBase64 = Base64.getEncoder().encodeToString(psiFile.getText().getBytes());
 
             // Prepare the request
-            RosieRequest request = new RosieRequest(psiFile.getName(), getRosieLanguage(language), "utf8", codeBase64, rosieRuleFile.rules, true);
+            var rosieRules = RosieRulesCache.getInstance(project).getRosieRulesForLanguage(language);
+            //If there is no rule for the target language, then Rosie is not called, and no annotation is performed
+            if (rosieRules.isEmpty()) {
+                return List.of();
+            }
+
+            RosieRequest request = new RosieRequest(psiFile.getName(), getRosieLanguage(language), "utf8", codeBase64, rosieRules, true);
             String requestString = GSON.toJson(request);
             StringEntity postingString = new StringEntity(requestString); //gson.toJson() converts your pojo to json
             HttpPost httpPost = new HttpPost(ROSIE_POST_URL);
@@ -153,7 +98,14 @@ public class RosieImpl implements Rosie {
                 LOGGER.debug("rosie response: " + rosieResponse);
 
                 annotations = rosieResponse.ruleResponses.stream()
-                    .flatMap(res -> res.violations.stream().map(violation -> new RosieAnnotation(res.identifier, violation)))
+                    .flatMap(res -> res.violations.stream()
+                        //distinct()' makes sure that if multiple, completely identical, violations are returned
+                        // for the same problem from Rosie, only one instance is shown by RosieAnnotator.
+                        .distinct()
+                        .map(violation -> {
+                            var rule = RosieRulesCache.getInstance(project).getRuleWithNamesFor(language, res.identifier);
+                            return new RosieAnnotation(rule.ruleName, rule.rulesetName, violation);
+                        }))
                     .collect(toList());
             }
             client.close();
