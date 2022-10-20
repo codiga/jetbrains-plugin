@@ -31,7 +31,7 @@ public interface CodigaApi {
      *
      * @return true if the API is working (mearning API keys are correctly configured).
      */
-    public boolean isWorking();
+    boolean isWorking();
 
 
     /**
@@ -39,15 +39,15 @@ public interface CodigaApi {
      *
      * @return the username of the logged in user if the API works correctly (and API keys are correct).
      */
-    public Optional<String> getUsername();
+    Optional<String> getUsername();
 
-    public List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords,
+    List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords,
                                                                                   List<String> dependencies,
                                                                                   Optional<String> parameters,
                                                                                   LanguageEnumeration language,
                                                                                   String filename);
 
-    public List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term,
+    List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> getRecipesForClientByShotcurt(Optional<String> term,
                                                                                   List<String> dependencies,
                                                                                   Optional<String> parameters,
                                                                                   LanguageEnumeration language,
@@ -56,9 +56,9 @@ public interface CodigaApi {
                                                                                   Optional<Boolean> onlyPrivate,
                                                                                   Optional<Boolean> onlySubscribed);
 
-    public Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language);
+    Optional<Long> getRecipesForClientByShotcurtLastTimestmap(List<String> dependencies, LanguageEnumeration language);
 
-    public List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term,
+    List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> getRecipesSemantic(Optional<String> term,
                                                                                                      List<String> dependencies,
                                                                                                      Optional<String> parameters,
                                                                                                      LanguageEnumeration language,
@@ -67,9 +67,9 @@ public interface CodigaApi {
                                                                                                      Optional<Boolean> onlyPrivate,
                                                                                                      Optional<Boolean> onlySubscribed);
 
-    public void recordRecipeUse(Long recipeId);
+    void recordRecipeUse(Long recipeId);
 
-    public Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames);
+    Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames);
 
     /**
      * Retrieves the rulesets from the Codiga server for the provided ruleset names configured in {@code codiga.yml}.
