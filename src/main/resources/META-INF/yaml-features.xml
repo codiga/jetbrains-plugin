@@ -1,5 +1,13 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceInterface="io.codiga.plugins.jetbrains.services.Rosie"
+                serviceImplementation="io.codiga.plugins.jetbrains.services.RosieImpl"
+                testServiceImplementation="io.codiga.plugins.jetbrains.services.RosieTest"
+        />
         <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.RosieRulesCacheUpdater"/>
+        <externalAnnotator
+                language=""
+                implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
     </extensions>
 </idea-plugin>
