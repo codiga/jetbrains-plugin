@@ -24,8 +24,8 @@ public class RosieAnnotationJetBrains {
     private final List<RosieViolationFix> fixes;
 
 
-    public RosieAnnotationJetBrains(RosieAnnotation annotation, String rulesetName, Editor editor) {
-        this.rulesetName = rulesetName;
+    public RosieAnnotationJetBrains(RosieAnnotation annotation, Editor editor) {
+        this.rulesetName = annotation.getRulesetName();
         this.ruleName = annotation.getRuleName();
         this.message = annotation.getMessage();
         this.severity = annotation.getSeverity();

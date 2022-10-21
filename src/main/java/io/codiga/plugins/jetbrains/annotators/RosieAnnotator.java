@@ -117,7 +117,7 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
     @Nullable
     private static RosieAnnotationJetBrains convertToAnnotationJetBrains(RosieAnnotation annotation, Editor editor) {
         try {
-            return new RosieAnnotationJetBrains(annotation, annotation.getRulesetName(), editor);
+            return new RosieAnnotationJetBrains(annotation, editor);
         } catch (IndexOutOfBoundsException e) {
             LOGGER.warn(String.format(
                 "[RosieAnnotator] Issue during calculating the line start offset in the editor, for start line %d, or for end line %d.",
