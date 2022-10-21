@@ -3,6 +3,7 @@ package io.codiga.plugins.jetbrains.model.rosie;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,15 +13,11 @@ import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
  * Represents a position in an editor by its line number and its column number within that line.
  */
 @EqualsAndHashCode
+@AllArgsConstructor
 public final class RosiePosition {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     public int line;
     public int col;
-
-    public RosiePosition(int line, int col) {
-        this.line = line;
-        this.col = col;
-    }
 
     /**
      * Returns the position offset within the Document of the argument Editor.

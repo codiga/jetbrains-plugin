@@ -1,5 +1,7 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
+import lombok.Getter;
+
 import java.util.List;
 
 /**
@@ -8,6 +10,7 @@ import java.util.List;
  *
  * @see RosieAnnotationJetBrains
  */
+@Getter
 public class RosieAnnotation {
     private final String rulesetName;
     private final String ruleName;
@@ -28,37 +31,5 @@ public class RosieAnnotation {
         this.start = violation.start;
         this.end = violation.end;
         this.fixes = violation.fixes;
-    }
-
-    public String getRulesetName() {
-        return rulesetName;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public String getRuleName() {
-        return this.ruleName;
-    }
-
-    public String getSeverity() {
-        return this.severity;
-    }
-
-    public String getCategory() {
-        return this.category;
-    }
-
-    public RosiePosition getStart() {
-        return this.start;
-    }
-
-    public RosiePosition getEnd() {
-        return this.end;
-    }
-
-    public List<RosieViolationFix> getFixes() {
-        return this.fixes;
     }
 }
