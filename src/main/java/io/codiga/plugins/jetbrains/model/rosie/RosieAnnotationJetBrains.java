@@ -1,6 +1,7 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
 import com.intellij.openapi.editor.Editor;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  *
  * @see RosieAnnotation
  */
+@Getter
 public class RosieAnnotationJetBrains {
     private final String rulesetName;
     private final String ruleName;
@@ -22,8 +24,8 @@ public class RosieAnnotationJetBrains {
     private final List<RosieViolationFix> fixes;
 
 
-    public RosieAnnotationJetBrains(RosieAnnotation annotation, String rulesetName, Editor editor) {
-        this.rulesetName = rulesetName;
+    public RosieAnnotationJetBrains(RosieAnnotation annotation, Editor editor) {
+        this.rulesetName = annotation.getRulesetName();
         this.ruleName = annotation.getRuleName();
         this.message = annotation.getMessage();
         this.severity = annotation.getSeverity();
@@ -31,37 +33,5 @@ public class RosieAnnotationJetBrains {
         this.start = annotation.getStart().getOffset(editor);
         this.end = annotation.getEnd().getOffset(editor);
         this.fixes = List.copyOf(annotation.getFixes());
-    }
-
-    public String getRulesetName() {
-        return rulesetName;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public String getRuleName() {
-        return this.ruleName;
-    }
-
-    public String getSeverity() {
-        return this.severity;
-    }
-
-    public String getCategory() {
-        return this.category;
-    }
-
-    public int getStart() {
-        return this.start;
-    }
-
-    public int getEnd() {
-        return this.end;
-    }
-
-    public List<RosieViolationFix> getFixes() {
-        return this.fixes;
     }
 }

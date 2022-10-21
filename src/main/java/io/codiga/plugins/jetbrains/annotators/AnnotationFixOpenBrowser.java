@@ -10,6 +10,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 
 /**
  * Fix to open the browser to learn more about a violation and a rule.
@@ -49,11 +50,15 @@ public class AnnotationFixOpenBrowser implements IntentionAction {
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         try {
-            String urlString = String.format(RULE_DETAILS_URL, rosieAnnotation.getRulesetName(), rosieAnnotation.getRuleName());
-            BrowserUtil.browse(urlString);
+            BrowserUtil.browse(getUrlString());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @TestOnly
+    String getUrlString() {
+        return String.format(RULE_DETAILS_URL, rosieAnnotation.getRulesetName(), rosieAnnotation.getRuleName());
     }
 
     @Override

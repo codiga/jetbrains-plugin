@@ -1,11 +1,13 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
 /**
  * Represents a single quick fix edit in an Editor.
  */
 @EqualsAndHashCode
+@AllArgsConstructor
 public class RosieViolationFixEdit {
     /**
      * The position of the edit from where the fix will begin.
@@ -24,12 +26,4 @@ public class RosieViolationFixEdit {
      * and {@link RosieConstants#ROSIE_FIX_REMOVE}.
      */
     public String editType;
-
-
-    public RosieViolationFixEdit(RosiePosition start, RosiePosition end, String editType, String content) {
-        this.start = start;
-        this.end = end;
-        this.content = content;
-        this.editType = editType;
-    }
 }

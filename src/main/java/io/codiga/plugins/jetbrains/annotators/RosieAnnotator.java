@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
+import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotation;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
 import io.codiga.plugins.jetbrains.model.rosie.RosieViolationFix;
 import io.codiga.plugins.jetbrains.services.Rosie;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.model.rosie.RosieConstants.*;
@@ -96,12 +98,33 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         List<RosieAnnotationJetBrains> annotations = rosieService
             .getAnnotations(rosieAnnotatorInformation.psiFile, rosieAnnotatorInformation.project)
             .stream()
-            .map(annotation -> new RosieAnnotationJetBrains(annotation, annotation.getRulesetName(), rosieAnnotatorInformation.editor))
+            .map(annotation -> convertToAnnotationJetBrains(annotation, rosieAnnotatorInformation.editor))
+            .filter(Objects::nonNull)
             .collect(toList());
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime;
         LOGGER.info(String.format("rosie call time roundtrip: %s", executionTime));
         return annotations;
+    }
+
+    /**
+     * Converts the argument {@code RosieAnnotation} to {@code RosieAnnotationJetBrains}.
+     * <p>
+     * If there is an {@code IndexOutOfBoundsException} during conversion, specifically when trying to calculate
+     * the line start index in the given editor for a {@code RosiePosition.line} value that is outside the editor's
+     * range, it returns null, so that it can be filtered out.
+     */
+    @Nullable
+    private static RosieAnnotationJetBrains convertToAnnotationJetBrains(RosieAnnotation annotation, Editor editor) {
+        try {
+            return new RosieAnnotationJetBrains(annotation, editor);
+        } catch (IndexOutOfBoundsException e) {
+            LOGGER.warn(String.format(
+                "[RosieAnnotator] Issue during calculating the line start offset in the editor, for start line %d, or for end line %d.",
+                annotation.getStart().line,
+                annotation.getEnd().line));
+            return null;
+        }
     }
 
     /**
