@@ -47,7 +47,6 @@ public class RosieRulesCacheUpdater implements StartupActivity {
      * Starts the updater for the {@link RosieRulesCache}.
      */
     private void startRosieRulesCacheUpdater(@NotNull Project project) {
-        LOGGER.warn("[RosieRulesCacheUpdater] Starting Rosie rules cache updater");
         var updateHandler = new RosieRulesCacheUpdateHandler(RosieRulesCache.getInstance(project), project);
         var cacheUpdater = AppExecutorUtil.getAppScheduledExecutorService()
             .scheduleWithFixedDelay(updateHandler::handleCacheUpdate, 1L, 10L, SECONDS);
