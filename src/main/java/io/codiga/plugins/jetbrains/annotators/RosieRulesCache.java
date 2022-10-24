@@ -8,6 +8,7 @@ import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCacheValue.RuleWithNames;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRule;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.jetbrains.yaml.psi.YAMLFile;
 
 import java.util.List;
@@ -41,12 +42,12 @@ public final class RosieRulesCache implements Disposable {
     /**
      * The timestamp of the last update on the Codiga server for the rulesets cached (and configured in codiga.yml).
      */
-    private long lastUpdatedTimeStamp;
+    private long lastUpdatedTimeStamp = -1L;
     /**
      * -1 means the modification stamp of codiga.yml hasn't been set,
      * or there is no codiga.yml file in the project root.
      */
-    private long configFileModificationStamp = -1;
+    private long configFileModificationStamp = 0L;
 
     public RosieRulesCache(Project project) {
         this.cache = new ConcurrentHashMap<>();
@@ -120,9 +121,9 @@ public final class RosieRulesCache implements Disposable {
      */
     public void clear() {
         if (!cache.isEmpty()) {
-            configFileModificationStamp = -1;
             cache.clear();
         }
+        lastUpdatedTimeStamp = -1L;
     }
 
     @Override
@@ -132,5 +133,20 @@ public final class RosieRulesCache implements Disposable {
 
     public static RosieRulesCache getInstance(@NotNull Project project) {
         return project.getService(RosieRulesCache.class);
+    }
+
+    @TestOnly
+    public boolean isEmpty() {
+        return cache.isEmpty();
+    }
+
+    @TestOnly
+    public long getConfigFileModificationStamp() {
+        return configFileModificationStamp;
+    }
+
+    @TestOnly
+    public void setConfigFileModificationStamp(long configFileModificationStamp) {
+        this.configFileModificationStamp = configFileModificationStamp;
     }
 }
