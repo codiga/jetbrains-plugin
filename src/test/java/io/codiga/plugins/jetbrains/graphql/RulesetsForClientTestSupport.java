@@ -50,10 +50,14 @@ public final class RulesetsForClientTestSupport {
      */
     public static Optional<List<GetRulesetsForClientQuery.RuleSetsForClient>> getRulesetsForClient(List<String> rulesetNames) {
         List<GetRulesetsForClientQuery.RuleSetsForClient> rulesets;
+        if (rulesetNames.isEmpty()) {
+            return Optional.of(List.of());
+        }
         switch (rulesetNames.get(0)) {
             case "singleRulesetSingleLanguage":
                 rulesets = singleRulesetSingleLanguage(); //Python
                 break;
+            case "singleRulesetMultipleLanguagesDefaultTimestamp":
             case "singleRulesetMultipleLanguages":
                 rulesets = singleRulesetMultipleLanguages(); //Python, Java
                 break;
@@ -63,16 +67,36 @@ public final class RulesetsForClientTestSupport {
             case "multipleRulesetsMultipleLanguages":
                 rulesets = multipleRulesetsMultipleLanguages(); //Python, Java
                 break;
+            case "erroredRuleset":
+                rulesets = null;
+                break;
             default:
                 rulesets = List.of();
         }
-        return Optional.of(rulesets);
+        return Optional.ofNullable(rulesets);
+    }
+
+    public static Optional<Long> getRulesetsLastTimestamp(List<String> rulesetNames) {
+        switch (rulesetNames.get(0)) {
+            case "singleRulesetSingleLanguage":
+                return Optional.of(101L);
+            case "singleRulesetMultipleLanguagesDefaultTimestamp":
+                return Optional.of(100L);
+            case "singleRulesetMultipleLanguages":
+                return Optional.of(102L);
+            case "multipleRulesetsSingleLanguage":
+                return Optional.of(103L);
+            case "multipleRulesetsMultipleLanguages":
+                return Optional.of(104L);
+            default:
+                return Optional.empty();
+        }
     }
 
     /**
      * Returns a single ruleset with a few rules, all configured for the same language.
      */
-    private static List<GetRulesetsForClientQuery.RuleSetsForClient> singleRulesetSingleLanguage() {
+    public static List<GetRulesetsForClientQuery.RuleSetsForClient> singleRulesetSingleLanguage() {
         var rules = List.of(PYTHON_RULE_1, PYTHON_RULE_2, PYTHON_RULE_3);
 
         var ruleset = new GetRulesetsForClientQuery.RuleSetsForClient("typename", 1234, "python-ruleset", rules);
@@ -83,7 +107,7 @@ public final class RulesetsForClientTestSupport {
     /**
      * Returns a single ruleset with a few rules configured for different languages.
      */
-    private static List<GetRulesetsForClientQuery.RuleSetsForClient> singleRulesetMultipleLanguages() {
+    public static List<GetRulesetsForClientQuery.RuleSetsForClient> singleRulesetMultipleLanguages() {
         var rules = List.of(PYTHON_RULE_1, JAVA_RULE_1, PYTHON_RULE_3);
 
         var ruleset = new GetRulesetsForClientQuery.RuleSetsForClient("typename", 2345, "mixed-ruleset", rules);

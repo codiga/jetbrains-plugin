@@ -232,7 +232,7 @@ public final class CodigaApiTest implements CodigaApi {
 
     @Override
     public Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames) {
-        return Optional.empty();
+        return RulesetsForClientTestSupport.getRulesetsLastTimestamp(ruleNames);
     }
 
     @Override
