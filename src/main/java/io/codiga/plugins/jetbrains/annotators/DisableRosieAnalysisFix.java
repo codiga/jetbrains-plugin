@@ -32,7 +32,7 @@ public class DisableRosieAnalysisFix extends RosieAnnotationIntentionBase {
 
     @Override
     public @IntentionName @NotNull String getText() {
-        return "Disable analysis for this row";
+        return "Remove this warning";
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DisableRosieAnalysisFix extends RosieAnnotationIntentionBase {
 
         //Create the comment with the prefix associated with one-line comments in the file's language.
         var language = LanguageUtils.getLanguageFromFilename(psiFile.getName());
-        String codigaDisableComment = commentPrefixFor(language) + CODIGA_DISABLE;
+        String codigaDisableComment = commentPrefixFor(language) + " " + CODIGA_DISABLE;
 
         //Insert the comment text
         EditorModificationUtilEx.insertStringAtCaret(editor, codigaDisableComment);

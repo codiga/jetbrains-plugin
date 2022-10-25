@@ -76,8 +76,8 @@ public class RosieAnnotatorTest extends TestBase {
     //Disable Rosie analysis comment quick fixes
 
     public void testAddsCodigaDisableCommentToTopLevelElementInPython() {
-        doTestAnnotationFix("add_top_level_disable_codiga.py", "Disable analysis for this row",
-            "#codiga-disable\n" +
+        doTestAnnotationFix("add_top_level_disable_codiga.py", "Remove this warning",
+            "# codiga-disable\n" +
                 "class PersonWithAddress:\n" +
                 "  def __init__(self, name, age, address):\n" +
                 "    self.name = name\n" +
@@ -86,29 +86,29 @@ public class RosieAnnotatorTest extends TestBase {
     }
 
     public void testAddsCodigaDisableCommentToNestedElementInPython() {
-        doTestAnnotationFix("add_nested_disable_codiga.py", "Disable analysis for this row",
+        doTestAnnotationFix("add_nested_disable_codiga.py", "Remove this warning",
             "class PersonWithAddress:\n" +
                 "  def __init__(self, name, age, long_address):\n" +
                 "    self.name = name\n" +
                 "    self.age = age\n" +
-                "    #codiga-disable\n" +
+                "    # codiga-disable\n" +
                 "    self.address = long_address");
     }
 
     public void testAddsCodigaDisableCommentToTopLevelElementInJava() {
-        doTestAnnotationFix("add_top_level_disable_codiga.java", "Disable analysis for this row",
-            "//codiga-disable\n" +
+        doTestAnnotationFix("add_top_level_disable_codiga.java", "Remove this warning",
+            "// codiga-disable\n" +
                 "public class SomeClass {\n" +
                 "}");
     }
 
     public void testAddsCodigaDisableCommentToNestedElementInJava() {
-        doTestAnnotationFix("add_nested_disable_codiga.java", "Disable analysis for this row",
+        doTestAnnotationFix("add_nested_disable_codiga.java", "Remove this warning",
             "public class SomeClass {\n" +
                 "    void method() {\n" +
                 "        boolean isPassing = true;\n" +
                 "        if (isPassing)\n" +
-                "            //codiga-disable\n" +
+                "            // codiga-disable\n" +
                 "            String passing = \"passing\";\n" +
                 "    }\n" +
                 "}");
