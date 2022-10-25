@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.7.20]
+### Added
 - [#158](https://github.com/codiga/jetbrains-plugin/issues/158): Added a quick fix for Rosie violations, to disable Rosie analysis for a specific row.
 
 ### Changed
