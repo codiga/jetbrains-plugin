@@ -3,6 +3,7 @@ package io.codiga.plugins.jetbrains.services;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -71,7 +72,8 @@ public class RosieImpl implements Rosie {
         }
 
         try {
-            String codeBase64 = Base64.getEncoder().encodeToString(psiFile.getText().getBytes());
+            byte[] fileText = ReadAction.compute(() -> psiFile.getText().getBytes());
+            String codeBase64 = Base64.getEncoder().encodeToString(fileText);
 
             // Prepare the request
             var rosieRules = RosieRulesCache.getInstance(project).getRosieRulesForLanguage(language);
