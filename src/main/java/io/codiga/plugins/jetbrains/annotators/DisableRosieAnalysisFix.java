@@ -21,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
  * Adds the {@code codiga-disable} string as a comment above the line on which this intention is invoked.
  * <p>
  * This will make the Rosie service ignore that line during analysis.
+ * <p>
+ * NOTE: the correct indentation is applied only when the IDE itself recognizes the language of the file,
+ * otherwise the comment is added at the beginning of the new line.
  */
 public class DisableRosieAnalysisFix extends RosieAnnotationIntentionBase {
 
