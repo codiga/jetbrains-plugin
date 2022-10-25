@@ -136,9 +136,7 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
      */
     @Override
     public void apply(
-        @NotNull PsiFile psiFile,
-        List<RosieAnnotationJetBrains> annotations,
-        @NotNull AnnotationHolder holder) {
+        @NotNull PsiFile psiFile, List<RosieAnnotationJetBrains> annotations, @NotNull AnnotationHolder holder) {
         // No annotation = nothing to do, just return now. If not enabled for this project, we return no annotations
         // and will stop here.
         if (annotations == null || annotations.isEmpty()) {
@@ -152,9 +150,14 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
     }
 
     /**
-     * Generate an annotation for a violation.
+     * Generate an annotation for a violation with possible fixes.
      * <p>
-     * A "fix" for opening the rule information in the browser is always added.
+     * The following quick fixes are always added:
+     * <ul>
+     *     <li>A fix for disabling the Rosie analysis for the current line, adding a {@code codiga-disable}
+     *     comment line above the current one.</li>
+     *     <li>A "fix" for opening the rule information in the browser is always added.</li>
+     * </ul>
      *
      * @param psiFile    - the file to annotate
      * @param annotation - the annotation we need
@@ -187,7 +190,9 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         for (RosieViolationFix rosieViolationFix : annotation.getFixes()) {
             annotationBuilder.withFix(new RosieAnnotationFix(rosieViolationFix));
         }
-        annotationBuilder.withFix(new AnnotationFixOpenBrowser(annotation));
+        annotationBuilder
+            .withFix(new DisableRosieAnalysisFix())
+            .withFix(new AnnotationFixOpenBrowser(annotation));
 
 
         LOGGER.info("Creating annotation with range: " + annotationRange);

@@ -12,7 +12,7 @@ public class RosieAnnotatorTest extends TestBase {
         return TEST_DATA_BASE_PATH + "/rosieannotator";
     }
 
-    //Positive cases
+    //Positive highlighting cases
 
     public void testNoHighlightForNoViolation() {
         doTestAnnotations("no_highlight_for_no_violation.py");
@@ -26,42 +26,7 @@ public class RosieAnnotatorTest extends TestBase {
         doTestAnnotations("highlight_for_multiple_violations.py", true, false, true);
     }
 
-    public void testTextInsertionFix() {
-        doTestAnnotationFixes("text_insertion_fix.py", "Fix: Insert text",
-            "clasThis is the inserted texts Person:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextReplacementFixWithEditRangeMatchingViolationRange() {
-        doTestAnnotationFixes("text_replacement_fix_ranges_matching.py", "Fix: Replace text",
-            "clasThis is the replacment textson:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextReplacementFixWithEditRangeNotMatchingViolationRange() {
-        doTestAnnotationFixes("text_replacement_fix_ranges_not_matching.py", "Fix: Replace text",
-            "cThis is the replacement texts Person:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextRemovalFixWithEditRangeMatchingViolationRange() {
-        doTestAnnotationFixes("text_removal_fix_ranges_matching.py", "Fix: Remove text",
-            "classon:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextRemovalFixWithEditRangeNotMatchingViolationRange() {
-        doTestAnnotationFixes("text_removal_fix_ranges_not_matching.py", "Fix: Remove text",
-            "cs Person:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    //Negative cases
+    //Negative highlighting cases
 
     public void testNoHighlightWhenFileRangeDoesntContainAnnotationStartOffset() {
         doTestAnnotations("no_highlight_for_start_offset_outside.py");
@@ -69,6 +34,84 @@ public class RosieAnnotatorTest extends TestBase {
 
     public void testNoHighlightWhenFileRangeDoesntContainAnnotationEndOffset() {
         doTestAnnotations("no_highlight_for_end_offset_outside.py");
+    }
+
+    //Rosie code quick fixes
+
+    public void testTextInsertionFix() {
+        doTestAnnotationFix("text_insertion_fix.py", "Fix: Insert text",
+            "clasThis is the inserted texts Person:\n" +
+                "  def __init__(self, name):\n" +
+                "    self.name = name\n");
+    }
+
+    public void testTextReplacementFixWithEditRangeMatchingViolationRange() {
+        doTestAnnotationFix("text_replacement_fix_ranges_matching.py", "Fix: Replace text",
+            "clasThis is the replacment textson:\n" +
+                "  def __init__(self, name):\n" +
+                "    self.name = name\n");
+    }
+
+    public void testTextReplacementFixWithEditRangeNotMatchingViolationRange() {
+        doTestAnnotationFix("text_replacement_fix_ranges_not_matching.py", "Fix: Replace text",
+            "cThis is the replacement texts Person:\n" +
+                "  def __init__(self, name):\n" +
+                "    self.name = name\n");
+    }
+
+    public void testTextRemovalFixWithEditRangeMatchingViolationRange() {
+        doTestAnnotationFix("text_removal_fix_ranges_matching.py", "Fix: Remove text",
+            "classon:\n" +
+                "  def __init__(self, name):\n" +
+                "    self.name = name\n");
+    }
+
+    public void testTextRemovalFixWithEditRangeNotMatchingViolationRange() {
+        doTestAnnotationFix("text_removal_fix_ranges_not_matching.py", "Fix: Remove text",
+            "cs Person:\n" +
+                "  def __init__(self, name):\n" +
+                "    self.name = name\n");
+    }
+
+    //Disable Rosie analysis comment quick fixes
+
+    public void testAddsCodigaDisableCommentToTopLevelElementInPython() {
+        doTestAnnotationFix("add_top_level_disable_codiga.py", "Disable analysis for this row",
+            "#codiga-disable\n" +
+                "class PersonWithAddress:\n" +
+                "  def __init__(self, name, age, address):\n" +
+                "    self.name = name\n" +
+                "    self.age = age\n" +
+                "    self.address = address");
+    }
+
+    public void testAddsCodigaDisableCommentToNestedElementInPython() {
+        doTestAnnotationFix("add_nested_disable_codiga.py", "Disable analysis for this row",
+            "class PersonWithAddress:\n" +
+                "  def __init__(self, name, age, long_address):\n" +
+                "    self.name = name\n" +
+                "    self.age = age\n" +
+                "    #codiga-disable\n" +
+                "    self.address = long_address");
+    }
+
+    public void testAddsCodigaDisableCommentToTopLevelElementInJava() {
+        doTestAnnotationFix("add_top_level_disable_codiga.java", "Disable analysis for this row",
+            "//codiga-disable\n" +
+                "public class SomeClass {\n" +
+                "}");
+    }
+
+    public void testAddsCodigaDisableCommentToNestedElementInJava() {
+        doTestAnnotationFix("add_nested_disable_codiga.java", "Disable analysis for this row",
+            "public class SomeClass {\n" +
+                "    void method() {\n" +
+                "        boolean isPassing = true;\n" +
+                "        if (isPassing)\n" +
+                "            //codiga-disable\n" +
+                "            String passing = \"passing\";\n" +
+                "    }\n" +
+                "}");
     }
 
     //Helpers
@@ -89,7 +132,7 @@ public class RosieAnnotatorTest extends TestBase {
         doTestAnnotations(filePath, true, true, true);
     }
 
-    private void doTestAnnotationFixes(String filePath, String fixName, String afterText) {
+    private void doTestAnnotationFix(String filePath, String fixName, String afterText) {
         myFixture.configureByFile(filePath);
         myFixture.doHighlighting();
         myFixture.launchAction(myFixture.findSingleIntention(fixName));
