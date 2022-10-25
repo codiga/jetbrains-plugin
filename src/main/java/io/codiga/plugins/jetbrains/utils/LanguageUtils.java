@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public final class LanguageUtils {
 
@@ -185,12 +186,21 @@ public final class LanguageUtils {
         }
     }
 
+    private static final Set<String> KEYWORDS_TO_FILTER_OUT = Set.of("todo", "fixme");
+
     public static @NotNull String removeLineFromCommentsSymbols(@NotNull String line) {
         return line.replaceAll("#", "").replaceAll("//", "");
     }
 
     public static long numberOfWordsInComment(@NotNull String line) {
-        return Arrays.asList(removeLineFromCommentsSymbols(line).split(" ")).stream().filter(s -> s.length() > 0).count();
+        return Arrays.stream(removeLineFromCommentsSymbols(line).split(" ")).filter(s -> !s.isEmpty()).count();
+    }
+
+    /**
+     * Returns whether the argument line contains lower-case any of the {@link #KEYWORDS_TO_FILTER_OUT}.
+     */
+    public static boolean containsTodoKeyword(@NotNull String line) {
+        return KEYWORDS_TO_FILTER_OUT.stream().anyMatch(keyword -> line.toLowerCase().contains(keyword));
     }
 
     /**

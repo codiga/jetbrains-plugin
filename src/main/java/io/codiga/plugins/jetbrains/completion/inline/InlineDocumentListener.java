@@ -21,6 +21,7 @@ import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -108,25 +109,8 @@ public class InlineDocumentListener implements DocumentListener {
         int lineStart = editor.getCaretModel().getVisualLineStart();
         int caretOffset = editor.getCaretModel().getOffset();
 
-        String currentLine;
-        try {
-            currentLine = document.getText(new TextRange(lineStart, caretOffset));
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-
+        String currentLine = getCurrentLineFromDocument(document, language, lineStart, caretOffset);
         if (currentLine == null) {
-            return;
-        }
-
-        if (!lineStartsWithComment(language, currentLine)) {
-            LOGGER.debug("line is not a comment");
-            return;
-        }
-
-        long numberOfWords = numberOfWordsInComment(currentLine);
-        if (numberOfWords <= 1) {
-            LOGGER.debug("not enough keywords: " + numberOfWords);
             return;
         }
 
@@ -148,6 +132,39 @@ public class InlineDocumentListener implements DocumentListener {
                 () -> queryRecipesAndShowSnippetPreview(codigaApi, editor, requestTimestamp, caretOffset, language, searchTerm, dependenciesName, filename),
                 TIMEOUT_REQUEST_POLLING_MILLISECONDS);
         }
+    }
+
+    /**
+     * Returns the current line from the argument document based on where the caret is placed.
+     *
+     * @return the text of the current line, or null if an issue occurred during getting the line,
+     * or the line is not eligible for inline completion
+     */
+    @Nullable
+    private static String getCurrentLineFromDocument(Document document, LanguageEnumeration language, int lineStart, int caretOffset) {
+        String currentLine;
+        try {
+            currentLine = document.getText(new TextRange(lineStart, caretOffset));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+
+        if (!lineStartsWithComment(language, currentLine)) {
+            LOGGER.debug("line is not a comment");
+            return null;
+        }
+
+        if (containsTodoKeyword(currentLine)) {
+            LOGGER.debug("line contains at least one todo keyword");
+            return null;
+        }
+
+        long numberOfWords = numberOfWordsInComment(currentLine);
+        if (numberOfWords <= 1) {
+            LOGGER.debug("not enough keywords: " + numberOfWords);
+            return null;
+        }
+        return currentLine;
     }
 
     private void queryRecipesAndShowSnippetPreview(CodigaApi codigaApi,

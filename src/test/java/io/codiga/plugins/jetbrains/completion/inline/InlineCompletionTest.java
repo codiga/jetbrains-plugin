@@ -117,6 +117,13 @@ public class InlineCompletionTest extends TestBase {
         assertNull(SnippetPreview.getInstance(myFixture.getEditor()));
     }
 
+    public void testNoSnippetPreviewWhenCompletionKeywordsContainTodoKeyword() {
+        myFixture.configureByFile("github_ci_config.yml");
+        myFixture.type("sometodo");
+
+        assertNull(SnippetPreview.getInstance(myFixture.getEditor()));
+    }
+
     //Settings based cases
 
     public void testNoSnippetPreviewWhenCodigaIsDisabled() {
