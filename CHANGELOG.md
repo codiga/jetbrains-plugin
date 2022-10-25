@@ -4,39 +4,19 @@
 
 ## [Unreleased]
 ### Added
+- [#158](https://github.com/codiga/jetbrains-plugin/issues/158): Added a quick fix for Rosie violations, to disable Rosie analysis for a specific row.
 
 ### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
+- [#160](https://github.com/codiga/jetbrains-plugin/issues/160): Inline completion is no longer triggered with comments containing the `todo` or `fixme` keywords
 
 ## [1.7.19]
 ### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
+- [#157](https://github.com/codiga/jetbrains-plugin/issues/157), [#141](https://github.com/codiga/jetbrains-plugin/issues/141): Support for codiga.yml file.
 
 ## [1.7.18]
 ### Added
 - [#142](https://github.com/codiga/jetbrains-plugin/issues/142): Added syntax highlighting for the code snippets in the Snippet Search
   tool window. Currently supported languages are Python and Java.
-
-## [1.7.18]
-
-### Fixed
-- [#150](https://github.com/codiga/jetbrains-plugin/issues/150): Added a missing library dependency and fixed `NoClassDefFoundError`s in some IDEs.
 
 ## [1.7.17]
 

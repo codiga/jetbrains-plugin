@@ -1,7 +1,5 @@
 package io.codiga.plugins.jetbrains.annotators;
 
-import com.intellij.codeInsight.intention.IntentionAction;
-import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.editor.Editor;
@@ -9,13 +7,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 
 /**
  * Fix to open the browser to learn more about a violation and a rule.
  */
-public class AnnotationFixOpenBrowser implements IntentionAction {
+@RequiredArgsConstructor
+public class AnnotationFixOpenBrowser extends RosieAnnotationIntentionBase {
 
     /**
      * https://app.codiga.io/hub/ruleset/&lt;ruleset-name>/&lt;rule-name>
@@ -23,25 +23,9 @@ public class AnnotationFixOpenBrowser implements IntentionAction {
     private static final String RULE_DETAILS_URL = "https://app.codiga.io/hub/ruleset/%s/%s";
     private final RosieAnnotationJetBrains rosieAnnotation;
 
-    public AnnotationFixOpenBrowser(RosieAnnotationJetBrains rosieAnnotation) {
-        this.rosieAnnotation = rosieAnnotation;
-    }
-
     @Override
-    public @IntentionName
-    @NotNull String getText() {
+    public @IntentionName @NotNull String getText() {
         return "See on Codiga Hub: rate or comment";
-    }
-
-    @Override
-    public @NotNull
-    @IntentionFamilyName String getFamilyName() {
-        return "Codiga";
-    }
-
-    @Override
-    public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
-        return true;
     }
 
     /**
@@ -63,6 +47,6 @@ public class AnnotationFixOpenBrowser implements IntentionAction {
 
     @Override
     public boolean startInWriteAction() {
-        return true;
+        return false;
     }
 }

@@ -1,0 +1,2 @@
+public<caret> class SomeClass {
+}

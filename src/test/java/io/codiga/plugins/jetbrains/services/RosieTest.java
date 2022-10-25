@@ -41,6 +41,12 @@ public class RosieTest implements Rosie {
                 return startOffsetOutside();
             case "no_highlight_for_end_offset_outside.py":
                 return endOffsetOutside();
+            case "add_top_level_disable_codiga.py":
+            case "add_top_level_disable_codiga.java":
+                return topLevelDisableCodigaComment();
+            case "add_nested_disable_codiga.py":
+            case "add_nested_disable_codiga.java":
+                return nestedDisableCodigaComment();
             default:
                 return List.of();
         }
@@ -213,5 +219,29 @@ public class RosieTest implements Rosie {
             Collections.emptyList());
 
         return List.of(new RosieAnnotation("start_offset_rule", "start_offset_ruleset", rosieViolation));
+    }
+
+    private List<RosieAnnotation> topLevelDisableCodigaComment() {
+        var rosieViolation = new RosieViolation(
+            "single_violation",
+            new RosiePosition(1, 5),
+            new RosiePosition(1, 10),
+            "INFORMATIONAL",
+            "CODE_STYLE",
+            Collections.emptyList());
+
+        return List.of(new RosieAnnotation("single_rule", "single_ruleset", rosieViolation));
+    }
+
+    private List<RosieAnnotation> nestedDisableCodigaComment() {
+        var rosieViolation = new RosieViolation(
+            "single_violation",
+            new RosiePosition(5, 10),
+            new RosiePosition(5, 30),
+            "INFORMATIONAL",
+            "CODE_STYLE",
+            Collections.emptyList());
+
+        return List.of(new RosieAnnotation("single_rule", "single_ruleset", rosieViolation));
     }
 }

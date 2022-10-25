@@ -144,6 +144,49 @@ public final class LanguageUtils {
     }
 
     /**
+     * Returns the one-line comment prefix for the argument language.
+     */
+    @NotNull
+    public static String commentPrefixFor(@NotNull LanguageEnumeration languageEnumeration) {
+        switch (languageEnumeration) {
+            case JAVASCRIPT:
+            case TYPESCRIPT:
+            case C:
+            case APEX:
+            case CPP:
+            case SCALA:
+            case DART:
+            case GO:
+            case OBJECTIVEC:
+            case KOTLIN:
+            case JAVA:
+            case SWIFT:
+            case SOLIDITY:
+            case RUST:
+            case SCSS:
+            case SASS:
+                return "//";
+            case PYTHON:
+            case SHELL:
+            case PERL:
+            case YAML:
+            case TERRAFORM:
+            case PHP:
+                return "#";
+            case COLDFUSION:
+                return "<!---";
+            case HASKELL:
+                return "--";
+            case CSS:
+                return "/*";
+            case TWIG:
+                return "{#";
+            default:
+                return "//";
+        }
+    }
+
+    /**
      * Keywords here are specified as lowercase values, and compared against the lowercase version of comment lines.
      */
     private static final Set<String> KEYWORDS_TO_FILTER_OUT = Set.of("todo", "fixme");
