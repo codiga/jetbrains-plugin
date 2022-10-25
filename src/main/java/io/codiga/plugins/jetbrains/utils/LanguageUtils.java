@@ -143,6 +143,9 @@ public final class LanguageUtils {
         }
     }
 
+    /**
+     * Keywords here are specified as lowercase values, and compared against the lowercase version of comment lines.
+     */
     private static final Set<String> KEYWORDS_TO_FILTER_OUT = Set.of("todo", "fixme");
 
     public static @NotNull String removeLineFromCommentsSymbols(@NotNull String line) {
