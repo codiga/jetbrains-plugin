@@ -10,4 +10,8 @@
                 language=""
                 implementationClass="io.codiga.plugins.jetbrains.annotators.RosieAnnotator"/>
     </extensions>
+
+    <extensions defaultExtensionNs="JavaScript.JsonSchema">
+        <ProviderFactory implementation="io.codiga.plugins.jetbrains.services.CodigaConfigSchemaProviderFactory"/>
+    </extensions>
 </idea-plugin>
