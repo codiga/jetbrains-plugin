@@ -17,9 +17,6 @@ import io.codiga.plugins.jetbrains.SnippetVisibility;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
-import io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier;
-import io.codiga.plugins.jetbrains.topics.SnippetToolWindowFileChangeNotifier;
-import io.codiga.plugins.jetbrains.topics.VisibilityKeyChangeNotifier;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -153,63 +150,40 @@ public class SnippetToolWindow {
          * Listen to message bus if the user added their API keys. If that is the
          * case, we update the user and search preferences.
          */
-        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC, new ApiKeyChangeNotifier() {
-            @Override
-            public void beforeAction(Object context) {
-                // empty, nothing needed here
-            }
-
-            @Override
-            public void afterAction(Object context) {
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC,
+            context -> {
                 updateUser();
                 updateSearchPreferences();
-            }
-        });
+            });
 
-        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_VISIBILITY_CHANGE_TOPIC, new VisibilityKeyChangeNotifier() {
-            @Override
-            public void beforeAction(Object context) {
-                // empty, nothing needed here
-            }
-
-            @Override
-            public void afterAction(Object context) {
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_VISIBILITY_CHANGE_TOPIC,
+            context -> {
                 updateUser();
                 initVisibilityFromSettings();
                 updateSearchPreferences();
+            });
+
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC, context -> {
+            updateUser();
+
+            // Check if project still active
+            if (project.isDisposed()) {
+                LOGGER.info("Project already disposed");
+                return;
             }
-        });
-
-        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC, new SnippetToolWindowFileChangeNotifier() {
-            @Override
-            public void beforeAction(Object context) {
-                // empty, nothing needed here
+            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+            if (fileEditorManager == null) {
+                return;
             }
-
-            @Override
-            public void afterAction(Object context) {
-                updateUser();
-
-                // Check if project still active
-                if (project.isDisposed()) {
-                    LOGGER.info("Project already disposed");
-                    return;
-                }
-                FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-                if (fileEditorManager == null) {
-                    return;
-                }
-                FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-                if (fileEditor == null) {
-                    return;
-                }
-                VirtualFile virtualFile = fileEditor.getFile();
-                if (virtualFile == null) {
-                    return;
-                }
-                updateEditor(project, virtualFile, Optional.empty(), true);
-
+            FileEditor fileEditor = fileEditorManager.getSelectedEditor();
+            if (fileEditor == null) {
+                return;
             }
+            VirtualFile virtualFile = fileEditor.getFile();
+            if (virtualFile == null) {
+                return;
+            }
+            updateEditor(project, virtualFile, Optional.empty(), true);
         });
 
 
