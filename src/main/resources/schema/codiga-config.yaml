@@ -1,0 +1,14 @@
+properties:
+  rulesets:
+    type: array
+    description: Specifies the list of Codiga Rosie ruleset names
+    # At least one item must be specified
+    minItems: 1
+    # Only unique ruleset names are allowed
+    uniqueItems: true
+    items:
+      type: string
+      example: a-ruleset-name
+required:
+  - rulesets
+additionalProperties: false
