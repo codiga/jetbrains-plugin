@@ -15,7 +15,7 @@ plugins {
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.3.1"
     //Lombok
-    id("io.freefair.lombok") version "6.5.0.3"
+    id("io.freefair.lombok") version "6.5.1"
 }
 
 group = properties("pluginGroup")
