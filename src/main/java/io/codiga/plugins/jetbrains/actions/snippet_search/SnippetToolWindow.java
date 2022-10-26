@@ -171,19 +171,25 @@ public class SnippetToolWindow {
                 LOGGER.info("Project already disposed");
                 return;
             }
-            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-            if (fileEditorManager == null) {
-                return;
-            }
-            FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-            if (fileEditor == null) {
-                return;
-            }
-            VirtualFile virtualFile = fileEditor.getFile();
-            if (virtualFile == null) {
-                return;
-            }
-            updateEditor(project, virtualFile, Optional.empty(), true);
+
+            Optional.ofNullable(FileEditorManager.getInstance(project))
+                .map(FileEditorManager::getSelectedEditor)
+                .map(FileEditor::getFile)
+                .ifPresent(virtualFile -> updateEditor(project, virtualFile, Optional.empty(), true));
+
+//            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+//            if (fileEditorManager == null) {
+//                return;
+//            }
+//            FileEditor fileEditor = fileEditorManager.getSelectedEditor();
+//            if (fileEditor == null) {
+//                return;
+//            }
+//            VirtualFile virtualFile = fileEditor.getFile();
+//            if (virtualFile == null) {
+//                return;
+//            }
+//            updateEditor(project, virtualFile, Optional.empty(), true);
         });
 
 
