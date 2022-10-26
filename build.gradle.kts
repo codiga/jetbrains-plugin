@@ -6,7 +6,7 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.7.10"
+    id("org.jetbrains.kotlin.jvm") version "1.7.20"
     // GraphQL
     id("com.apollographql.apollo") version "2.5.13"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
