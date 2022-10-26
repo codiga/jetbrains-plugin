@@ -18,6 +18,9 @@ import io.codiga.plugins.jetbrains.SnippetVisibility;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
+import io.codiga.plugins.jetbrains.topics.ApiKeyChangeNotifier;
+import io.codiga.plugins.jetbrains.topics.SnippetToolWindowFileChangeNotifier;
+import io.codiga.plugins.jetbrains.topics.VisibilityKeyChangeNotifier;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -142,32 +145,33 @@ public class SnippetToolWindow {
          * case, we update the user and search preferences.
          */
         ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC,
-            context -> {
+            (ApiKeyChangeNotifier) context -> {
                 updateUser();
                 updateSearchPreferences();
             });
 
         ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_VISIBILITY_CHANGE_TOPIC,
-            context -> {
+            (VisibilityKeyChangeNotifier) context -> {
                 updateUser();
                 initVisibilityFromSettings();
                 updateSearchPreferences();
             });
 
-        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC, context -> {
-            updateUser();
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC,
+            (SnippetToolWindowFileChangeNotifier) context -> {
+                updateUser();
 
-            // Check if project still active
-            if (project.isDisposed()) {
-                LOGGER.info("Project already disposed");
-                return;
-            }
+                // Check if project still active
+                if (project.isDisposed()) {
+                    LOGGER.info("Project already disposed");
+                    return;
+                }
 
-            Optional.ofNullable(FileEditorManager.getInstance(project))
-                .map(FileEditorManager::getSelectedEditor)
-                .map(FileEditor::getFile)
-                .ifPresent(virtualFile -> updateEditor(project, virtualFile, Optional.empty(), true));
-        });
+                Optional.ofNullable(FileEditorManager.getInstance(project))
+                    .map(FileEditorManager::getSelectedEditor)
+                    .map(FileEditor::getFile)
+                    .ifPresent(virtualFile -> updateEditor(project, virtualFile, Optional.empty(), true));
+            });
 
 
         /**
