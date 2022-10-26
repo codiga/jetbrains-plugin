@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.serviceContainer.AlreadyDisposedException;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.Alarm;
 import com.intellij.util.ui.AsyncProcessIcon;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -21,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
@@ -83,8 +83,9 @@ public class SnippetToolWindow {
          * in order to not hammer the backend with too many requests. We only make a
          * request if no key has not been typed within 500 ms.
          */
-        searchTerm.getDocument().addDocumentListener(new DocumentListener() {
-            private void updateResult() {
+        searchTerm.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
 
                 FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
@@ -114,17 +115,7 @@ public class SnippetToolWindow {
             }
 
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateResult();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateResult();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(@NotNull DocumentEvent e) {
                 // empty, nothing needed here
             }
         });
@@ -176,20 +167,6 @@ public class SnippetToolWindow {
                 .map(FileEditorManager::getSelectedEditor)
                 .map(FileEditor::getFile)
                 .ifPresent(virtualFile -> updateEditor(project, virtualFile, Optional.empty(), true));
-
-//            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-//            if (fileEditorManager == null) {
-//                return;
-//            }
-//            FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-//            if (fileEditor == null) {
-//                return;
-//            }
-//            VirtualFile virtualFile = fileEditor.getFile();
-//            if (virtualFile == null) {
-//                return;
-//            }
-//            updateEditor(project, virtualFile, Optional.empty(), true);
         });
 
 
