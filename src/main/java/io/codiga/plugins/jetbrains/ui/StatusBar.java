@@ -47,18 +47,8 @@ public class StatusBar implements StatusBarWidgetFactory {
         if (statusBar != null) {
             ApplicationManager.getApplication()
                 .getMessageBus().connect()
-                .subscribe(CodigaEnabledStatusNotifier.CODIGA_ENABLED_CHANGE_TOPIC, new CodigaEnabledStatusNotifier() {
-
-                    @Override
-                    public void beforeAction(Object context) {
-                        // no need any before action
-                    }
-
-                    @Override
-                    public void afterAction(Object context) {
-                        statusBar.updateWidget(getId());
-                    }
-                });
+                .subscribe(CodigaEnabledStatusNotifier.CODIGA_ENABLED_CHANGE_TOPIC,
+                    (CodigaEnabledStatusNotifier) context -> statusBar.updateWidget(getId()));
         }
         return new CodigaStatusWidget();
     }

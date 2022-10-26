@@ -3,10 +3,8 @@ package io.codiga.plugins.jetbrains.dependencies;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import io.codiga.api.type.LanguageEnumeration;
-import io.codiga.plugins.jetbrains.cache.ShortcutCache;
 import io.codiga.plugins.jetbrains.model.Dependency;
 import com.google.common.collect.ImmutableList;
-import com.intellij.psi.PsiFile;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 
 import java.util.List;

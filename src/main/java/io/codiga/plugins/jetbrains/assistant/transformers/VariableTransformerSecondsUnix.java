@@ -2,11 +2,7 @@ package io.codiga.plugins.jetbrains.assistant.transformers;
 
 import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class VariableTransformerSecondsUnix implements VariableTransformer {
   /**

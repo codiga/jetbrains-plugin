@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.serviceContainer.AlreadyDisposedException;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.Alarm;
 import com.intellij.util.ui.AsyncProcessIcon;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -24,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
@@ -86,8 +86,9 @@ public class SnippetToolWindow {
          * in order to not hammer the backend with too many requests. We only make a
          * request if no key has not been typed within 500 ms.
          */
-        searchTerm.getDocument().addDocumentListener(new DocumentListener() {
-            private void updateResult() {
+        searchTerm.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
 
                 FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
@@ -117,17 +118,7 @@ public class SnippetToolWindow {
             }
 
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateResult();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateResult();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(@NotNull DocumentEvent e) {
                 // empty, nothing needed here
             }
         });
@@ -153,41 +144,21 @@ public class SnippetToolWindow {
          * Listen to message bus if the user added their API keys. If that is the
          * case, we update the user and search preferences.
          */
-        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC, new ApiKeyChangeNotifier() {
-            @Override
-            public void beforeAction(Object context) {
-                // empty, nothing needed here
-            }
-
-            @Override
-            public void afterAction(Object context) {
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_API_KEY_CHANGE_TOPIC,
+            (ApiKeyChangeNotifier) context -> {
                 updateUser();
                 updateSearchPreferences();
-            }
-        });
+            });
 
-        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_VISIBILITY_CHANGE_TOPIC, new VisibilityKeyChangeNotifier() {
-            @Override
-            public void beforeAction(Object context) {
-                // empty, nothing needed here
-            }
-
-            @Override
-            public void afterAction(Object context) {
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_VISIBILITY_CHANGE_TOPIC,
+            (VisibilityKeyChangeNotifier) context -> {
                 updateUser();
                 initVisibilityFromSettings();
                 updateSearchPreferences();
-            }
-        });
+            });
 
-        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC, new SnippetToolWindowFileChangeNotifier() {
-            @Override
-            public void beforeAction(Object context) {
-                // empty, nothing needed here
-            }
-
-            @Override
-            public void afterAction(Object context) {
+        ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC,
+            (SnippetToolWindowFileChangeNotifier) context -> {
                 updateUser();
 
                 // Check if project still active
@@ -195,22 +166,12 @@ public class SnippetToolWindow {
                     LOGGER.info("Project already disposed");
                     return;
                 }
-                FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-                if (fileEditorManager == null) {
-                    return;
-                }
-                FileEditor fileEditor = fileEditorManager.getSelectedEditor();
-                if (fileEditor == null) {
-                    return;
-                }
-                VirtualFile virtualFile = fileEditor.getFile();
-                if (virtualFile == null) {
-                    return;
-                }
-                updateEditor(project, virtualFile, Optional.empty(), true);
 
-            }
-        });
+                Optional.ofNullable(FileEditorManager.getInstance(project))
+                    .map(FileEditorManager::getSelectedEditor)
+                    .map(FileEditor::getFile)
+                    .ifPresent(virtualFile -> updateEditor(project, virtualFile, Optional.empty(), true));
+            });
 
 
         /**

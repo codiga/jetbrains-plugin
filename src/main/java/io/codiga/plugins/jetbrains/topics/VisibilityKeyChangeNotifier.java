@@ -8,12 +8,8 @@ import com.intellij.util.messages.Topic;
  * We subscribe to this topic in the preferences when the API key change in order to refresh the list
  * of projects.
  */
-public interface VisibilityKeyChangeNotifier {
+public interface VisibilityKeyChangeNotifier extends ChangeNotifier {
 
     Topic<VisibilityKeyChangeNotifier> CODIGA_VISIBILITY_CHANGE_TOPIC =
         Topic.create("Codiga snippets visibility change", VisibilityKeyChangeNotifier.class);
-
-    void beforeAction(Object context);
-
-    void afterAction(Object context);
 }

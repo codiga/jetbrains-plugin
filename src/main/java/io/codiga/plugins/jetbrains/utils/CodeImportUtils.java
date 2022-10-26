@@ -4,10 +4,8 @@ import io.codiga.api.type.LanguageEnumeration;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static io.codiga.plugins.jetbrains.Constants.LINE_SEPARATOR;
-import static io.codiga.plugins.jetbrains.Constants.PYTHON_IMPORT_KEYWORD;
 
 /**
  * All methods to handle imports in code. This is specifally used in the coding

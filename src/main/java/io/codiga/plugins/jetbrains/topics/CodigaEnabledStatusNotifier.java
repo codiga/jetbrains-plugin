@@ -8,12 +8,8 @@ import com.intellij.util.messages.Topic;
  * We subscribe to this topic in the preferences when the API key change in order to refresh the list
  * of projects.
  */
-public interface CodigaEnabledStatusNotifier {
+public interface CodigaEnabledStatusNotifier extends ChangeNotifier {
 
     Topic<CodigaEnabledStatusNotifier> CODIGA_ENABLED_CHANGE_TOPIC =
         Topic.create("Codiga inline completion change", CodigaEnabledStatusNotifier.class);
-
-    void beforeAction(Object context);
-
-    void afterAction(Object context);
 }
