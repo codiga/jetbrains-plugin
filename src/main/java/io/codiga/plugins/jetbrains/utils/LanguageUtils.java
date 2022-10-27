@@ -7,6 +7,7 @@ import io.codiga.plugins.jetbrains.actions.snippet_search.service.DefaultFileTyp
 import io.codiga.plugins.jetbrains.actions.snippet_search.service.JavaFileTypeService;
 import io.codiga.plugins.jetbrains.actions.snippet_search.service.PythonFileTypeService;
 import io.codiga.plugins.jetbrains.actions.snippet_search.service.SyntaxHighlightFileTypeService;
+import io.codiga.plugins.jetbrains.actions.snippet_search.service.YamlFileTypeService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -23,7 +24,8 @@ public final class LanguageUtils {
      */
     private static final Map<LanguageEnumeration, Class<? extends SyntaxHighlightFileTypeService>> LANGUAGE_TO_SERVICE = Map.of(
         LanguageEnumeration.JAVA, JavaFileTypeService.class,
-        LanguageEnumeration.PYTHON, PythonFileTypeService.class
+        LanguageEnumeration.PYTHON, PythonFileTypeService.class,
+        LanguageEnumeration.YAML, YamlFileTypeService.class
     );
 
     private LanguageUtils() {
