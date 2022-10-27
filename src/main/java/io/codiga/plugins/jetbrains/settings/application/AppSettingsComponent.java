@@ -2,10 +2,11 @@ package io.codiga.plugins.jetbrains.settings.application;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.util.ui.FormBuilder;
+import com.intellij.util.ui.UI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.ui.DialogApiStatus;
@@ -128,20 +129,26 @@ public class AppSettingsComponent {
         buttonsPanel.add(buttonGetApiKeys);
         buttonsPanel.add(buttonTestConnection);
         p.addToRight(buttonsPanel);
-        myMainPanel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(new JBLabel(SETTINGS_API_TOKEN_LABEL), apiToken, 1, false)
-            .addLabeledComponent(new JBLabel("            "), new JBLabel(" Add your Codiga API keys to use your recipes in your IDE."), 1, false)
-            .addComponent(p, 0)
-            .addLabeledComponent(this.codigaEnabledCheckbox, new JBLabel(SETTINGS_ENABLED_CODIGA))
-            .addLabeledComponent(this.useCompletationCheckbox, new JBLabel(SETTINGS_ENABLED_COMPLETION))
-            .addLabeledComponent(useInlineCompletionCheckbox, new JBLabel(SETTINGS_ENABLED_INLINE_COMPLETION))
-            .addSeparator(1)
 
-            .addComponent(new JLabel(SETTINGS_SNIPPETS_VISIBILITY_PARAMETERS), 1)
-            .addLabeledComponent(snippetsVisibilityAll, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_ALL_SNIPPETS))
-            .addLabeledComponent(snippetsVisibilityPublic, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_PUBLIC_SNIPPETS_ONLY))
-            .addLabeledComponent(snippetsVisibilityPrivate, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_PRIVATE_ONLY))
-            .addLabeledComponent(snippetsVisibilityFavoriteOnly, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_FAVORITE_ONLY))
+        JPanel apiTokenPanel = UI.PanelFactory.panel(apiToken).withComment(SETTINGS_API_TOKEN_COMMENT).createPanel();
+        myMainPanel = FormBuilder.createFormBuilder()
+            .addComponent(new TitledSeparator(SETTINGS_CODIGA_ACCOUNT_SECTION_TITLE))
+            .addVerticalGap(2)
+            .addLabeledComponent(SETTINGS_API_TOKEN_LABEL, apiTokenPanel, 1, true)
+            .addComponent(p, 0)
+
+            .addComponent(new TitledSeparator(SETTINGS_CODE_AND_INLINE_COMPLETION_SECTION_TITLE))
+            .addComponent(this.codigaEnabledCheckbox)
+            .addComponent(this.useCompletionCheckbox)
+            .addComponent(useInlineCompletionCheckbox)
+            .addVerticalGap(3)
+
+            .addComponent(new TitledSeparator(SETTINGS_SNIPPETS_VISIBILITY_PARAMETERS))
+            .addComponent(snippetsVisibilityAll)
+            .addComponent(snippetsVisibilityPublic)
+            .addComponent(snippetsVisibilityPrivate)
+            .addVerticalGap(2)
+            .addComponent(snippetsVisibilityFavoriteOnly)
             .addVerticalGap(5)
             .addComponentFillVertically(new JPanel(), 0)
             .getPanel();
@@ -158,10 +165,7 @@ public class AppSettingsComponent {
 
     @NotNull
     public String getApiToken() {
-        if (apiToken.getPassword() == null){
-            return "";
-        }
-        if (apiToken.getPassword().length == 0){
+        if (apiToken.getPassword() == null || apiToken.getPassword().length == 0) {
             return "";
         }
         return new String(apiToken.getPassword());
@@ -202,7 +206,7 @@ public class AppSettingsComponent {
         }
     }
 
-    public void setUseInlineComplextion(Boolean b) {
+    public void setUseInlineCompletion(Boolean b) {
         this.useInlineCompletion = b;
         this.useInlineCompletionCheckbox.setSelected(b);
         this.useInlineCompletionCheckbox.setEnabled(codigaEnabled);
