@@ -82,10 +82,12 @@ public class AppSettingsConfigurable implements Configurable {
         if (settings.getApiToken() != null) {
             mySettingsComponent.setApiToken(settings.getApiToken());
         }
-        mySettingsComponent.setUseEnabledCheckbox(settings.getUseCompletion());
-        mySettingsComponent.setSnippetsVisiliblity(settings.getPrivateSnippetsOnly(), settings.getPublicSnippetsOnly(), settings.getFavoriteSnippetsOnly());
-        mySettingsComponent.setUseInlineComplextion(settings.getUseInlineCompletion());
+        //Make sure this is set before the rest of the code completion checkboxes, because enabling those ones
+        // depends on this one.
         mySettingsComponent.setCodigaEnabled(settings.getCodigaEnabled());
+        mySettingsComponent.setUseEnabledCheckbox(settings.getUseCompletion());
+        mySettingsComponent.setSnippetsVisibility(settings.getPrivateSnippetsOnly(), settings.getPublicSnippetsOnly(), settings.getFavoriteSnippetsOnly());
+        mySettingsComponent.setUseInlineCompletion(settings.getUseInlineCompletion());
     }
 
     @Override

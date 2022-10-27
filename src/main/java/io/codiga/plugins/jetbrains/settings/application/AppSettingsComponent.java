@@ -205,12 +205,14 @@ public class AppSettingsComponent {
     public void setUseInlineComplextion(Boolean b) {
         this.useInlineCompletion = b;
         this.useInlineCompletionCheckbox.setSelected(b);
+        this.useInlineCompletionCheckbox.setEnabled(codigaEnabled);
     }
 
     public void setUseEnabledCheckbox(Boolean b) {
         if (this.useCompletionCheckbox != null) {
             this.useCompletion = b;
             this.useCompletionCheckbox.setSelected(b);
+            this.useCompletionCheckbox.setEnabled(codigaEnabled);
         }
     }
 
