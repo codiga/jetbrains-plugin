@@ -43,6 +43,7 @@ import static io.codiga.plugins.jetbrains.utils.LanguageUtils.getLanguageName;
  */
 public class SnippetToolWindow {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
+    private static final LoginMouseListener LOGGED_IN_LABEL_MOUSE_LISTENER = new LoginMouseListener();
     private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
     private final JPanel noRecipePanel = new JPanel();
     private final JPanel languageNotSupportedPanel = new JPanel();
@@ -279,7 +280,8 @@ public class SnippetToolWindow {
             searchFavoriteSnippetsOnlyEnabled = true;
             String htmlLoginLabel = String.format("<html>Logged as <a href=\"https://app.codiga.io\">%s</a></html>", username.get());
             loggedInLabel.setText(htmlLoginLabel);
-            loggedInLabel.addMouseListener(new LoginMouseListener());
+            loggedInLabel.removeMouseListener(LOGGED_IN_LABEL_MOUSE_LISTENER);
+            loggedInLabel.addMouseListener(LOGGED_IN_LABEL_MOUSE_LISTENER);
         } else {
             snippetVisibility.setVisibilities(true, false, false, false);
             setDefaultValuesForSearchPreferences();
