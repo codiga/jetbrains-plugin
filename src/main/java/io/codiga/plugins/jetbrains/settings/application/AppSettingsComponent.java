@@ -28,13 +28,13 @@ public class AppSettingsComponent {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final JPanel myMainPanel;
     private final JPasswordField apiToken = new JPasswordField(40);
-    private final JCheckBox useCompletationCheckbox;
-    private JBRadioButton snippetsVisibilityAll = new JBRadioButton();
-    private JBRadioButton snippetsVisibilityPublic = new JBRadioButton();
-    private JBRadioButton snippetsVisibilityPrivate = new JBRadioButton();
-    private JBCheckBox snippetsVisibilityFavoriteOnly = new JBCheckBox();
-    private JBCheckBox useInlineCompletionCheckbox = new JBCheckBox();
-    private JBCheckBox codigaEnabledCheckbox = new JBCheckBox();
+    private final JCheckBox useCompletionCheckbox;
+    private JBRadioButton snippetsVisibilityAll = new JBRadioButton(SETTINGS_SNIPPETS_VISIBILITY_ALL_SNIPPETS);
+    private JBRadioButton snippetsVisibilityPublic = new JBRadioButton(SETTINGS_SNIPPETS_VISIBILITY_PUBLIC_SNIPPETS_ONLY);
+    private JBRadioButton snippetsVisibilityPrivate = new JBRadioButton(SETTINGS_SNIPPETS_VISIBILITY_PRIVATE_ONLY);
+    private JBCheckBox snippetsVisibilityFavoriteOnly = new JBCheckBox(SETTINGS_SNIPPETS_VISIBILITY_FAVORITE_ONLY);
+    private JBCheckBox useInlineCompletionCheckbox = new JBCheckBox(SETTINGS_ENABLED_INLINE_COMPLETION);
+    private JBCheckBox codigaEnabledCheckbox = new JBCheckBox(SETTINGS_ENABLED_CODIGA);
     private boolean useCompletion;
     private boolean useInlineCompletion;
     private boolean snippetsPublicOnly;
@@ -59,11 +59,11 @@ public class AppSettingsComponent {
         JButton buttonGetApiKeys = new JButton(SETTINGS_GET_API_TOKEN_BUTTON_TEXT);
 
 
-        useCompletationCheckbox = new JCheckBox();
+        useCompletionCheckbox = new JCheckBox(SETTINGS_ENABLED_COMPLETION);
 
-        useCompletationCheckbox.addActionListener(event -> {
-            LOGGER.debug("setting isDisabled to" + useCompletationCheckbox.isSelected());
-            useCompletion = useCompletationCheckbox.isSelected();
+        useCompletionCheckbox.addActionListener(event -> {
+            LOGGER.debug("setting isDisabled to" + useCompletionCheckbox.isSelected());
+            useCompletion = useCompletionCheckbox.isSelected();
         });
 
         snippetsVisibilityAll.addActionListener(event -> {
@@ -105,8 +105,7 @@ public class AppSettingsComponent {
             this.codigaEnabled = codigaEnabledCheckbox.isSelected();
 
             this.useInlineCompletionCheckbox.setEnabled(this.codigaEnabled);
-            this.useCompletationCheckbox.setEnabled(this.codigaEnabled);
-
+            this.useCompletionCheckbox.setEnabled(this.codigaEnabled);
         });
 
 
@@ -210,9 +209,9 @@ public class AppSettingsComponent {
     }
 
     public void setUseEnabledCheckbox(Boolean b) {
-        if (this.useCompletationCheckbox != null) {
+        if (this.useCompletionCheckbox != null) {
             this.useCompletion = b;
-            this.useCompletationCheckbox.setSelected(b);
+            this.useCompletionCheckbox.setSelected(b);
         }
     }
 
