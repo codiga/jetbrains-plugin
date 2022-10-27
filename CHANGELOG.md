@@ -7,12 +7,15 @@
 - Added JSON/YAML schema provider for the `codiga.yml` config file, so that code completion and automatic validation in that file is performed automatically.
 
 ### Changed
+- Improved the plugin's settings UI.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+- Fixed a UI issue on the plugin's settings page that the checkboxes did not reflect Codiga's disabled state.
+- Fixed the issue that the status bar icon's tooltip text did not update upon enabling/disabling Codiga.
 
 ### Security
 

@@ -2,10 +2,11 @@ package io.codiga.plugins.jetbrains.settings.application;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.util.ui.FormBuilder;
+import com.intellij.util.ui.UI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.ui.DialogApiStatus;
@@ -28,13 +29,13 @@ public class AppSettingsComponent {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final JPanel myMainPanel;
     private final JPasswordField apiToken = new JPasswordField(40);
-    private final JCheckBox useCompletationCheckbox;
-    private JBRadioButton snippetsVisibilityAll = new JBRadioButton();
-    private JBRadioButton snippetsVisibilityPublic = new JBRadioButton();
-    private JBRadioButton snippetsVisibilityPrivate = new JBRadioButton();
-    private JBCheckBox snippetsVisibilityFavoriteOnly = new JBCheckBox();
-    private JBCheckBox useInlineCompletionCheckbox = new JBCheckBox();
-    private JBCheckBox codigaEnabledCheckbox = new JBCheckBox();
+    private final JCheckBox useCompletionCheckbox;
+    private JBRadioButton snippetsVisibilityAll = new JBRadioButton(SETTINGS_SNIPPETS_VISIBILITY_ALL_SNIPPETS);
+    private JBRadioButton snippetsVisibilityPublic = new JBRadioButton(SETTINGS_SNIPPETS_VISIBILITY_PUBLIC_SNIPPETS_ONLY);
+    private JBRadioButton snippetsVisibilityPrivate = new JBRadioButton(SETTINGS_SNIPPETS_VISIBILITY_PRIVATE_ONLY);
+    private JBCheckBox snippetsVisibilityFavoriteOnly = new JBCheckBox(SETTINGS_SNIPPETS_VISIBILITY_FAVORITE_ONLY);
+    private JBCheckBox useInlineCompletionCheckbox = new JBCheckBox(SETTINGS_ENABLED_INLINE_COMPLETION);
+    private JBCheckBox codigaEnabledCheckbox = new JBCheckBox(SETTINGS_ENABLED_CODIGA);
     private boolean useCompletion;
     private boolean useInlineCompletion;
     private boolean snippetsPublicOnly;
@@ -58,12 +59,18 @@ public class AppSettingsComponent {
         JButton buttonTestConnection = new JButton(SETTINGS_TEST_API_BUTTON_TEXT);
         JButton buttonGetApiKeys = new JButton(SETTINGS_GET_API_TOKEN_BUTTON_TEXT);
 
+        //The button group is responsible for making sure that only one
+        // radio button in that group can be selected at a time
+        var snippetVisibilityGroup = new ButtonGroup();
+        snippetVisibilityGroup.add(snippetsVisibilityAll);
+        snippetVisibilityGroup.add(snippetsVisibilityPublic);
+        snippetVisibilityGroup.add(snippetsVisibilityPrivate);
 
-        useCompletationCheckbox = new JCheckBox();
+        useCompletionCheckbox = new JCheckBox(SETTINGS_ENABLED_COMPLETION);
 
-        useCompletationCheckbox.addActionListener(event -> {
-            LOGGER.debug("setting isDisabled to" + useCompletationCheckbox.isSelected());
-            useCompletion = useCompletationCheckbox.isSelected();
+        useCompletionCheckbox.addActionListener(event -> {
+            LOGGER.debug("setting isDisabled to" + useCompletionCheckbox.isSelected());
+            useCompletion = useCompletionCheckbox.isSelected();
         });
 
         snippetsVisibilityAll.addActionListener(event -> {
@@ -71,16 +78,13 @@ public class AppSettingsComponent {
                 this.snippetsPublicOnly = false;
                 this.snippetsPrivateOnly = false;
             }
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
         });
-
 
         snippetsVisibilityPublic.addActionListener(event -> {
             if (snippetsVisibilityPublic.isSelected()) {
                 this.snippetsPublicOnly = true;
                 this.snippetsPrivateOnly = false;
             }
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
         });
 
         snippetsVisibilityPrivate.addActionListener(event -> {
@@ -88,25 +92,20 @@ public class AppSettingsComponent {
                 this.snippetsPublicOnly = false;
                 this.snippetsPrivateOnly = true;
             }
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
         });
 
 
-        snippetsVisibilityFavoriteOnly.addActionListener(event -> {
-            this.snippetsFavoriteOnly = snippetsVisibilityFavoriteOnly.isSelected();
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
-        });
+        snippetsVisibilityFavoriteOnly.addActionListener(event ->
+            this.snippetsFavoriteOnly = snippetsVisibilityFavoriteOnly.isSelected());
 
-        useInlineCompletionCheckbox.addActionListener(event -> {
-            this.useInlineCompletion = useInlineCompletionCheckbox.isSelected();
-        });
+        useInlineCompletionCheckbox.addActionListener(event ->
+            this.useInlineCompletion = useInlineCompletionCheckbox.isSelected());
 
         codigaEnabledCheckbox.addActionListener(event -> {
             this.codigaEnabled = codigaEnabledCheckbox.isSelected();
 
             this.useInlineCompletionCheckbox.setEnabled(this.codigaEnabled);
-            this.useCompletationCheckbox.setEnabled(this.codigaEnabled);
-
+            this.useCompletionCheckbox.setEnabled(this.codigaEnabled);
         });
 
 
@@ -130,20 +129,26 @@ public class AppSettingsComponent {
         buttonsPanel.add(buttonGetApiKeys);
         buttonsPanel.add(buttonTestConnection);
         p.addToRight(buttonsPanel);
-        myMainPanel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(new JBLabel(SETTINGS_API_TOKEN_LABEL), apiToken, 1, false)
-            .addLabeledComponent(new JBLabel("            "), new JBLabel(" Add your Codiga API keys to use your recipes in your IDE."), 1, false)
-            .addComponent(p, 0)
-            .addLabeledComponent(this.codigaEnabledCheckbox, new JBLabel(SETTINGS_ENABLED_CODIGA))
-            .addLabeledComponent(this.useCompletationCheckbox, new JBLabel(SETTINGS_ENABLED_COMPLETION))
-            .addLabeledComponent(useInlineCompletionCheckbox, new JBLabel(SETTINGS_ENABLED_INLINE_COMPLETION))
-            .addSeparator(1)
 
-            .addComponent(new JLabel(SETTINGS_SNIPPETS_VISIBILITY_PARAMETERS), 1)
-            .addLabeledComponent(snippetsVisibilityAll, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_ALL_SNIPPETS))
-            .addLabeledComponent(snippetsVisibilityPublic, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_PUBLIC_SNIPPETS_ONLY))
-            .addLabeledComponent(snippetsVisibilityPrivate, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_PRIVATE_ONLY))
-            .addLabeledComponent(snippetsVisibilityFavoriteOnly, new JBLabel(SETTINGS_SNIPPETS_VISIBILITY_FAVORITE_ONLY))
+        JPanel apiTokenPanel = UI.PanelFactory.panel(apiToken).withComment(SETTINGS_API_TOKEN_COMMENT).createPanel();
+        myMainPanel = FormBuilder.createFormBuilder()
+            .addComponent(new TitledSeparator(SETTINGS_CODIGA_ACCOUNT_SECTION_TITLE))
+            .addVerticalGap(2)
+            .addLabeledComponent(SETTINGS_API_TOKEN_LABEL, apiTokenPanel, 1, true)
+            .addComponent(p, 0)
+
+            .addComponent(new TitledSeparator(SETTINGS_CODE_AND_INLINE_COMPLETION_SECTION_TITLE))
+            .addComponent(this.codigaEnabledCheckbox)
+            .addComponent(this.useCompletionCheckbox)
+            .addComponent(useInlineCompletionCheckbox)
+            .addVerticalGap(3)
+
+            .addComponent(new TitledSeparator(SETTINGS_SNIPPETS_VISIBILITY_PARAMETERS))
+            .addComponent(snippetsVisibilityAll)
+            .addComponent(snippetsVisibilityPublic)
+            .addComponent(snippetsVisibilityPrivate)
+            .addVerticalGap(2)
+            .addComponent(snippetsVisibilityFavoriteOnly)
             .addVerticalGap(5)
             .addComponentFillVertically(new JPanel(), 0)
             .getPanel();
@@ -160,10 +165,7 @@ public class AppSettingsComponent {
 
     @NotNull
     public String getApiToken() {
-        if (apiToken.getPassword() == null){
-            return "";
-        }
-        if (apiToken.getPassword().length == 0){
+        if (apiToken.getPassword() == null || apiToken.getPassword().length == 0) {
             return "";
         }
         return new String(apiToken.getPassword());
@@ -204,49 +206,44 @@ public class AppSettingsComponent {
         }
     }
 
-    public void setUseInlineComplextion(Boolean b) {
+    public void setUseInlineCompletion(Boolean b) {
         this.useInlineCompletion = b;
         this.useInlineCompletionCheckbox.setSelected(b);
+        this.useInlineCompletionCheckbox.setEnabled(codigaEnabled);
     }
 
     public void setUseEnabledCheckbox(Boolean b) {
-        if (this.useCompletationCheckbox != null) {
+        if (this.useCompletionCheckbox != null) {
             this.useCompletion = b;
-            this.useCompletationCheckbox.setSelected(b);
+            this.useCompletionCheckbox.setSelected(b);
+            this.useCompletionCheckbox.setEnabled(codigaEnabled);
         }
     }
 
-    public void setSnippetsVisiliblity(boolean privateOnly, boolean publicOnly, boolean favoriteOnly) {
+    public void setSnippetsVisibility(boolean privateOnly, boolean publicOnly, boolean favoriteOnly) {
         LOGGER.debug("private: " + privateOnly);
         LOGGER.debug("public: " + publicOnly);
         LOGGER.debug("favorite: " + favoriteOnly);
         this.snippetsPublicOnly = publicOnly;
         this.snippetsFavoriteOnly = favoriteOnly;
         this.snippetsPrivateOnly = privateOnly;
-        if (this.snippetsVisibilityAll == null || this.snippetsVisibilityPrivate == null || this.snippetsVisibilityPublic == null || this.snippetsVisibilityFavoriteOnly == null) {
+        if (this.snippetsVisibilityAll == null
+            || this.snippetsVisibilityPrivate == null
+            || this.snippetsVisibilityPublic == null
+            || this.snippetsVisibilityFavoriteOnly == null) {
             return;
-
         }
 
         if (!privateOnly && !publicOnly) {
             this.snippetsVisibilityAll.setSelected(true);
-            this.snippetsVisibilityPublic.setSelected(false);
-            this.snippetsVisibilityPrivate.setSelected(false);
         }
         if (!privateOnly && publicOnly) {
-            this.snippetsVisibilityAll.setSelected(false);
             this.snippetsVisibilityPublic.setSelected(true);
-            this.snippetsVisibilityPrivate.setSelected(false);
         }
         if (privateOnly && !publicOnly) {
-            this.snippetsVisibilityAll.setSelected(false);
-            this.snippetsVisibilityPublic.setSelected(false);
             this.snippetsVisibilityPrivate.setSelected(true);
         }
 
-
         this.snippetsVisibilityFavoriteOnly.setSelected(favoriteOnly);
-
     }
 }
-
