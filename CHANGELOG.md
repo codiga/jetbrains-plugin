@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.7.21]
+### Added
 - Added JSON/YAML schema provider for the `codiga.yml` config file, so that code completion and automatic validation in that file is performed automatically.
 
 ### Changed
