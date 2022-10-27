@@ -58,6 +58,12 @@ public class AppSettingsComponent {
         JButton buttonTestConnection = new JButton(SETTINGS_TEST_API_BUTTON_TEXT);
         JButton buttonGetApiKeys = new JButton(SETTINGS_GET_API_TOKEN_BUTTON_TEXT);
 
+        //The button group is responsible for making sure that only one
+        // radio button in that group can be selected at a time
+        var snippetVisibilityGroup = new ButtonGroup();
+        snippetVisibilityGroup.add(snippetsVisibilityAll);
+        snippetVisibilityGroup.add(snippetsVisibilityPublic);
+        snippetVisibilityGroup.add(snippetsVisibilityPrivate);
 
         useCompletionCheckbox = new JCheckBox(SETTINGS_ENABLED_COMPLETION);
 
@@ -71,16 +77,13 @@ public class AppSettingsComponent {
                 this.snippetsPublicOnly = false;
                 this.snippetsPrivateOnly = false;
             }
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
         });
-
 
         snippetsVisibilityPublic.addActionListener(event -> {
             if (snippetsVisibilityPublic.isSelected()) {
                 this.snippetsPublicOnly = true;
                 this.snippetsPrivateOnly = false;
             }
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
         });
 
         snippetsVisibilityPrivate.addActionListener(event -> {
@@ -88,18 +91,14 @@ public class AppSettingsComponent {
                 this.snippetsPublicOnly = false;
                 this.snippetsPrivateOnly = true;
             }
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
         });
 
 
-        snippetsVisibilityFavoriteOnly.addActionListener(event -> {
-            this.snippetsFavoriteOnly = snippetsVisibilityFavoriteOnly.isSelected();
-            setSnippetsVisiliblity(this.snippetsPrivateOnly, this.snippetsPublicOnly, this.snippetsFavoriteOnly);
-        });
+        snippetsVisibilityFavoriteOnly.addActionListener(event ->
+            this.snippetsFavoriteOnly = snippetsVisibilityFavoriteOnly.isSelected());
 
-        useInlineCompletionCheckbox.addActionListener(event -> {
-            this.useInlineCompletion = useInlineCompletionCheckbox.isSelected();
-        });
+        useInlineCompletionCheckbox.addActionListener(event ->
+            this.useInlineCompletion = useInlineCompletionCheckbox.isSelected());
 
         codigaEnabledCheckbox.addActionListener(event -> {
             this.codigaEnabled = codigaEnabledCheckbox.isSelected();
@@ -215,37 +214,30 @@ public class AppSettingsComponent {
         }
     }
 
-    public void setSnippetsVisiliblity(boolean privateOnly, boolean publicOnly, boolean favoriteOnly) {
+    public void setSnippetsVisibility(boolean privateOnly, boolean publicOnly, boolean favoriteOnly) {
         LOGGER.debug("private: " + privateOnly);
         LOGGER.debug("public: " + publicOnly);
         LOGGER.debug("favorite: " + favoriteOnly);
         this.snippetsPublicOnly = publicOnly;
         this.snippetsFavoriteOnly = favoriteOnly;
         this.snippetsPrivateOnly = privateOnly;
-        if (this.snippetsVisibilityAll == null || this.snippetsVisibilityPrivate == null || this.snippetsVisibilityPublic == null || this.snippetsVisibilityFavoriteOnly == null) {
+        if (this.snippetsVisibilityAll == null
+            || this.snippetsVisibilityPrivate == null
+            || this.snippetsVisibilityPublic == null
+            || this.snippetsVisibilityFavoriteOnly == null) {
             return;
-
         }
 
         if (!privateOnly && !publicOnly) {
             this.snippetsVisibilityAll.setSelected(true);
-            this.snippetsVisibilityPublic.setSelected(false);
-            this.snippetsVisibilityPrivate.setSelected(false);
         }
         if (!privateOnly && publicOnly) {
-            this.snippetsVisibilityAll.setSelected(false);
             this.snippetsVisibilityPublic.setSelected(true);
-            this.snippetsVisibilityPrivate.setSelected(false);
         }
         if (privateOnly && !publicOnly) {
-            this.snippetsVisibilityAll.setSelected(false);
-            this.snippetsVisibilityPublic.setSelected(false);
             this.snippetsVisibilityPrivate.setSelected(true);
         }
 
-
         this.snippetsVisibilityFavoriteOnly.setSelected(favoriteOnly);
-
     }
 }
-
