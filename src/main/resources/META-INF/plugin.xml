@@ -1,10 +1,42 @@
 <idea-plugin>
     <id>io.codiga.plugins.jetbrains-plugin</id>
-    <name>Codiga - Smart Code Snippets</name>
+    <name>Codiga</name>
     <vendor email="support@codiga.io" url="http://www.codiga.io">Codiga</vendor>
 
     <description>
         <![CDATA[
+            <p>
+            Code Analysis and Code Snippets on Steroids!
+            </p>
+
+            <h2>Code Analysis</h2>
+            <p>
+                Codiga analyzes your code in real-time and suggests fixes. Codiga uses public rules available on the
+                <a href="https://app.codiga.io/hub/rulesets">hub</a>. You can also create your own code analysis rules.
+            </p>
+            <p>
+                Use static code analysis rules from the <a href="https://app.codiga.io/hub/rulesets">Codiga Hub</a> or use
+                your private rules (requires API token to be specified).
+            </p>
+            <h3>Quick Start</h3>
+            <ul>
+                <li>Select rulesets from the <a href="https://app.codiga.io/hub/rulesets">Codiga Hub</a> to check your Python code</li>
+                <li>Create a codiga.yml file at the root of your project with the list of rulesets you want to use (example below)</li>
+                <li>Get feedback on your code in real-time!</li>
+            </ul>
+
+            <h3>Configuration Example</h3>
+            <p>
+                Create a codiga.yml file at the root of your project with the following content.
+            </p>
+            <pre>
+rulesets:
+  - python-security
+  - python-flask
+  - python-best-practices
+            </pre>
+
+            <h2>Code Snippets</h2>
             <p>
                 Search, create and share <a href="https://www.codiga.io/code-snippets/smart-code-snippets/">Smart Code Snippets</a> for 15+ languages.
             </p>
