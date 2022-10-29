@@ -8,6 +8,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ProcessingContext;
@@ -108,14 +109,15 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
             .map(kw -> kw.substring(1));
 
 
+        Project project = parameters.getOriginalFile().getProject();
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
 
-        List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile())
+        List<String> dependenciesName = dependencyManagement.getDependencies(project, virtualFile)
             .stream().map(Dependency::getName)
             .collect(Collectors.toList());
 
-        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile());
+        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, virtualFile);
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = ShortcutCache.getInstance().getRecipesShortcut(new ShortcutCacheKey(language, filename, dependenciesName));
 
         final boolean usesTabs = detectIfTabs(currentLine);
