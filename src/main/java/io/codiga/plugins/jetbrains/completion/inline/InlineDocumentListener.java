@@ -37,8 +37,6 @@ public class InlineDocumentListener implements DocumentListener {
     private static final int TIMEOUT_REQUEST_POLLING_MILLISECONDS = 500;
     private final DependencyManagement dependencyManagement = new DependencyManagement();
     private final Alarm updateListAlarm = new Alarm();
-    private final CodigaApi codigaApi = CodigaApi.getInstance();
-    private final AppSettingsState settings = AppSettingsState.getInstance();
 
     private long lastRequestTimestamp = 0;
 
@@ -64,6 +62,7 @@ public class InlineDocumentListener implements DocumentListener {
             return;
         }
 
+        final AppSettingsState settings = AppSettingsState.getInstance();
         if (!settings.getCodigaEnabled()) {
             LOGGER.debug("codiga disabled");
             return;
@@ -182,7 +181,7 @@ public class InlineDocumentListener implements DocumentListener {
             snippetVisibility.getOnlyPrivate(),
             snippetVisibility.getOnlyFavorite()));
 
-        List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = codigaApi.getRecipesSemantic(
+        List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets = CodigaApi.getInstance().getRecipesSemantic(
             searchTerm,
             dependenciesName,
             Optional.empty(),
