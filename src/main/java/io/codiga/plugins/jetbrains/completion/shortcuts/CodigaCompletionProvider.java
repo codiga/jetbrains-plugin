@@ -91,31 +91,22 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         }
 
         // Attempt to get the keyword and if not present, just exit.
-        Optional<String> keyword = getKeywordFromLine(currentLine, column - 1);
+        Optional<String> keyword = getKeywordFromLine(currentLine, column - 1)
+            // The keyword has to start with a . or a slash
+            .filter(kw -> kw.startsWith(".") || kw.startsWith("/"));
+
         if (keyword.isEmpty()) {
             return;
         }
 
-        // The keyword has to start with a . or a slash
-        if (!keyword.get().startsWith(".") && !keyword.get().startsWith("/")) {
-            return;
-        }
+        keyword = keyword
+            //If the text entered is only a dot or slash, put no keyword so that we search all shortcuts
+            .filter(kw -> !kw.equalsIgnoreCase(".") && !kw.equalsIgnoreCase("/"))
+            //If the keyword is longer than one character and starts with a dot, remove the dot so that
+            // we filter by the correct prefix.
+            .filter(kw -> kw.length() > 1 && (kw.startsWith(".") || kw.startsWith("/")))
+            .map(kw -> kw.substring(1));
 
-        /**
-         * If the text entered is only a dot or slash, put no keyword so that we search all shortcuts
-         */
-        if (keyword.get().equalsIgnoreCase(".") || keyword.get().equalsIgnoreCase("/")) {
-            keyword = Optional.empty();
-        } else {
-            /**
-             * If the keyword is longer than one character and starts with a dot, remove the dot so that
-             * we filter by the correct prefix.
-             */
-            if (keyword.get().length() > 1 && (keyword.get().startsWith(".") || keyword.get().startsWith("/"))) {
-                String newKeyword = keyword.get().substring(1);
-                keyword = Optional.of(newKeyword);
-            }
-        }
 
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
