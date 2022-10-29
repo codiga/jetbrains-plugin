@@ -37,13 +37,13 @@ public class InlineDocumentListener implements DocumentListener {
     private static final int TIMEOUT_REQUEST_POLLING_MILLISECONDS = 500;
     private final DependencyManagement dependencyManagement = new DependencyManagement();
     private final Alarm updateListAlarm = new Alarm();
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
+    private final AppSettingsState settings = AppSettingsState.getInstance();
 
     private long lastRequestTimestamp = 0;
 
     @Override
     public void documentChanged(@NotNull DocumentEvent documentEvent) {
-        final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
-        final AppSettingsState settings = AppSettingsState.getInstance();
         if (documentEvent.getDocument().isInBulkUpdate()) {
             LOGGER.debug("bulk update - skipping");
             return;
@@ -79,19 +79,16 @@ public class InlineDocumentListener implements DocumentListener {
 
         //Using Application.invokeLater() as delay, the logic would run only after tests' tearDown() methods.
         if (ApplicationManager.getApplication().isUnitTestMode()) {
-            checkDocumentAndInitiateSnippetPreview(codigaApi, document, editor, requestTimestamp);
+            checkDocumentAndInitiateSnippetPreview(document, editor, requestTimestamp);
         } else {
             ApplicationManager.getApplication()
                 .invokeLater(
-                    () -> checkDocumentAndInitiateSnippetPreview(codigaApi, document, editor, requestTimestamp),
+                    () -> checkDocumentAndInitiateSnippetPreview(document, editor, requestTimestamp),
                     project.getDisposed());
         }
     }
 
-    private void checkDocumentAndInitiateSnippetPreview(CodigaApi codigaApi,
-                                                        Document document,
-                                                        Editor editor,
-                                                        long requestTimestamp) {
+    private void checkDocumentAndInitiateSnippetPreview(Document document, Editor editor, long requestTimestamp) {
         SnippetPreview previousPreview = SnippetPreview.getInstance(editor);
 
         if (previousPreview != null) {
@@ -124,12 +121,12 @@ public class InlineDocumentListener implements DocumentListener {
 
         //Using 'Alarm.addRequest()' as delay, the logic would be executed only after tests' tearDown() methods.
         if (ApplicationManager.getApplication().isUnitTestMode()) {
-            queryRecipesAndShowSnippetPreview(codigaApi, editor, requestTimestamp, caretOffset, language, searchTerm, dependenciesName, filename);
+            queryRecipesAndShowSnippetPreview(editor, requestTimestamp, caretOffset, language, searchTerm, dependenciesName, filename);
         } else {
             // Finally, make the request. We make a request periodically and then
             // only get the latest request. We poll
             updateListAlarm.addRequest(
-                () -> queryRecipesAndShowSnippetPreview(codigaApi, editor, requestTimestamp, caretOffset, language, searchTerm, dependenciesName, filename),
+                () -> queryRecipesAndShowSnippetPreview(editor, requestTimestamp, caretOffset, language, searchTerm, dependenciesName, filename),
                 TIMEOUT_REQUEST_POLLING_MILLISECONDS);
         }
     }
@@ -167,8 +164,7 @@ public class InlineDocumentListener implements DocumentListener {
         return currentLine;
     }
 
-    private void queryRecipesAndShowSnippetPreview(CodigaApi codigaApi,
-                                                   Editor editor,
+    private void queryRecipesAndShowSnippetPreview(Editor editor,
                                                    long requestTimestamp,
                                                    int caretOffset,
                                                    LanguageEnumeration language,
