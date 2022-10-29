@@ -61,8 +61,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                                   @NotNull CompletionResultSet result) {
         LOGGER.debug("Triggering completion");
 
-        List<LookupElementBuilder> elements = new ArrayList<>();
-
         if (!AppSettingsState.getInstance().getCodigaEnabled()) {
             LOGGER.debug("codiga disabled");
             return;
@@ -81,8 +79,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         if (lineEnd > lineStart) {
             currentLine = editor.getDocument().getText(new TextRange(lineStart, lineEnd));
         }
-        final boolean usesTabs = detectIfTabs(currentLine);
-        final int indentationCurrentLine = getIndentation(currentLine, usesTabs);
 
         // clean tab indentation to correctly look for completion results
         currentLine = currentLine.replace("\t", "");
@@ -96,7 +92,7 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
 
         // Attempt to get the keyword and if not present, just exit.
         Optional<String> keyword = getKeywordFromLine(currentLine, column - 1);
-        if (!keyword.isPresent()) {
+        if (keyword.isEmpty()) {
             return;
         }
 
@@ -131,6 +127,10 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile());
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = ShortcutCache.getInstance().getRecipesShortcut(new ShortcutCacheKey(language, filename, dependenciesName));
 
+        final boolean usesTabs = detectIfTabs(currentLine);
+        final int indentationCurrentLine = getIndentation(currentLine, usesTabs);
+
+        List<LookupElementBuilder> elements = new ArrayList<>();
 
         for (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe : recipes) {
             if (keyword.isPresent() && !recipe.shortcut().startsWith(keyword.get())) {

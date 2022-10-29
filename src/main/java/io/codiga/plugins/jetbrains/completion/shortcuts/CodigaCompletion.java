@@ -11,6 +11,3 @@ public class CodigaCompletion extends CompletionContributor {
             new CodigaCompletionProvider());
     }
 }
-
-
-
