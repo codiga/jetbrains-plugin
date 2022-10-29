@@ -8,6 +8,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ProcessingContext;
@@ -61,8 +62,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
                                   @NotNull CompletionResultSet result) {
         LOGGER.debug("Triggering completion");
 
-        List<LookupElementBuilder> elements = new ArrayList<>();
-
         if (!AppSettingsState.getInstance().getCodigaEnabled()) {
             LOGGER.debug("codiga disabled");
             return;
@@ -81,8 +80,6 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         if (lineEnd > lineStart) {
             currentLine = editor.getDocument().getText(new TextRange(lineStart, lineEnd));
         }
-        final boolean usesTabs = detectIfTabs(currentLine);
-        final int indentationCurrentLine = getIndentation(currentLine, usesTabs);
 
         // clean tab indentation to correctly look for completion results
         currentLine = currentLine.replace("\t", "");
@@ -95,42 +92,38 @@ public class CodigaCompletionProvider extends CompletionProvider<CompletionParam
         }
 
         // Attempt to get the keyword and if not present, just exit.
-        Optional<String> keyword = getKeywordFromLine(currentLine, column - 1);
-        if (!keyword.isPresent()) {
+        Optional<String> keyword = getKeywordFromLine(currentLine, column - 1)
+            // The keyword has to start with a . or a slash
+            .filter(kw -> kw.startsWith(".") || kw.startsWith("/"));
+
+        if (keyword.isEmpty()) {
             return;
         }
 
-        // The keyword has to start with a . or a slash
-        if (!keyword.get().startsWith(".") && !keyword.get().startsWith("/")) {
-            return;
-        }
+        keyword = keyword
+            //If the text entered is only a dot or slash, put no keyword so that we search all shortcuts
+            .filter(kw -> !kw.equalsIgnoreCase(".") && !kw.equalsIgnoreCase("/"))
+            //If the keyword is longer than one character and starts with a dot, remove the dot so that
+            // we filter by the correct prefix.
+            .filter(kw -> kw.length() > 1 && (kw.startsWith(".") || kw.startsWith("/")))
+            .map(kw -> kw.substring(1));
 
-        /**
-         * If the text entered is only a dot or slash, put no keyword so that we search all shortcuts
-         */
-        if (keyword.get().equalsIgnoreCase(".") || keyword.get().equalsIgnoreCase("/")) {
-            keyword = Optional.empty();
-        } else {
-            /**
-             * If the keyword is longer than one character and starts with a dot, remove the dot so that
-             * we filter by the correct prefix.
-             */
-            if (keyword.get().length() > 1 && (keyword.get().startsWith(".") || keyword.get().startsWith("/"))) {
-                String newKeyword = keyword.get().substring(1);
-                keyword = Optional.of(newKeyword);
-            }
-        }
 
+        Project project = parameters.getOriginalFile().getProject();
         final VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
         LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath());
 
-        List<String> dependenciesName = dependencyManagement.getDependencies(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile())
+        List<String> dependenciesName = dependencyManagement.getDependencies(project, virtualFile)
             .stream().map(Dependency::getName)
             .collect(Collectors.toList());
 
-        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(parameters.getOriginalFile().getProject(), parameters.getOriginalFile().getVirtualFile());
+        String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, virtualFile);
         List<GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut> recipes = ShortcutCache.getInstance().getRecipesShortcut(new ShortcutCacheKey(language, filename, dependenciesName));
 
+        final boolean usesTabs = detectIfTabs(currentLine);
+        final int indentationCurrentLine = getIndentation(currentLine, usesTabs);
+
+        List<LookupElementBuilder> elements = new ArrayList<>();
 
         for (GetRecipesForClientByShortcutQuery.GetRecipesForClientByShortcut recipe : recipes) {
             if (keyword.isPresent() && !recipe.shortcut().startsWith(keyword.get())) {
