@@ -50,7 +50,6 @@ public class SnippetToolWindow {
     private final JPanel languageNotSupportedPanel = new JPanel();
     private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();
     private final Project project;
-    private final ToolWindow toolWindow;
 
     AppSettingsState settings = AppSettingsState.getInstance();
     private JPanel mainPanel;
@@ -76,7 +75,6 @@ public class SnippetToolWindow {
         Alarm searchTermAlarm = new Alarm();
 
         this.project = project;
-        this.toolWindow = toolWindow;
         initVisibilityFromSettings();
         radioAllSnippets.addActionListener(e -> updateSearchPreferences(true, false, false, snippetVisibility.isOnlyFavorite()));
         radioPrivateOnly.addActionListener(e -> updateSearchPreferences(false, true, false, snippetVisibility.isOnlyFavorite()));
