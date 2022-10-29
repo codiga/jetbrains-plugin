@@ -5,15 +5,15 @@ import io.codiga.api.GetRecipesForClientSemanticQuery;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
  * Mouse listener to redirect the user to the login page.
  */
-public class CopyToClipboardMouseListener implements MouseListener {
+public class CopyToClipboardMouseListener extends MouseAdapter {
     private final GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet;
 
     public CopyToClipboardMouseListener(GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch _snippet) {
@@ -26,25 +26,5 @@ public class CopyToClipboardMouseListener implements MouseListener {
         StringSelection stringSelection = new StringSelection(decodedCode);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        // empty, nothing needed here
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        // empty, nothing needed here
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        // empty, nothing needed here
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        // empty, nothing needed here
     }
 }

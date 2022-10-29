@@ -1,7 +1,6 @@
 package io.codiga.plugins.jetbrains.actions.snippet_search;
 
 import com.github.rjeschke.txtmark.Processor;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -21,8 +20,8 @@ import io.codiga.plugins.jetbrains.utils.DesktopUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -64,7 +63,7 @@ public class SnippetPanel {
     private static final MarkdownDecorator markdownDecorator = new MarkdownDecorator();
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
 
     public SnippetPanel(GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch snippet,
                         CodeInsertionContext _codeInsertionContext,
@@ -117,7 +116,7 @@ public class SnippetPanel {
          * Logic to preview or insert the snippet. When we hover the button, we preview
          * the snippet. Once clicked, we insert the snippet into the code.
          */
-        insert.addMouseListener(new MouseListener() {
+        insert.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (project == null) {
@@ -148,16 +147,6 @@ public class SnippetPanel {
 
                 insert.setText("Preview");
                 codeInsertionContext.clearAll();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                // empty, nothing needed here
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                // empty, nothing needed here
             }
 
             @Override
