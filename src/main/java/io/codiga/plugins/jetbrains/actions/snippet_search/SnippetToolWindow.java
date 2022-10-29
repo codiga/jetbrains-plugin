@@ -362,19 +362,19 @@ public class SnippetToolWindow {
         List<GetRecipesForClientSemanticQuery.AssistantRecipesSemanticSearch> snippets =
             codigaApi.getRecipesSemantic(term, dependencies, Optional.empty(), languageEnumeration, filename, visibilityForQuery.getOnlyPublic(), visibilityForQuery.getOnlyPrivate(), visibilityForQuery.getOnlyFavorite());
 
-        // Create the snippet panel.
-        List<SnippetPanel> panels = snippets.stream().map(s -> new SnippetPanel(s, codeInsertionContext, project)).collect(Collectors.toList());
-
         snippetsPanel.removeAll();
         snippetsPanel.setLayout(new BoxLayout(snippetsPanel, BoxLayout.Y_AXIS));
 
         if (snippets.isEmpty()) {
             snippetsPanel.add(noRecipePanel);
         } else {
-            panels.forEach(p -> {
-                snippetsPanel.add(new JSeparator());
-                snippetsPanel.add(p.getComponent());
-            });
+            // Create the snippet panel.
+            snippets.stream()
+                .map(s -> new SnippetPanel(s, codeInsertionContext, project))
+                .forEach(p -> {
+                    snippetsPanel.add(new JSeparator());
+                    snippetsPanel.add(p.getComponent());
+                });
         }
 
         loadingPanel.setVisible(false);
