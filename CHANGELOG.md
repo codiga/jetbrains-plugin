@@ -6,6 +6,7 @@
 ### Added
 
 ### Changed
+- Improved the performance of editor tab switches when the Snippet Search tool window is closed.
 
 ### Deprecated
 

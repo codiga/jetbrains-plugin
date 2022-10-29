@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.serviceContainer.AlreadyDisposedException;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.Alarm;
@@ -160,19 +161,23 @@ public class SnippetToolWindow {
 
         ApplicationManager.getApplication().getMessageBus().connect().subscribe(CODIGA_NEW_FILE_SELECTED_TOPIC,
             (SnippetToolWindowFileChangeNotifier) context -> {
-                updateUser();
-
-                // Check if project still active
-                if (project.isDisposed()) {
-                    LOGGER.info("Project already disposed");
-                    return;
+                //Update the tool window contents only when the tool window is open, to avoid unnecessary updates
+                // and requests to the Codiga backend, when closed.
+                if (toolWindow.isVisible()) {
+                    updateToolWindowForEditorChange();
                 }
-
-                Optional.ofNullable(FileEditorManager.getInstance(project))
-                    .map(FileEditorManager::getSelectedEditor)
-                    .map(FileEditor::getFile)
-                    .ifPresent(virtualFile -> updateEditor(project, virtualFile, Optional.empty(), true));
             });
+
+        //Since the tool window contents are updated only when the tool window is open, this listener makes sure
+        // that when users reopen it, they get the updated contents.
+        project.getMessageBus().connect().subscribe(ToolWindowManagerListener.TOPIC, new ToolWindowManagerListener() {
+            @Override
+            public void toolWindowShown(@NotNull ToolWindow toolWindow) {
+                if (SnippetToolWindowFactory.SNIPPET_SEARCH_TOOL_WINDOW_ID.equals(toolWindow.getId())) {
+                    updateToolWindowForEditorChange();
+                }
+            }
+        });
 
 
         /**
@@ -201,6 +206,21 @@ public class SnippetToolWindow {
                 LOGGER.debug("Cannot create new panel", ade);
             }
         }, 500);
+    }
+
+    private void updateToolWindowForEditorChange() {
+        updateUser();
+
+        // Check if project still active
+        if (project.isDisposed()) {
+            LOGGER.info("Project already disposed");
+            return;
+        }
+
+        Optional.ofNullable(FileEditorManager.getInstance(project))
+            .map(FileEditorManager::getSelectedEditor)
+            .map(FileEditor::getFile)
+            .ifPresent(virtualFile -> updateEditor(project, virtualFile, Optional.empty(), true));
     }
 
     /**
