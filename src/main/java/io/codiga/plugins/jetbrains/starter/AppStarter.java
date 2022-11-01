@@ -43,14 +43,14 @@ import static java.util.stream.Collectors.toList;
  */
 public class AppStarter implements StartupActivity {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private final CodigaApi codigaApi = CodigaApi.getInstance();
-    private final AppSettingsState appSettingsState = AppSettingsState.getInstance();
     private Notification notification;
 
     @Override
     public void runActivity(@NotNull Project project) {
-        showConfigureApiKeyNotification(project);
-        showShortcutKeysNotification(project);
+        CodigaApi codigaApi = CodigaApi.getInstance();
+        AppSettingsState appSettingsState = AppSettingsState.getInstance();
+        showConfigureApiKeyNotification(project, codigaApi, appSettingsState);
+        showShortcutKeysNotification(project, appSettingsState);
         startShortcutCacheUpdater(project);
     }
 
@@ -58,7 +58,7 @@ public class AppStarter implements StartupActivity {
      * Check if we can get the user via the GraphQL API.
      * If that does not work, show a balloon asking to enter the API keys.
      */
-    private void showConfigureApiKeyNotification(@NotNull Project project) {
+    private void showConfigureApiKeyNotification(@NotNull Project project, CodigaApi codigaApi, AppSettingsState appSettingsState) {
         if (!codigaApi.getUsername().isPresent()) {
             notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
                 .createNotification("Configure your API keys to get access to your recipes from Codiga.", NotificationType.INFORMATION)
@@ -70,7 +70,6 @@ public class AppStarter implements StartupActivity {
                             notification.hideBalloon();
                             ShowSettingsUtil.getInstance().showSettingsDialog(project, AppSettingsConfigurable.class);
                         }
-
                     }
                 })
                 .addAction(new AnAction("Hide") {
@@ -79,7 +78,6 @@ public class AppStarter implements StartupActivity {
                         if (notification != null) {
                             notification.hideBalloon();
                         }
-
                     }
                 })
                 .addAction(new AnAction("Never show again") {
@@ -89,7 +87,6 @@ public class AppStarter implements StartupActivity {
                         if (notification != null) {
                             notification.hideBalloon();
                         }
-
                     }
                 });
             if (appSettingsState.getShowDialogApiNotification()) {
@@ -102,7 +99,7 @@ public class AppStarter implements StartupActivity {
      * Make sure one editor is being opened at the file. Otherwise, the Coding Assistant cannot get the context
      * and will crash.
      */
-    private void showShortcutKeysNotification(@NotNull Project project) {
+    private void showShortcutKeysNotification(@NotNull Project project, AppSettingsState appSettingsState) {
         if (appSettingsState.getShowDialogOnboarding() &&
             FileEditorManager.getInstance(project) != null &&
             FileEditorManager.getInstance(project).getSelectedEditor() != null) {
@@ -118,7 +115,6 @@ public class AppStarter implements StartupActivity {
                                 ActionPlaces.UNKNOWN,
                                 new Presentation(),
                                 ActionManager.getInstance(), 0));
-
                     }
                 })
                 .addAction(new AnAction("Shortcuts") {
@@ -130,7 +126,6 @@ public class AppStarter implements StartupActivity {
                                 ActionPlaces.UNKNOWN,
                                 new Presentation(),
                                 ActionManager.getInstance(), 0));
-
                     }
                 })
                 .addAction(new AnAction("Doc") {
@@ -150,7 +145,6 @@ public class AppStarter implements StartupActivity {
                         if (notification != null) {
                             notification.hideBalloon();
                         }
-
                     }
                 });
             Notifications.Bus.notify(notification, project);
