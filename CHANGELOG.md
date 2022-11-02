@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 ### Added
+- [#177](https://github.com/codiga/jetbrains-plugin/issues/177): Added a notification popup, when we detect that the project contains Python module(s),
+  to give users the option to create a Codiga config file with default Python rulesets.  
 
 ### Changed
 - Improved the performance of editor tab switches when the Snippet Search tool window is closed.
