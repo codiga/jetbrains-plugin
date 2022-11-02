@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.services;
+package io.codiga.plugins.jetbrains.rosie;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;

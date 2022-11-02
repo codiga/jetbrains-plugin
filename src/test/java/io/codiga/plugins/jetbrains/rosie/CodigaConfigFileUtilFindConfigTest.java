@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.services;
+package io.codiga.plugins.jetbrains.rosie;
 
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import org.jetbrains.yaml.psi.YAMLFile;

@@ -14,7 +14,7 @@ public class RosieRequest {
      * The Rosie language string.
      * <p>
      * See {@link io.codiga.plugins.jetbrains.utils.RosieUtils#getRosieLanguage(io.codiga.api.type.LanguageEnumeration)}
-     * and {@link io.codiga.plugins.jetbrains.services.RosieImpl#SUPPORTED_LANGUAGES}.
+     * and {@link io.codiga.plugins.jetbrains.rosie.RosieImpl#SUPPORTED_LANGUAGES}.
      */
     public String language;
     public String fileEncoding;

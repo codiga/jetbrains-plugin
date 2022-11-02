@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * Annotation information created by {@link io.codiga.plugins.jetbrains.services.RosieImpl} based on the
+ * Annotation information created by {@link io.codiga.plugins.jetbrains.rosie.RosieImpl} based on the
  * information retrieved in {@link RosieResponse} from the Codiga API.
  *
  * @see RosieAnnotationJetBrains
