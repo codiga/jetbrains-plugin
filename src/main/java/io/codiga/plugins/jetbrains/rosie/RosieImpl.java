@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.services;
+package io.codiga.plugins.jetbrains.rosie;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;

@@ -15,7 +15,7 @@ import com.intellij.psi.PsiFile;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotation;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
 import io.codiga.plugins.jetbrains.model.rosie.RosieViolationFix;
-import io.codiga.plugins.jetbrains.services.Rosie;
+import io.codiga.plugins.jetbrains.rosie.Rosie;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
