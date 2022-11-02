@@ -49,6 +49,11 @@ import java.util.concurrent.ScheduledFuture;
 public class RosieStartupActivity implements StartupActivity {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
+    /**
+     * This id comes via {@code com.jetbrains.python.PythonModuleTypeBase},
+     * from {@code com.jetbrains.python.PyNames#PYTHON_MODULE_ID}.
+     */
+    private static final String PYTHON_MODULE_ID = "PYTHON_MODULE";
 
     /**
      * Stores the Rosie cache updaters per project, so that they can be properly cancelled upon project close.
@@ -96,7 +101,7 @@ public class RosieStartupActivity implements StartupActivity {
             Module[] modules = ModuleManager.getInstance(project).getModules();
             //If there is at least one Python module in the project, we are showing the notification
             // For an explanation on modules, see https://www.jetbrains.com/help/idea/creating-and-managing-modules.html
-            boolean hasPythonModule = Arrays.stream(modules).map(ModuleType::get).map(ModuleType::getId).anyMatch("PYTHON_MODULE"::equals);
+            boolean hasPythonModule = Arrays.stream(modules).map(ModuleType::get).map(ModuleType::getId).anyMatch(PYTHON_MODULE_ID::equals);
 
             if (hasPythonModule) {
                 notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
