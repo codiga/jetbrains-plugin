@@ -1,7 +1,7 @@
 package io.codiga.plugins.jetbrains.starter;
 
-import static io.codiga.plugins.jetbrains.services.CodigaConfigFileUtil.collectRulesetNames;
-import static io.codiga.plugins.jetbrains.services.CodigaConfigFileUtil.findCodigaConfigFile;
+import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.collectRulesetNames;
+import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.findCodigaConfigFile;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import com.intellij.openapi.application.WriteAction;

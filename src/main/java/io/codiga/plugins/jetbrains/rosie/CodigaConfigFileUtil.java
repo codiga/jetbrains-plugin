@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.services;
+package io.codiga.plugins.jetbrains.rosie;
 
 import static java.util.stream.Collectors.toList;
 
@@ -28,7 +28,7 @@ import java.util.Optional;
 public final class CodigaConfigFileUtil {
 
     private static final String RULESETS = "rulesets";
-    private static final String CODIGA_CONFIG_FILE_NAME = "codiga.yml";
+    public static final String CODIGA_CONFIG_FILE_NAME = "codiga.yml";
 
     /**
      * Finds the codiga.yml config file in the argument project.

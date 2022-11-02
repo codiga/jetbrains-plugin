@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.yaml.psi.YAMLFile;
 
 /**
- * Handles updating the {@link RosieRulesCache}. This is executed periodically via {@link RosieRulesCacheUpdater}.
+ * Handles updating the {@link RosieRulesCache}. This is executed periodically via {@link RosieStartupActivity}.
  */
 @RequiredArgsConstructor
 public final class RosieRulesCacheUpdateHandler {
