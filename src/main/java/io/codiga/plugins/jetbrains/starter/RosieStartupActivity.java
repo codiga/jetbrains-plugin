@@ -102,10 +102,10 @@ public class RosieStartupActivity implements StartupActivity {
             }
 
             if (isPythonSdkConfigured(project)) {
-                notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
+                notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga Code Analysis")
                     .createNotification("Check for security, code style in your Python code with Codiga", NotificationType.INFORMATION)
                     .setSubtitle("Codiga Code Analysis")
-                    .addAction(new AnAction("Create a codiga.yml file to check code") {
+                    .addAction(new AnAction("Create codiga.yml") {
                         @Override
                         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                             if (notification != null) {
@@ -123,7 +123,7 @@ public class RosieStartupActivity implements StartupActivity {
                             }
                         }
                     })
-                    .addAction(new AnAction("Never remind me for this project") {
+                    .addAction(new AnAction("Never for this project") {
                         @Override
                         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                             if (notification != null) {

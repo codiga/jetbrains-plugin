@@ -99,10 +99,8 @@ rulesets:
                 implementation="io.codiga.plugins.jetbrains.completion.inline.InlineDocumentListener"/>
 
         <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.AppStarter"/>
-        <notificationGroup
-                id="Codiga API"
-                displayType="BALLOON"
-        />
+        <notificationGroup id="Codiga API" displayType="BALLOON"/>
+        <notificationGroup id="Codiga Code Analysis" displayType="BALLOON"/>
 
         <applicationService
                 serviceInterface="io.codiga.plugins.jetbrains.graphql.CodigaApi"
