@@ -36,43 +36,6 @@ public class RosieAnnotatorTest extends TestBase {
         doTestAnnotations("no_highlight_for_end_offset_outside.py");
     }
 
-    //Rosie code quick fixes
-
-    public void testTextInsertionFix() {
-        doTestAnnotationFix("text_insertion_fix.py", "Fix: Insert text",
-            "clasThis is the inserted texts Person:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextReplacementFixWithEditRangeMatchingViolationRange() {
-        doTestAnnotationFix("text_replacement_fix_ranges_matching.py", "Fix: Replace text",
-            "clasThis is the replacment textson:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextReplacementFixWithEditRangeNotMatchingViolationRange() {
-        doTestAnnotationFix("text_replacement_fix_ranges_not_matching.py", "Fix: Replace text",
-            "cThis is the replacement texts Person:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextRemovalFixWithEditRangeMatchingViolationRange() {
-        doTestAnnotationFix("text_removal_fix_ranges_matching.py", "Fix: Remove text",
-            "classon:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
-    public void testTextRemovalFixWithEditRangeNotMatchingViolationRange() {
-        doTestAnnotationFix("text_removal_fix_ranges_not_matching.py", "Fix: Remove text",
-            "cs Person:\n" +
-                "  def __init__(self, name):\n" +
-                "    self.name = name\n");
-    }
-
     //Disable Rosie analysis comment quick fixes
 
     public void testAddsCodigaDisableCommentToTopLevelElementInPython() {
