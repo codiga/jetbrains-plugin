@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Test service implementation of the Rosie service.
  */
-public class RosieTest implements Rosie {
+public class RosieApiTest implements RosieApi {
 
     @Override
     @NotNull

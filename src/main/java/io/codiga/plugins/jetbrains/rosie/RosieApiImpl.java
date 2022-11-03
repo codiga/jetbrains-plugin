@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Default implementation of the Rosie API.
  */
-public class RosieImpl implements Rosie {
+public class RosieApiImpl implements RosieApi {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final String ROSIE_POST_URL = "https://analysis.codiga.io/analyze";
     private static final Gson GSON = new Gson();
@@ -46,7 +46,7 @@ public class RosieImpl implements Rosie {
      */
     private static final List<LanguageEnumeration> SUPPORTED_LANGUAGES = List.of(LanguageEnumeration.PYTHON);
 
-    public RosieImpl() {
+    public RosieApiImpl() {
         // no constructor instructions
     }
 
