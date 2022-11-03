@@ -1,11 +1,12 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
+import io.codiga.plugins.jetbrains.rosie.RosieApiImpl;
 import lombok.Getter;
 
 import java.util.List;
 
 /**
- * Annotation information created by {@link io.codiga.plugins.jetbrains.services.RosieImpl} based on the
+ * Annotation information created by {@link RosieApiImpl} based on the
  * information retrieved in {@link RosieResponse} from the Codiga API.
  *
  * @see RosieAnnotationJetBrains

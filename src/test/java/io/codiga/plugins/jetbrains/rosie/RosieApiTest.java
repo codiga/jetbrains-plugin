@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.services;
+package io.codiga.plugins.jetbrains.rosie;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Test service implementation of the Rosie service.
  */
-public class RosieTest implements Rosie {
+public class RosieApiTest implements RosieApi {
 
     @Override
     @NotNull

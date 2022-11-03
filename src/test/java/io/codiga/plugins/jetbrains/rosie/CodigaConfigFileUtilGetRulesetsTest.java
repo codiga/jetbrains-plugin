@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.services;
+package io.codiga.plugins.jetbrains.rosie;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 

@@ -1,4 +1,4 @@
-package io.codiga.plugins.jetbrains.services;
+package io.codiga.plugins.jetbrains.rosie;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Service for retrieving Rosie specific information from the Codiga API.
  */
-public interface Rosie {
+public interface RosieApi {
 
     /**
      * Returns the annotations from the Codiga API based on the argument file, based on which code annotation
