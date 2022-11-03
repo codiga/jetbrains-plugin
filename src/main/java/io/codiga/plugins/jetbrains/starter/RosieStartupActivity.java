@@ -16,11 +16,14 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ModuleRootModel;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.concurrency.AppExecutorUtil;
@@ -35,11 +38,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Initiates a notification popup to create the Codiga config file if there is a Python module in the project.
+ * Initiates a notification popup to create the Codiga config file if either the Project or a Module is
+ * configured with a Python SDK.
  * <p>
  * Initiates a background task the periodically updates the local Rosie rules cache.
  * <p>
@@ -50,10 +55,10 @@ public class RosieStartupActivity implements StartupActivity {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     /**
-     * This id comes via {@code com.jetbrains.python.PythonModuleTypeBase},
-     * from {@code com.jetbrains.python.PyNames#PYTHON_MODULE_ID}.
+     * This id comes via {@code com.jetbrains.python.sdk.PythonSdkType},
+     * from {@code com.jetbrains.python.PyNames#PYTHON_SDK_ID_NAME}.
      */
-    private static final String PYTHON_MODULE_ID = "PYTHON_MODULE";
+    private static final String PYTHON_SDK_ID_NAME = "Python SDK";
 
     /**
      * Stores the Rosie cache updaters per project, so that they can be properly cancelled upon project close.
@@ -82,8 +87,6 @@ public class RosieStartupActivity implements StartupActivity {
      *     <li>action to never remind the user again for the current project. This state is stored in {@link CodigaConfigState}.</li>
      * </ul>
      * <p>
-     * Currently, it looks only for Python modules in the project, other languages are not supported at the moment.
-     * <p>
      * NOTE: if at project opening, there is a codiga.yml present, but the user deletes it, we notify them about the missing file,
      * the next time open the same project.
      */
@@ -98,14 +101,10 @@ public class RosieStartupActivity implements StartupActivity {
                 return;
             }
 
-            Module[] modules = ModuleManager.getInstance(project).getModules();
-            //If there is at least one Python module in the project, we are showing the notification
-            // For an explanation on modules, see https://www.jetbrains.com/help/idea/creating-and-managing-modules.html
-            boolean hasPythonModule = Arrays.stream(modules).map(ModuleType::get).map(ModuleType::getId).anyMatch(PYTHON_MODULE_ID::equals);
-
-            if (hasPythonModule) {
+            if (isPythonSdkConfigured(project)) {
                 notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga API")
                     .createNotification("Check for security, code style in your Python code with Codiga", NotificationType.INFORMATION)
+                    .setSubtitle("Codiga Code Analysis")
                     .addAction(new AnAction("Create a codiga.yml file to check code") {
                         @Override
                         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -137,6 +136,22 @@ public class RosieStartupActivity implements StartupActivity {
                 Notifications.Bus.notify(notification, project);
             }
         }
+    }
+
+    private boolean isPythonSdkConfigured(Project project) {
+        //First, check if a Python SDK is configured on project level
+        Sdk projectSdk = ProjectRootManager.getInstance(project).getProjectSdk();
+        boolean isPythonSdkConfigured = projectSdk != null && PYTHON_SDK_ID_NAME.equals(projectSdk.getSdkType().getName());
+        //If Python is not configured on project level, there might still be one or more modules that have Python SDK configured.
+        if (!isPythonSdkConfigured) {
+            Module[] modules = ModuleManager.getInstance(project).getModules();
+            isPythonSdkConfigured = Arrays.stream(modules)
+                .map(ModuleRootManager::getInstance)
+                .map(ModuleRootModel::getSdk)
+                .filter(Objects::nonNull)
+                .anyMatch(moduleSdk -> PYTHON_SDK_ID_NAME.equals(moduleSdk.getSdkType().getName()));
+        }
+        return isPythonSdkConfigured;
     }
 
     /**
