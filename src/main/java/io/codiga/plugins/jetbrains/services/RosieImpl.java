@@ -116,7 +116,7 @@ public class RosieImpl implements Rosie {
             LOGGER.error("[RosieImpl] ClientProtocolException", unsupportedEncodingException);
             return List.of();
         } catch (JsonSyntaxException jsonSyntaxException) {
-            LOGGER.error("[RosieImpl] cannot decode JSON", jsonSyntaxException);
+            LOGGER.warn("[RosieImpl] cannot decode JSON", jsonSyntaxException);
             return List.of();
         }
     }
