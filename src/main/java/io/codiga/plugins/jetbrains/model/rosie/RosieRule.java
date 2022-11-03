@@ -2,10 +2,12 @@ package io.codiga.plugins.jetbrains.model.rosie;
 
 import io.codiga.api.GetRulesetsForClientQuery;
 import io.codiga.api.type.ElementCheckedEnumeration;
+import lombok.ToString;
 
 /**
  * The rule descriptor converted from {@link GetRulesetsForClientQuery.Rule}, and sent to Rosie.
  */
+@ToString
 public class RosieRule {
     public String id;
     public String contentBase64;

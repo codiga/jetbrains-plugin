@@ -13,6 +13,7 @@ import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotation;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRequest;
 import io.codiga.plugins.jetbrains.model.rosie.RosieResponse;
+import io.codiga.plugins.jetbrains.model.rosie.RosieRule;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -91,13 +92,15 @@ public class RosieImpl implements Rosie {
             httpPost.setEntity(postingString);
 
             CloseableHttpClient client = HttpClients.createDefault();
+            long requestTimestamp = System.currentTimeMillis();
             HttpResponse response = client.execute(httpPost);
+            LOGGER.debug("Rules sent in request " + requestTimestamp + ": " + rosieRules.stream().map(RosieRule::toString).collect(toList()));
             List<RosieAnnotation> annotations = List.of();
             if (response.getEntity() != null) {
 
                 String result = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                LOGGER.debug("Response received from request " + requestTimestamp + ": " + result);
                 RosieResponse rosieResponse = GSON.fromJson(result, RosieResponse.class);
-                LOGGER.debug("rosie response: " + rosieResponse);
 
                 annotations = rosieResponse.ruleResponses.stream()
                     .flatMap(res -> res.violations.stream()
