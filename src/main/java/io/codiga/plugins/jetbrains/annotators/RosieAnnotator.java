@@ -15,7 +15,7 @@ import com.intellij.psi.PsiFile;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotation;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
 import io.codiga.plugins.jetbrains.model.rosie.RosieViolationFix;
-import io.codiga.plugins.jetbrains.rosie.Rosie;
+import io.codiga.plugins.jetbrains.rosie.RosieApi;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +58,7 @@ class RosieAnnotatorInformation {
  */
 public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation, List<RosieAnnotationJetBrains>> {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private final Rosie rosieService = ApplicationManager.getApplication().getService(Rosie.class);
+    private final RosieApi rosieApi = ApplicationManager.getApplication().getService(RosieApi.class);
     private final AppSettingsState settings = AppSettingsState.getInstance();
 
     /**
@@ -95,7 +95,7 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         }
 
         long startTime = System.currentTimeMillis();
-        List<RosieAnnotationJetBrains> annotations = rosieService
+        List<RosieAnnotationJetBrains> annotations = rosieApi
             .getAnnotations(rosieAnnotatorInformation.psiFile, rosieAnnotatorInformation.project)
             .stream()
             .map(annotation -> convertToAnnotationJetBrains(annotation, rosieAnnotatorInformation.editor))

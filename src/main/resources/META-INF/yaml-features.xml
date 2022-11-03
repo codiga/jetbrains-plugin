@@ -1,9 +1,9 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
-                serviceInterface="io.codiga.plugins.jetbrains.rosie.Rosie"
-                serviceImplementation="io.codiga.plugins.jetbrains.rosie.RosieImpl"
-                testServiceImplementation="io.codiga.plugins.jetbrains.rosie.RosieTest"
+                serviceInterface="io.codiga.plugins.jetbrains.rosie.RosieApi"
+                serviceImplementation="io.codiga.plugins.jetbrains.rosie.RosieApiImpl"
+                testServiceImplementation="io.codiga.plugins.jetbrains.rosie.RosieApiTest"
         />
         <postStartupActivity implementation="io.codiga.plugins.jetbrains.starter.RosieStartupActivity"/>
         <externalAnnotator
