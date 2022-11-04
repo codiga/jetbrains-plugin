@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.8.1]
+### Added
 - [#177](https://github.com/codiga/jetbrains-plugin/issues/177): Added a notification popup, when we detect that the project contains Python module(s),
   to give users the option to create a Codiga config file with default Python rulesets.  
 
@@ -19,17 +32,6 @@
 ### Security
 
 ## [1.7.22]
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## [1.7.21]
 ### Added
