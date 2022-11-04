@@ -7,10 +7,14 @@ import io.codiga.api.GetRulesetsForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCacheValue.RuleWithNames;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRule;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 import org.jetbrains.yaml.psi.YAMLFile;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,23 +46,24 @@ public final class RosieRulesCache implements Disposable {
     /**
      * The timestamp of the last update on the Codiga server for the rulesets cached (and configured in codiga.yml).
      */
+    @Getter
+    @Setter
     private long lastUpdatedTimeStamp = -1L;
     /**
      * -1 means the modification stamp of codiga.yml hasn't been set,
      * or there is no codiga.yml file in the project root.
      */
-    private long configFileModificationStamp = 0L;
+    private long configFileModificationStamp = -1L;
+
+    /**
+     * Ruleset names from the codiga.yml config file.
+     */
+    @Getter
+    private List<String> rulesetNames;
 
     public RosieRulesCache(Project project) {
         this.cache = new ConcurrentHashMap<>();
-    }
-
-    public long getLastUpdatedTimeStamp() {
-        return lastUpdatedTimeStamp;
-    }
-
-    public void setLastUpdatedTimeStamp(long lastUpdatedTimeStamp) {
-        this.lastUpdatedTimeStamp = lastUpdatedTimeStamp;
+        this.rulesetNames = Collections.synchronizedList(new ArrayList<>());
     }
 
     public boolean hasDifferentModificationStampThan(YAMLFile codigaConfigFile) {
@@ -67,6 +72,10 @@ public final class RosieRulesCache implements Disposable {
 
     public void saveModificationStampOf(YAMLFile codigaConfigFile) {
         this.configFileModificationStamp = codigaConfigFile.getModificationStamp();
+    }
+
+    public void setRulesetNames(List<String> rulesetNames) {
+        this.rulesetNames = Collections.synchronizedList(rulesetNames);
     }
 
     /**
@@ -122,6 +131,9 @@ public final class RosieRulesCache implements Disposable {
     public void clear() {
         if (!cache.isEmpty()) {
             cache.clear();
+        }
+        if (!rulesetNames.isEmpty()) {
+            rulesetNames.clear();
         }
         lastUpdatedTimeStamp = -1L;
     }

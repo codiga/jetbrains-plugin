@@ -21,16 +21,26 @@ public final class RosieRulesCacheUpdateHandler {
     private final RosieRulesCache rulesCache;
     private final Project project;
 
+    /**
+     * First initialization of the ruleset names in cache.
+     * <p>
+     * Further ruleset name caching happens only when the Codiga config file is modified.
+     */
+    public void initRulesets() {
+        YAMLFile codigaConfigFile = findCodigaConfigFile(project);
+        if (isCodigaConfigFileExist(codigaConfigFile)) {
+            rulesCache.setRulesetNames(collectRulesetNames(codigaConfigFile));
+            rulesCache.saveModificationStampOf(codigaConfigFile);
+        }
+    }
+
     public void handleCacheUpdate() {
         if (project.isDisposed()) {
             return;
         }
 
         YAMLFile codigaConfigFile = findCodigaConfigFile(project);
-        if (codigaConfigFile == null
-            //While the PsiFile may still exist, the underlying VirtualFile may not be valid, or exist at all
-            || !codigaConfigFile.getVirtualFile().isValid()
-            || !codigaConfigFile.getVirtualFile().exists()) {
+        if (!isCodigaConfigFileExist(codigaConfigFile)) {
             rulesCache.clear();
             //Since the config file no longer exist, its modification stamp is reset too
             rulesCache.setConfigFileModificationStamp(0);
@@ -40,14 +50,22 @@ public final class RosieRulesCacheUpdateHandler {
         if (rulesCache.hasDifferentModificationStampThan(codigaConfigFile)) {
             updateCacheFromModifiedCodigaConfigFile(codigaConfigFile);
         } else {
-            updateCacheFromChangesOnServer(codigaConfigFile);
+            updateCacheFromChangesOnServer();
         }
+    }
+
+    private boolean isCodigaConfigFileExist(YAMLFile codigaConfigFile) {
+        return codigaConfigFile != null
+            //While the PsiFile may still exist, the underlying VirtualFile may not be valid, or exist at all
+            && codigaConfigFile.getVirtualFile().exists()
+            && codigaConfigFile.getVirtualFile().isValid();
     }
 
     //There was a change in the codiga.yml file
     private void updateCacheFromModifiedCodigaConfigFile(YAMLFile codigaConfigFile) {
         rulesCache.saveModificationStampOf(codigaConfigFile);
         var rulesetNames = collectRulesetNames(codigaConfigFile);
+        rulesCache.setRulesetNames(rulesetNames);
 
         //Since there was a config change locally, and there is at least one ruleset name configured,
         // query to the Codiga server must be sent.
@@ -79,8 +97,8 @@ public final class RosieRulesCacheUpdateHandler {
     }
 
     //The codiga.yml file is unchanged
-    private void updateCacheFromChangesOnServer(YAMLFile codigaConfigFile) {
-        var rulesetNames = collectRulesetNames(codigaConfigFile);
+    private void updateCacheFromChangesOnServer() {
+        var rulesetNames = rulesCache.getRulesetNames();
         if (!rulesetNames.isEmpty()) {
             /*
               If any of the rulesets have changed on the Codiga server, compared to what we have in the local cache,

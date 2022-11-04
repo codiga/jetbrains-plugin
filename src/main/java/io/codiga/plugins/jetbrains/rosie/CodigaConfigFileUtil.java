@@ -8,8 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.util.CachedValueProvider;
-import com.intellij.psi.util.CachedValuesManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.psi.YAMLFile;
@@ -60,28 +58,14 @@ public final class CodigaConfigFileUtil {
 
     /**
      * Returns the list of ruleset names configured in the codiga.yml file.
-     * <p>
-     * In case of integration tests the caching is dropped. For some reason they fail with the following error,
-     * that doesn't occur outside test execution:
-     * <p>
-     * <i>"... is retaining PSI, causing memory leaks and possible invalid element access"</i>
      *
      * @param codigaConfigFile the codiga.yml file in the current project
      * @return the list of ruleset names, or empty list if the codiga.yml file is configured incorrectly
      */
     @NotNull
     public static List<String> collectRulesetNames(@NotNull YAMLFile codigaConfigFile) {
-        return ApplicationManager.getApplication().isUnitTestMode()
-            ? compute(() -> readRulesetNames(codigaConfigFile))
-            : compute(() -> CachedValuesManager.getManager(codigaConfigFile.getProject())
-            .getCachedValue(
-                codigaConfigFile.getProject(),
-                () -> CachedValueProvider.Result.create(readRulesetNames(codigaConfigFile), codigaConfigFile)));
-    }
-
-    private static List<String> compute(@NotNull Computable<List<String>> computation) {
         //Since 'RosieRulesCacheUpdater' is not DumbAware, it is executed on EDT, thus needed to wrap the PSI operation in a ReadAction.
-        return ApplicationManager.getApplication().runReadAction(computation);
+        return ApplicationManager.getApplication().runReadAction((Computable<List<String>>) () -> readRulesetNames(codigaConfigFile));
     }
 
     private static List<String> readRulesetNames(@NotNull YAMLFile codigaConfigFile) {
