@@ -25,7 +25,7 @@ public class AnnotationFixOpenBrowser extends RosieAnnotationIntentionBase {
 
     @Override
     public @IntentionName @NotNull String getText() {
-        return "See on Codiga Hub: rate or comment";
+        return String.format("See rule '%s' on the Codiga Hub", rosieAnnotation.getRuleName());
     }
 
     /**

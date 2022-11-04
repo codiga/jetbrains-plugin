@@ -191,7 +191,7 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
             annotationBuilder.withFix(new RosieAnnotationFix(rosieViolationFix));
         }
         annotationBuilder
-            .withFix(new DisableRosieAnalysisFix())
+            .withFix(new DisableRosieAnalysisFix(annotation.getRuleName()))
             .withFix(new AnnotationFixOpenBrowser(annotation));
 
 
