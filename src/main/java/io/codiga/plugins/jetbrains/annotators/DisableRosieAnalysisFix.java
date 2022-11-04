@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,14 +26,16 @@ import org.jetbrains.annotations.NotNull;
  * NOTE: the correct indentation is applied only when the IDE itself recognizes the language of the file,
  * otherwise the comment is added at the beginning of the new line.
  */
+@RequiredArgsConstructor
 public class DisableRosieAnalysisFix extends RosieAnnotationIntentionBase {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final String CODIGA_DISABLE = "codiga-disable";
+    private final String ruleName;
 
     @Override
     public @IntentionName @NotNull String getText() {
-        return "Remove this warning";
+        return String.format("Remove error '%s'", ruleName);
     }
 
     @Override

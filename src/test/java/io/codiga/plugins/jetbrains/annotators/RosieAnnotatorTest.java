@@ -39,7 +39,7 @@ public class RosieAnnotatorTest extends TestBase {
     //Disable Rosie analysis comment quick fixes
 
     public void testAddsCodigaDisableCommentToTopLevelElementInPython() {
-        doTestAnnotationFix("add_top_level_disable_codiga.py", "Remove this warning",
+        doTestAnnotationFix("add_top_level_disable_codiga.py", "Remove error 'single_rule'",
             "# codiga-disable\n" +
                 "class PersonWithAddress:\n" +
                 "  def __init__(self, name, age, address):\n" +
@@ -49,7 +49,7 @@ public class RosieAnnotatorTest extends TestBase {
     }
 
     public void testAddsCodigaDisableCommentToNestedElementInPython() {
-        doTestAnnotationFix("add_nested_disable_codiga.py", "Remove this warning",
+        doTestAnnotationFix("add_nested_disable_codiga.py", "Remove error 'single_rule'",
             "class PersonWithAddress:\n" +
                 "  def __init__(self, name, age, long_address):\n" +
                 "    self.name = name\n" +
@@ -59,14 +59,14 @@ public class RosieAnnotatorTest extends TestBase {
     }
 
     public void testAddsCodigaDisableCommentToTopLevelElementInJava() {
-        doTestAnnotationFix("add_top_level_disable_codiga.java", "Remove this warning",
+        doTestAnnotationFix("add_top_level_disable_codiga.java", "Remove error 'single_rule'",
             "// codiga-disable\n" +
                 "public class SomeClass {\n" +
                 "}");
     }
 
     public void testAddsCodigaDisableCommentToNestedElementInJava() {
-        doTestAnnotationFix("add_nested_disable_codiga.java", "Remove this warning",
+        doTestAnnotationFix("add_nested_disable_codiga.java", "Remove error 'single_rule'",
             "public class SomeClass {\n" +
                 "    void method() {\n" +
                 "        boolean isPassing = true;\n" +
