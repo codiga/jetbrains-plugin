@@ -43,6 +43,21 @@ See instructions [here](https://www.apollographql.com/docs/android/essentials/ge
 ./gradlew :downloadApolloSchema --endpoint='https://api.codiga.io/graphql' --schema=schema.json
 ```
 
+## Debug logging
+
+To enable *debug* log statements, and see them in the IDE's `idea.log` file, you have two options:
+
+### Enable it via build.gradle.kts
+
+Here, just uncomment the `runIde { systemProperty("idea.log.debug.categories", "Codiga") }` section.
+
+### Enable it in the sandbox IDE
+
+For this you need to:
+- Run the sandbox IDE,
+- Open the <kbd>Help</kbd> > <kbd>Diagnostic Tools</kbd> > <kbd>Debug Log Settings...</kbd> dialog,
+- Enter *Codiga* on the first line. *Codiga* is the logger category to which our loggers are associated.
+
 ## Relevant documentation
 
  - [IntelliJ Plugin documentation](https://plugins.jetbrains.com/docs/intellij/basics.html)

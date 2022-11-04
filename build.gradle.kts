@@ -111,6 +111,17 @@ tasks {
         )
     }
 
+//    runIde {
+        /*
+            Enables debug level logging in the sandbox IDE's idea.log. NOTE: this doesn't enable debug level for the console.
+            The category value 'Codiga' comes from 'io.codiga.plugins.jetbrains.Constants.LOGGER_NAME'.
+            See docs:
+                - https://plugins.jetbrains.com/docs/intellij/ide-infrastructure.html#logging
+                - https://plugins.jetbrains.com/docs/intellij/testing-faq.html#how-to-enable-debugtrace-logging
+         */
+//        systemProperty("idea.log.debug.categories", "Codiga")
+//    }
+
     runPluginVerifier {
         ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
     }
