@@ -48,8 +48,8 @@ public class RosieRule {
         }
     }
 
-    public RosieRule(GetRulesetsForClientQuery.Rule rule) {
-        this.id = rule.id().toString();
+    public RosieRule(String rulesetName, GetRulesetsForClientQuery.Rule rule) {
+        this.id = rulesetName + "/" + rule.name();
         this.contentBase64 = rule.content();
         this.language = rule.language().rawValue();
         this.type = rule.ruleType().rawValue();

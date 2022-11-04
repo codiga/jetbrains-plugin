@@ -57,7 +57,7 @@ public final class RosieRulesCacheValue {
         public RuleWithNames(String rulesetName, GetRulesetsForClientQuery.Rule rule) {
             this.rulesetName = rulesetName;
             this.ruleName = rule.name();
-            this.rosieRule = new RosieRule(rule);
+            this.rosieRule = new RosieRule(rulesetName, rule);
         }
     }
 }
