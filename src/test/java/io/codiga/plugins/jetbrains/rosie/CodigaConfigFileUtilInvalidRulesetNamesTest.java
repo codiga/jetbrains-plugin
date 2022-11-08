@@ -39,6 +39,7 @@ public class CodigaConfigFileUtilInvalidRulesetNamesTest {
 
             //Valid cases
             { "5long", true},
+            { "123456789", true},
             { "python-ruleset-63", true},
             { "python-ruleset-name", true},
         });
