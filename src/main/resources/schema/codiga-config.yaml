@@ -10,8 +10,8 @@ properties:
       type: string
       # Lowercase alphanumeric characters and dashes (-).
       # Can't start with dash.
-      # At least 5 characters long.
-      pattern: ^[a-z0-9][a-z0-9-]{4,}$
+      pattern: ^[a-z0-9][a-z0-9-]*$
+      minLength: 5
       example: a-ruleset-name
 required:
   - rulesets
