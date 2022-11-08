@@ -12,6 +12,11 @@
 
         <applicationService
                 serviceImplementation="io.codiga.plugins.jetbrains.actions.snippet_search.service.YamlFileTypeService"/>
+
+        <localInspection
+                implementationClass="io.codiga.plugins.jetbrains.inspection.CodigaRulesetContentInspection"
+                id="codiga.empty.nonexistent.ruleset" language="yaml"
+                displayName="Empty or non-existent Codiga ruleset" groupName="Codiga" enabledByDefault="true" level="WARNING"/>
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">

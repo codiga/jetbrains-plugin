@@ -25,6 +25,7 @@ import java.util.Optional;
  */
 public final class CodigaConfigFileUtil {
 
+    private static final String CODIGA_RULESET_NAME_PATTERN = "^[a-z0-9][a-z0-9-]{4,}$";
     private static final String RULESETS = "rulesets";
     public static final String CODIGA_CONFIG_FILE_NAME = "codiga.yml";
 
@@ -96,6 +97,10 @@ public final class CodigaConfigFileUtil {
             }
         }
         return List.of();
+    }
+
+    public static boolean isRulesetNameValid(String rulesetName) {
+        return rulesetName.matches(CODIGA_RULESET_NAME_PATTERN);
     }
 
     private CodigaConfigFileUtil() {
