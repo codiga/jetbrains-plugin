@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 ### Added
+- [#191](https://github.com/codiga/jetbrains-plugin/issues/191): Users can now navigate from codiga.yml to the rulesets on Codiga Hub
+  via Ctrl + clicking on ruleset names.
 
 ### Changed
 

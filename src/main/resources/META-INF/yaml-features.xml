@@ -12,6 +12,10 @@
 
         <applicationService
                 serviceImplementation="io.codiga.plugins.jetbrains.actions.snippet_search.service.YamlFileTypeService"/>
+
+        <psi.referenceContributor
+                language="yaml"
+                implementation="io.codiga.plugins.jetbrains.reference.CodigaRulesetReferenceContributor"/>
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">
