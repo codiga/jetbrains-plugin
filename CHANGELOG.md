@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 ### Added
+- [#191](https://github.com/codiga/jetbrains-plugin/issues/191): Users can now navigate from codiga.yml to the rulesets on Codiga Hub
+  via Ctrl + clicking on ruleset names.
 - [#189](https://github.com/codiga/jetbrains-plugin/issues/189): Added an inspection to mark rulesets in codiga.yml when they either
   doesn't exist on Codiga Hub or they exist but contain no rule.
 
