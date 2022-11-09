@@ -43,6 +43,6 @@ public class CodigaRulesetContentInspectionTest extends TestBase {
     private void doTest(String text) {
         myFixture.configureByText("codiga.yml", text);
         myFixture.enableInspections(new CodigaRulesetContentInspection());
-        myFixture.testHighlighting(true, true, true);
+        myFixture.testHighlighting(true, false, true);
     }
 }
