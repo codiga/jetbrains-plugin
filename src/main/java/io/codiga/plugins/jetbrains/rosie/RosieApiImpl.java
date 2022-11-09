@@ -23,6 +23,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -115,11 +116,14 @@ public class RosieApiImpl implements RosieApi {
             }
             client.close();
             return annotations;
+        } catch (UnknownHostException unknownHostException) {
+            LOGGER.warn("[RosieApiImpl] Could not connect to analysis.codiga.io.", unknownHostException);
+            return List.of();
         } catch (IOException unsupportedEncodingException) {
-            LOGGER.error("[RosieImpl] ClientProtocolException", unsupportedEncodingException);
+            LOGGER.warn("[RosieApiImpl] ClientProtocolException", unsupportedEncodingException);
             return List.of();
         } catch (JsonSyntaxException jsonSyntaxException) {
-            LOGGER.warn("[RosieImpl] cannot decode JSON", jsonSyntaxException);
+            LOGGER.warn("[RosieApiImpl] cannot decode JSON", jsonSyntaxException);
             return List.of();
         }
     }
