@@ -34,7 +34,4 @@ public class Constants {
 
     // PHP constants
     public static final String PHP_DEPENDENCY_FILE = "composer.json";
-
-    public static final String CREDENTIALS_SERVICE = "Codiga";
-    public static final String CREDENTIALS_KEY = "Api Token";
 }
