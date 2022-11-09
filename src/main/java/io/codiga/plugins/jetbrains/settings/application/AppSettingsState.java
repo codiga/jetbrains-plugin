@@ -1,14 +1,11 @@
 package io.codiga.plugins.jetbrains.settings.application;
 
-import com.intellij.credentialStore.CredentialAttributes;
-import com.intellij.credentialStore.CredentialAttributesKt;
-import com.intellij.credentialStore.Credentials;
-import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.PasswordUtil;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Tag;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -28,10 +25,7 @@ import static io.codiga.plugins.jetbrains.Constants.*;
 )
 public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    public static final String INVALID_RECORD_ERROR_MESSAGE = "find: An invalid record was encountered. (-67701)";
 
-    // See https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#retrieve-stored-credentials
-    CredentialAttributes credentialAttributes = createCredentialAttributes(CREDENTIALS_KEY);
     @Tag
     private String fingerprint = "";
     @Tag
@@ -50,15 +44,11 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     private Boolean favoriteSnippetsOnly = false;
     @Tag
     private Boolean codigaEnabled = true;
+    @Tag
+    private String apiToken = "";
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
-    }
-
-    private CredentialAttributes createCredentialAttributes(String key) {
-        return new CredentialAttributes(
-            CredentialAttributesKt.generateServiceName(CREDENTIALS_SERVICE, key)
-        );
     }
 
     public String getFingerprint() {
@@ -92,28 +82,16 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         this.showDialogOnboarding = b;
     }
 
-
     public String getApiToken() {
-        Credentials credentials = null;
         try {
-            credentials = PasswordSafe.getInstance().get(credentialAttributes);
-        } catch (Throwable e) {
-            //Prevents an issue related to macOS keychain credentials store to be surfaced to users,
-            // but still logging it to not lose sight of it.
-            // See https://github.com/codiga/jetbrains-plugin/issues/151
-            if (e.getMessage().contains(INVALID_RECORD_ERROR_MESSAGE)) {
-                LOGGER.debug("[AppSettingsState] macOS credentials store: An invalid record was encountered.");
-            }
+            return PasswordUtil.decodePassword(apiToken);
+        } catch (NumberFormatException e) {
+            return null;
         }
-        if (credentials != null) {
-            return credentials.getPasswordAsString();
-        }
-        return null;
     }
 
     public void setApiToken(String s) {
-        Credentials credentials = new Credentials(CREDENTIALS_KEY, s);
-        PasswordSafe.getInstance().set(credentialAttributes, credentials);
+        apiToken = PasswordUtil.encodePassword(s);
     }
 
     public boolean getPublicSnippetsOnly() {
@@ -158,11 +136,6 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public void setUseInlineCompletion(Boolean b) {
         LOGGER.debug("[AppSettingsState] useInlineCompletion: " + b);
         this.useInlineCompletion = b;
-    }
-
-
-    public boolean hasApiToken() {
-        return getApiToken().length() > 0;
     }
 
     @Nullable
