@@ -2,6 +2,7 @@ package io.codiga.plugins.jetbrains.inspection;
 
 import static io.codiga.plugins.jetbrains.graphql.RulesetsForClientTestSupport.getRulesetsForClient;
 
+import com.intellij.testFramework.LightProjectDescriptor;
 import io.codiga.api.GetRulesetsForClientQuery;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCache;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
@@ -12,6 +13,16 @@ import java.util.List;
  * Integration test for {@link CodigaRulesetContentInspection}.
  */
 public class CodigaRulesetContentInspectionTest extends TestBase {
+
+    /**
+     * To re-create project, and have it clean for each test.
+     * <p>
+     * See last sentence of <a href="https://plugins.jetbrains.com/docs/intellij/light-and-heavy-tests.html#light-tests">Light tests</a>.
+     */
+    @Override
+    protected LightProjectDescriptor getProjectDescriptor() {
+        return new LightProjectDescriptor();
+    }
 
     public void testNoHighlightingWhenCacheIsNotInitialized() {
         doTest("rulesets:\n" +
