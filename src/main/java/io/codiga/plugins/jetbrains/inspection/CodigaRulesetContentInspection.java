@@ -43,9 +43,9 @@ public class CodigaRulesetContentInspection extends LocalInspectionTool {
         return new YamlPsiElementVisitor() {
             @Override
             public void visitScalar(@NotNull YAMLScalar scalar) {
-                if (scalar instanceof YAMLPlainTextImpl && scalar.getParent() instanceof YAMLSequenceItem) {
+                var cache = RosieRulesCache.getInstance(holder.getProject());
+                if (cache.isInitialized() && scalar instanceof YAMLPlainTextImpl && scalar.getParent() instanceof YAMLSequenceItem) {
                     String rulesetName = scalar.getText();
-                    var cache = RosieRulesCache.getInstance(holder.getProject());
 
                     //Since ruleset names are already validated by the associated JSON schema,
                     // there is no need to mark them as non-existent too.

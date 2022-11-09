@@ -75,6 +75,11 @@ public final class RosieRulesCache implements Disposable {
      * If a locally configured ruleset name is not returned (it doesn't exist on Codiga Hub), it won't have an entry in this collection.
      */
     private final Map<String, Boolean> rulesetsFromServer;
+    /**
+     * Stores if {@link #updateCacheFrom(List)} has been called at least once.
+     */
+    @Getter
+    private boolean isInitialized = false;
 
     public RosieRulesCache(Project project) {
         this.project = project;
@@ -116,6 +121,7 @@ public final class RosieRulesCache implements Disposable {
         saveRulesets(rulesetsFromCodigaAPI);
         saveRulesByLanguages(rulesetsFromCodigaAPI);
         reAnalyzeConfigFile();
+        isInitialized = true;
     }
 
     private void saveRulesets(List<GetRulesetsForClientQuery.RuleSetsForClient> rulesetsFromCodigaAPI) {

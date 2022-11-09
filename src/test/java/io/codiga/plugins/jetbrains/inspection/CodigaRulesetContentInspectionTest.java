@@ -13,6 +13,13 @@ import java.util.List;
  */
 public class CodigaRulesetContentInspectionTest extends TestBase {
 
+    public void testNoHighlightingWhenCacheIsNotInitialized() {
+        doTest("rulesets:\n" +
+            "  - non-existent\n" +
+            "  - python-ruleset\n" +
+            "  - InvaliD_ruleset-na!me");
+    }
+
     public void testCodigaRulesetExistence() {
         var rulesets = getRulesetsForClient(List.of("multipleRulesetsMultipleLanguages", "non-existent")).get();
         RosieRulesCache.getInstance(getProject()).updateCacheFrom(rulesets);
