@@ -6,6 +6,8 @@
 ### Added
 - [#191](https://github.com/codiga/jetbrains-plugin/issues/191): Users can now navigate from codiga.yml to the rulesets on Codiga Hub
   via Ctrl + clicking on ruleset names.
+- [#189](https://github.com/codiga/jetbrains-plugin/issues/189): Added an inspection to mark rulesets in codiga.yml when they either
+  doesn't exist on Codiga Hub or they exist but contain no rule.
 
 ### Changed
 
@@ -19,19 +21,11 @@
 
 ## [1.8.1]
 ### Added
-- [#177](https://github.com/codiga/jetbrains-plugin/issues/177): Added a notification popup, when we detect that the project contains Python module(s),
-  to give users the option to create a Codiga config file with default Python rulesets.  
+- [#177](https://github.com/codiga/jetbrains-plugin/issues/177): Added a notification popup, when we detect that the project,
+  or one of its modules is configured with a Python SDK, to give users the option to create a Codiga config file with default Python rulesets.  
 
 ### Changed
 - Improved the performance of editor tab switches when the Snippet Search tool window is closed.
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## [1.7.22]
 
