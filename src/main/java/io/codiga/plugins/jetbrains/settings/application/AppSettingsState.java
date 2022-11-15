@@ -29,9 +29,9 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     @Tag
     private String fingerprint = "";
     @Tag
-    private Boolean useCompletion = true;
+    private Boolean useCompletion = false;
     @Tag
-    private Boolean useInlineCompletion = true;
+    private Boolean useInlineCompletion = false;
     @Tag
     private Boolean showDialogApiNotification = true;
     @Tag

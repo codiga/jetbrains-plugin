@@ -13,12 +13,14 @@ public class VariableIndentationTest extends TestBase {
 
   public void testIndentation() {
     AppSettingsState.getInstance().setUseInlineCompletion(false);
+    AppSettingsState.getInstance().setUseCompletion(true);
+
     myFixture.testCompletionVariants("spawn_thread.rs");
     myFixture.type(".spawn");
     myFixture.complete(CompletionType.BASIC);
-
-
     myFixture.checkResultByFile("spawn_thread_indent_result.rs");
-    AppSettingsState.getInstance().setUseInlineCompletion(true);
+
+    AppSettingsState.getInstance().setUseInlineCompletion(false);
+    AppSettingsState.getInstance().setUseCompletion(false);
   }
 }

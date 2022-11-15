@@ -13,6 +13,12 @@ public class InlineCompletionTest extends TestBase {
         return "src/test/data/completion/inline";
     }
 
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        AppSettingsState.getInstance().setUseInlineCompletion(true);
+    }
+
     //Multiple snippets
 
     public void testAcceptFirstSnippet() {
