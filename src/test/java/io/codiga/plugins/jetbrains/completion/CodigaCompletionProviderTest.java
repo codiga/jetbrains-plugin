@@ -13,10 +13,14 @@ public class CodigaCompletionProviderTest extends TestBase {
 
     public void testAcceptRecipeSuggestion() {
         AppSettingsState.getInstance().setUseInlineCompletion(true);
+        AppSettingsState.getInstance().setUseCompletion(true);
+
         myFixture.testCompletionVariants("spawn_thread.rs");
         myFixture.type(".spawn");
         myFixture.complete(CompletionType.BASIC);
         myFixture.checkResultByFile("spawn_thread_accept_result.rs");
-        AppSettingsState.getInstance().setUseInlineCompletion(true);
+
+        AppSettingsState.getInstance().setUseInlineCompletion(false);
+        AppSettingsState.getInstance().setUseCompletion(false);
     }
 }
