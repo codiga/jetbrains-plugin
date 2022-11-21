@@ -8,7 +8,7 @@ plugins {
     // Kotlin support
     id("org.jetbrains.kotlin.jvm") version "1.7.21"
     // GraphQL
-    id("com.apollographql.apollo") version "2.5.13"
+    id("com.apollographql.apollo") version "2.5.14"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // UPDATE TO v1.9.1 WHEN IT IS RELEASED TO FIX https://youtrack.jetbrains.com/issue/IDEA-298989/Duplicate-method-name-getFont.
     id("org.jetbrains.intellij") version "1.6.0"
