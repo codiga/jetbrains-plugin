@@ -155,7 +155,15 @@ public class AppStarter implements StartupActivity {
      * Starts the shortcut cache refresher.
      */
     private void startShortcutCacheUpdater(@NotNull Project project) {
+        if (project.isDisposed()) {
+            return;
+        }
+
         AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() -> {
+            if (project.isDisposed()) {
+                return;
+            }
+
             final AppSettingsState settings = AppSettingsState.getInstance();
             if (settings == null) {
                 return;
