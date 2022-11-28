@@ -52,7 +52,7 @@ dependencies {
     implementation("com.rollbar:rollbar-java:1.8.1") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation("org.slf4j:slf4j-log4j12:2.0.3") {
+    implementation("org.slf4j:slf4j-log4j12:2.0.5") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
