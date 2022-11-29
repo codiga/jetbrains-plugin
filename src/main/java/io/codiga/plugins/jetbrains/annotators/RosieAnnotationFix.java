@@ -65,8 +65,8 @@ public class RosieAnnotationFix extends RosieAnnotationIntentionBase {
     }
 
     /**
-     * If the start/end offset for any edit, received from the rule configuration, is incorrect, and is outside the
-     * current file's range, we show an error, and don't apply the fix.
+     * If the start offset for additions, or the start/end offset for removals and updates, received from the rule configuration,
+     * is either null or is outside the current file's range, we show an error, and don't apply the fix.
      */
     @VisibleForTesting
     boolean hasInvalidEditOffset(@NotNull Project project, Editor editor, PsiFile psiFile) {
@@ -75,7 +75,14 @@ public class RosieAnnotationFix extends RosieAnnotationIntentionBase {
             TextRange fileRange = psiFile.getTextRange();
             hasInvalidOffset = this.rosieViolationFix.edits
                 .stream()
-                .anyMatch(edit -> !fileRange.contains(edit.start.getOffset(editor)) || !fileRange.contains(edit.end.getOffset(editor)));
+                .anyMatch(edit -> {
+                    if (edit.editType.equalsIgnoreCase(ROSIE_FIX_ADD)) {
+                        return edit.start == null || !fileRange.contains(edit.start.getOffset(editor));
+                    }
+                    return edit.start == null || edit.end == null
+                        || !fileRange.contains(edit.start.getOffset(editor))
+                        || !fileRange.contains(edit.end.getOffset(editor));
+                });
         } catch (IndexOutOfBoundsException e) {
             //Let it through, so that it can be handled by the 'hasInvalidOffset' check below.
         }
@@ -88,5 +95,4 @@ public class RosieAnnotationFix extends RosieAnnotationIntentionBase {
         }
         return hasInvalidOffset;
     }
-
 }

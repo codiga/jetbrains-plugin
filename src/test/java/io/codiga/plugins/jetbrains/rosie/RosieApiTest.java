@@ -29,6 +29,8 @@ public class RosieApiTest implements RosieApi {
                 return multipleViolations();
             case "text_insertion_fix.py":
                 return textInsertionFix();
+            case "text_insertion_fix_null_end.py":
+                return textInsertionFixNullEnd();
             case "text_replacement_fix_ranges_matching.py":
                 return textReplaceRangesMatching();
             case "text_replacement_fix_ranges_not_matching.py":
@@ -104,6 +106,26 @@ public class RosieApiTest implements RosieApi {
                 new RosieViolationFixEdit(
                     new RosiePosition(1, 5),
                     new RosiePosition(1, 10),
+                    "This is the inserted text",
+                    "add")));
+        var rosieViolation = new RosieViolation(
+            "has_text_insertion_fix",
+            new RosiePosition(1, 5),
+            new RosiePosition(1, 10),
+            "WARNING",
+            "CODE_STYLE",
+            List.of(rosieViolationFix));
+
+        return List.of(new RosieAnnotation("text_insertion_rule", "text_insertion_ruleset", rosieViolation));
+    }
+
+    private List<RosieAnnotation> textInsertionFixNullEnd() {
+        var rosieViolationFix = new RosieViolationFix(
+            "Insert text null end",
+            List.of(
+                new RosieViolationFixEdit(
+                    new RosiePosition(1, 5),
+                    null,
                     "This is the inserted text",
                     "add")));
         var rosieViolation = new RosieViolation(

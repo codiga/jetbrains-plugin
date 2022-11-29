@@ -28,6 +28,13 @@ public class RosieAnnotationFixTest extends TestBase {
                 "    self.name = name\n");
     }
 
+    public void testTextInsertionFixForNullEnd() {
+        doTestAnnotationFix("text_insertion_fix_null_end.py", "Fix: Insert text null end",
+            "clasThis is the inserted texts Person:\n" +
+                "  def __init__(self, name):\n" +
+                "    self.name = name\n");
+    }
+
     //Replace
 
     public void testTextReplacementFixWithEditRangeMatchingViolationRange() {
@@ -61,6 +68,78 @@ public class RosieAnnotationFixTest extends TestBase {
     }
 
     //Negative cases
+
+    public void testDoesntApplyFixWhenStartIsNullForAddition() {
+        PsiFile psiFile = myFixture.configureByFile("text_insertion_fix.py");
+        var fix = new RosieAnnotationFix(
+            new RosieViolationFix(
+                "Apply fix",
+                List.of(
+                    new RosieViolationFixEdit(
+                        null,
+                        new RosiePosition(3, 10),
+                        "Content",
+                        "add"
+                    ),
+                    new RosieViolationFixEdit(
+                        new RosiePosition(1, 5),
+                        new RosiePosition(3, 10),
+                        "Content",
+                        "add"
+                    ))));
+
+        assertThrows(
+            CommonRefactoringUtil.RefactoringErrorHintException.class,
+            () -> fix.hasInvalidEditOffset(getProject(), myFixture.getEditor(), psiFile));
+    }
+
+    public void testDoesntApplyFixWhenStartIsNullForNonAddition() {
+        PsiFile psiFile = myFixture.configureByFile("text_replacement_fix_ranges_matching.py");
+        var fix = new RosieAnnotationFix(
+            new RosieViolationFix(
+                "Apply fix",
+                List.of(
+                    new RosieViolationFixEdit(
+                        null,
+                        new RosiePosition(3, 10),
+                        "Content",
+                        "update"
+                    ),
+                    new RosieViolationFixEdit(
+                        new RosiePosition(1, 5),
+                        new RosiePosition(3, 10),
+                        "Content",
+                        "update"
+                    ))));
+
+        assertThrows(
+            CommonRefactoringUtil.RefactoringErrorHintException.class,
+            () -> fix.hasInvalidEditOffset(getProject(), myFixture.getEditor(), psiFile));
+    }
+
+    public void testDoesntApplyFixWhenEndIsNullForNonAddition() {
+        PsiFile psiFile = myFixture.configureByFile("text_replacement_fix_ranges_matching.py");
+        var fix = new RosieAnnotationFix(
+            new RosieViolationFix(
+                "Apply fix",
+                List.of(
+                    new RosieViolationFixEdit(
+                        new RosiePosition(1, 5),
+                        null,
+                        "Content",
+                        "update"
+                    ),
+                    new RosieViolationFixEdit(
+                        new RosiePosition(1, 5),
+                        new RosiePosition(3, 10),
+                        "Content",
+                        "update"
+                    ))));
+
+        assertThrows(
+            CommonRefactoringUtil.RefactoringErrorHintException.class,
+            () -> fix.hasInvalidEditOffset(getProject(), myFixture.getEditor(), psiFile));
+    }
 
     public void testDoesntApplyFixWhenStartLineIsOutOfRange() {
         PsiFile psiFile = myFixture.configureByFile("text_insertion_fix.py");
@@ -111,7 +190,7 @@ public class RosieAnnotationFixTest extends TestBase {
     }
 
     public void testDoesntApplyFixWhenEndLineIsOutOfRange() {
-        PsiFile psiFile = myFixture.configureByFile("text_insertion_fix.py");
+        PsiFile psiFile = myFixture.configureByFile("text_replacement_fix_ranges_matching.py");
         var fix = new RosieAnnotationFix(
             new RosieViolationFix(
                 "Apply fix",
@@ -120,13 +199,13 @@ public class RosieAnnotationFixTest extends TestBase {
                         new RosiePosition(1, 1),
                         new RosiePosition(3, 10),
                         "Content",
-                        "add"
+                        "update"
                     ),
                     new RosieViolationFixEdit(
                         new RosiePosition(1, 5),
                         new RosiePosition(6, 10), //end line is invalid
                         "Content",
-                        "add"
+                        "update"
                     ))));
 
         assertThrows(
@@ -135,7 +214,7 @@ public class RosieAnnotationFixTest extends TestBase {
     }
 
     public void testDoesntApplyFixWhenEndColumnIsOutOfRange() {
-        PsiFile psiFile = myFixture.configureByFile("text_insertion_fix.py");
+        PsiFile psiFile = myFixture.configureByFile("text_replacement_fix_ranges_matching.py");
         var fix = new RosieAnnotationFix(
             new RosieViolationFix(
                 "Apply fix",
@@ -144,13 +223,13 @@ public class RosieAnnotationFixTest extends TestBase {
                         new RosiePosition(1, 1),
                         new RosiePosition(3, 10),
                         "Content",
-                        "add"
+                        "update"
                     ),
                     new RosieViolationFixEdit(
                         new RosiePosition(1, 5),
-                        new RosiePosition(6, -2), //end column is invalid
+                        new RosiePosition(3, 100), //end column is invalid
                         "Content",
-                        "add"
+                        "update"
                     ))));
 
         assertThrows(
