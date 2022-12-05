@@ -5,7 +5,9 @@ import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import org.junit.Test;
 
-
+/**
+ * Unit test for {@link LanguageUtils}.
+ */
 public class LanguageUtilsTest extends TestBase {
 
 
@@ -35,6 +37,7 @@ public class LanguageUtilsTest extends TestBase {
         assertEquals(LanguageEnumeration.OBJECTIVEC, LanguageUtils.getLanguageFromFilename("myfile.M"));
         assertEquals(LanguageEnumeration.PYTHON, LanguageUtils.getLanguageFromFilename("myfile.py"));
         assertEquals(LanguageEnumeration.PYTHON, LanguageUtils.getLanguageFromFilename("myfile.py3"));
+        assertEquals(LanguageEnumeration.PYTHON, LanguageUtils.getLanguageFromFilename("myfile.ipynb"));
         assertEquals(LanguageEnumeration.PERL, LanguageUtils.getLanguageFromFilename("myfile.pl"));
         assertEquals(LanguageEnumeration.PERL, LanguageUtils.getLanguageFromFilename("myfile.pm"));
 
