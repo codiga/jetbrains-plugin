@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FilenameUtils;
 
 import java.util.Map;
+import java.util.Locale;
 
 public final class LanguageUtils {
 
@@ -71,7 +72,7 @@ public final class LanguageUtils {
             return LanguageEnumeration.UNKNOWN;
         }
 
-        if (filename.toLowerCase(java.util.Locale.getDefault()).startsWith("docker")) {
+        if (filename.toLowerCase(Locale.getDefault()).startsWith("docker") || extension.equals("dockerfile")) {
             return LanguageEnumeration.DOCKER;
         }
 
