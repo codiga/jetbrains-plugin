@@ -23,6 +23,7 @@ public final class LanguageUtils {
         .put("html", LanguageEnumeration.HTML)
         .put("html5", LanguageEnumeration.HTML)
         .put("htm", LanguageEnumeration.HTML)
+        .put("ipynb", LanguageEnumeration.PYTHON)
         .put("js", LanguageEnumeration.JAVASCRIPT)
         .put("jsx", LanguageEnumeration.JAVASCRIPT)
         .put("json", LanguageEnumeration.JSON)
