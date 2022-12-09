@@ -2,7 +2,6 @@ package io.codiga.plugins.jetbrains.rosie;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -30,6 +29,7 @@ import java.util.List;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.utils.RosieUtils.getRosieLanguage;
+import static io.codiga.plugins.jetbrains.utils.UserAgentUtils.getUserAgent;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -49,13 +49,6 @@ public class RosieApiImpl implements RosieApi {
 
     public RosieApiImpl() {
         // no constructor instructions
-    }
-
-    private String getUserAgent() {
-        return String.format("%s %s %s",
-            ApplicationInfo.getInstance().getFullApplicationName(),
-            ApplicationInfo.getInstance().getMajorVersion(),
-            ApplicationInfo.getInstance().getMinorVersion());
     }
 
     @Override
