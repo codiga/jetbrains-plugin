@@ -1,26 +1,25 @@
 package io.codiga.plugins.jetbrains.graphql;
 
-
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
-import org.junit.Test;
 
 /**
  * Unit test for {@link LanguageUtils}.
  */
 public class LanguageUtilsTest extends TestBase {
 
-
-    @Test
     public void testAllLanguages() {
-
         assertEquals(LanguageEnumeration.APEX, LanguageUtils.getLanguageFromFilename("myfile.cls"));
         assertEquals(LanguageEnumeration.C, LanguageUtils.getLanguageFromFilename("myfile.c"));
         assertEquals(LanguageEnumeration.CPP, LanguageUtils.getLanguageFromFilename("myfile.cpp"));
         assertEquals(LanguageEnumeration.CSS, LanguageUtils.getLanguageFromFilename("myfile.css"));
         assertEquals(LanguageEnumeration.CSHARP, LanguageUtils.getLanguageFromFilename("myfile.cs"));
         assertEquals(LanguageEnumeration.DART, LanguageUtils.getLanguageFromFilename("myfile.dart"));
+        assertEquals(LanguageEnumeration.DOCKER, LanguageUtils.getLanguageFromFilename("dockerfile.myfile"));
+        assertEquals(LanguageEnumeration.DOCKER, LanguageUtils.getLanguageFromFilename("myfile.dockerfile"));
         assertEquals(LanguageEnumeration.DOCKER, LanguageUtils.getLanguageFromFilename("Dockerfile"));
+        assertEquals(LanguageEnumeration.DOCKER, LanguageUtils.getLanguageFromFilename("dockerfile"));
+        assertEquals(LanguageEnumeration.UNKNOWN, LanguageUtils.getLanguageFromFilename("dock"));
 
         assertEquals(LanguageEnumeration.GO, LanguageUtils.getLanguageFromFilename("myfile.go"));
         assertEquals(LanguageEnumeration.HASKELL, LanguageUtils.getLanguageFromFilename("myfile.hs"));
@@ -59,7 +58,5 @@ public class LanguageUtilsTest extends TestBase {
         assertEquals(LanguageEnumeration.UNKNOWN, LanguageUtils.getLanguageFromFilename("myfile"));
         assertEquals(LanguageEnumeration.YAML, LanguageUtils.getLanguageFromFilename("myfile.yaml"));
         assertEquals(LanguageEnumeration.YAML, LanguageUtils.getLanguageFromFilename("myfile.yml"));
-
-
     }
 }
