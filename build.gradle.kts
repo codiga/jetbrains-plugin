@@ -11,7 +11,7 @@ plugins {
     id("com.apollographql.apollo") version "2.5.14"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // UPDATE TO v1.9.1 WHEN IT IS RELEASED TO FIX https://youtrack.jetbrains.com/issue/IDEA-298989/Duplicate-method-name-getFont.
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.10.1"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "2.0.0"
     //Lombok
