@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
+import static io.codiga.plugins.jetbrains.graphql.Constants.USER_AGENT;
+import static io.codiga.plugins.jetbrains.utils.UserAgentUtils.getUserAgent;
 
 /**
  * This class implements the Codiga API, which is a GraphQL API.
@@ -40,6 +42,8 @@ public final class CodigaApiImpl implements CodigaApi {
         .serverUrl(Constants.ENDPOINT_URL)
         .build();
 
+
+
     /**
      * Set the header with access/secret keys so that we do an authenticated
      * request. to the API.
@@ -58,10 +62,12 @@ public final class CodigaApiImpl implements CodigaApi {
             return RequestHeaders
                 .builder()
                 .addHeader(Constants.API_TOKEN_HEADER, apiToken)
+                .addHeader(USER_AGENT, getUserAgent())
                 .build();
         }
         return RequestHeaders
             .builder()
+            .addHeader(USER_AGENT, getUserAgent())
             .build();
     }
 
