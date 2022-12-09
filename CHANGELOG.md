@@ -5,7 +5,6 @@
 ## Unreleased
 
 ### Added
-- [#213](https://github.com/codiga/jetbrains-plugin/issues/213): Added support for Jupyter Notebook (.ipynb) files. 
 
 ### Changed
 
@@ -16,6 +15,11 @@
 ### Fixed
 
 ### Security
+
+## 1.8.6 - 2022-12-09
+
+### Added
+- [#213](https://github.com/codiga/jetbrains-plugin/issues/213): Added support for Jupyter Notebook (.ipynb) files.
 
 ## 1.8.2 - 2022-11-09
 
