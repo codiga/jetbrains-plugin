@@ -175,8 +175,8 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         TextRange annotationRange = new TextRange(annotation.getStart(), annotation.getEnd());
         LOGGER.debug("annotation range: " + annotationRange);
 
-        if (!fileRange.contains(annotationRange.getEndOffset()) ||
-            !fileRange.contains(annotationRange.getStartOffset())) {
+        if (!fileRange.containsOffset(annotationRange.getEndOffset()) ||
+            !fileRange.containsOffset(annotationRange.getStartOffset())) {
             LOGGER.debug("range outside of the scope");
             return;
         }
