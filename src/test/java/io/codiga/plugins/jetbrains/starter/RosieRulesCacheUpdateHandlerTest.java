@@ -129,8 +129,10 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         myFixture.copyFileToProject("codiga.yml");
 
         RosieRulesCache rulesCache = RosieRulesCache.getInstance(getProject());
+        rulesCache.setRulesetNames(List.of("singleRulesetSingleLanguage"));
         rulesCache.updateCacheFrom(RulesetsForClientTestSupport.singleRulesetMultipleLanguages());
         rulesCache.setLastUpdatedTimeStamp(101L);
+        rulesCache.setConfigFileModificationStamp(0);
 
         assertSize(2, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
         assertEquals(101, rulesCache.getLastUpdatedTimeStamp());
