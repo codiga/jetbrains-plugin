@@ -43,7 +43,7 @@ public final class RosieRulesCacheUpdateHandler {
         if (!isCodigaConfigFileExist(codigaConfigFile)) {
             rulesCache.clear();
             //Since the config file no longer exist, its modification stamp is reset too
-            rulesCache.setConfigFileModificationStamp(0);
+            rulesCache.setConfigFileModificationStamp(-1);
             return;
         }
 
