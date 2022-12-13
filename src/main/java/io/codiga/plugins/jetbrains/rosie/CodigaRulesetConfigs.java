@@ -1,11 +1,9 @@
 package io.codiga.plugins.jetbrains.rosie;
 
-import com.intellij.openapi.project.Project;
-
 /**
  * Provides default ruleset configurations for the Codiga config file.
  *
- * @see io.codiga.plugins.jetbrains.starter.RosieStartupActivity#showConfigureDefaultConfigFileNotification(Project)
+ * @see io.codiga.plugins.jetbrains.starter.RosieStartupActivity#showConfigureDefaultConfigFileNotification(com.intellij.openapi.project.Project)
  */
 public final class CodigaRulesetConfigs {
 

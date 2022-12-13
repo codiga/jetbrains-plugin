@@ -40,7 +40,7 @@ public final class RosieRulesCache implements Disposable {
 
     private final Project project;
     /**
-     * Mapping the rules to their target languages, because this way
+     * Mapping the rules to their target Rosie languages, because this way
      * <ul>
      *     <li>retrieving the rules from this cache is much easier,</li>
      *     <li>filtering the rules by language each time a request has to be sent to
@@ -165,8 +165,18 @@ public final class RosieRulesCache implements Disposable {
      *                 provided language
      */
     public List<RosieRule> getRosieRulesForLanguage(LanguageEnumeration language) {
-        var cachedRules = cache.get(language);
+        var cachedRules = cache.get(getCachedLanguageTypeOf(language));
         return cachedRules != null ? cachedRules.getRosieRules() : List.of();
+    }
+
+    /**
+     * Since, besides JavaScript files, rules for TypeScript files are also handled under the same JavaScript Rosie language
+     * type, we have to return JavaScript rules for TypeScript files as well.
+     *
+     * @param fileLanguage the file language to map
+     */
+    private LanguageEnumeration getCachedLanguageTypeOf(LanguageEnumeration fileLanguage) {
+        return fileLanguage == LanguageEnumeration.TYPESCRIPT ? LanguageEnumeration.JAVASCRIPT : fileLanguage;
     }
 
     /**
@@ -179,7 +189,7 @@ public final class RosieRulesCache implements Disposable {
      * cached here.
      */
     public RuleWithNames getRuleWithNamesFor(LanguageEnumeration language, String ruleId) {
-        return cache.get(language).getRules().get(ruleId);
+        return cache.get(getCachedLanguageTypeOf(language)).getRules().get(ruleId);
     }
 
     /**

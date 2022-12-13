@@ -28,7 +28,8 @@ import java.util.Base64;
 import java.util.List;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
-import static io.codiga.plugins.jetbrains.utils.RosieUtils.getRosieLanguage;
+import static io.codiga.plugins.jetbrains.utils.RosieLanguageSupport.getRosieLanguage;
+import static io.codiga.plugins.jetbrains.utils.RosieLanguageSupport.isLanguageSupported;
 import static io.codiga.plugins.jetbrains.utils.UserAgentUtils.getUserAgent;
 import static java.util.stream.Collectors.toList;
 
@@ -39,13 +40,6 @@ public class RosieApiImpl implements RosieApi {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final String ROSIE_POST_URL = "https://analysis.codiga.io/analyze";
     private static final Gson GSON = new Gson();
-
-    /**
-     * Current supported languages by Rosie.
-     * <p>
-     * See also {@link io.codiga.plugins.jetbrains.utils.RosieUtils#getRosieLanguage(LanguageEnumeration)}.
-     */
-    private static final List<LanguageEnumeration> SUPPORTED_LANGUAGES = List.of(LanguageEnumeration.PYTHON);
 
     public RosieApiImpl() {
         // no constructor instructions
@@ -58,11 +52,11 @@ public class RosieApiImpl implements RosieApi {
             return List.of();
         }
 
-        LanguageEnumeration language = LanguageUtils.getLanguageFromFilename(psiFile.getVirtualFile().getCanonicalPath());
+        LanguageEnumeration fileLanguage = LanguageUtils.getLanguageFromFilename(psiFile.getVirtualFile().getCanonicalPath());
 
         // not supported, we exit right away
-        if (!SUPPORTED_LANGUAGES.contains(language)) {
-            LOGGER.info(String.format("language not supported %s", language));
+        if (!isLanguageSupported(fileLanguage)) {
+            LOGGER.info(String.format("language not supported %s", fileLanguage));
             return List.of();
         }
 
@@ -71,13 +65,13 @@ public class RosieApiImpl implements RosieApi {
             String codeBase64 = Base64.getEncoder().encodeToString(fileText);
 
             // Prepare the request
-            var rosieRules = RosieRulesCache.getInstance(project).getRosieRulesForLanguage(language);
+            var rosieRules = RosieRulesCache.getInstance(project).getRosieRulesForLanguage(fileLanguage);
             //If there is no rule for the target language, then Rosie is not called, and no annotation is performed
             if (rosieRules.isEmpty()) {
                 return List.of();
             }
 
-            RosieRequest request = new RosieRequest(psiFile.getName(), getRosieLanguage(language), "utf8", codeBase64, rosieRules, true);
+            RosieRequest request = new RosieRequest(psiFile.getName(), getRosieLanguage(fileLanguage), "utf8", codeBase64, rosieRules, true);
             String requestString = GSON.toJson(request);
             StringEntity postingString = new StringEntity(requestString); //gson.toJson() converts your pojo to json
             HttpPost httpPost = new HttpPost(ROSIE_POST_URL);
@@ -102,7 +96,7 @@ public class RosieApiImpl implements RosieApi {
                         // for the same problem from Rosie, only one instance is shown by RosieAnnotator.
                         .distinct()
                         .map(violation -> {
-                            var rule = RosieRulesCache.getInstance(project).getRuleWithNamesFor(language, res.identifier);
+                            var rule = RosieRulesCache.getInstance(project).getRuleWithNamesFor(fileLanguage, res.identifier);
                             return new RosieAnnotation(rule.ruleName, rule.rulesetName, violation);
                         }))
                     .collect(toList());

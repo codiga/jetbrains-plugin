@@ -1,6 +1,6 @@
 package io.codiga.plugins.jetbrains.model.rosie;
 
-import io.codiga.plugins.jetbrains.rosie.RosieApiImpl;
+import io.codiga.plugins.jetbrains.utils.RosieLanguageSupport;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -14,8 +14,7 @@ public class RosieRequest {
     /**
      * The Rosie language string.
      * <p>
-     * See {@link io.codiga.plugins.jetbrains.utils.RosieUtils#getRosieLanguage(io.codiga.api.type.LanguageEnumeration)}
-     * and {@link RosieApiImpl#SUPPORTED_LANGUAGES}.
+     * @see RosieLanguageSupport
      */
     public String language;
     public String fileEncoding;
