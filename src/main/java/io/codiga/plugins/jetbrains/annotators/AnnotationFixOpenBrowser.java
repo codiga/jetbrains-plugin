@@ -32,7 +32,7 @@ public class AnnotationFixOpenBrowser extends RosieAnnotationIntentionBase {
      * Opens the rule's page on Codiga Hub for this particular violation.
      */
     @Override
-    public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
+    public void doInvoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         try {
             BrowserUtil.browse(getUrlString());
         } catch (Exception e) {

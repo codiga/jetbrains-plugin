@@ -1,6 +1,7 @@
 package io.codiga.plugins.jetbrains.actions;
 
 import com.intellij.ide.DataManager;
+import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -76,7 +77,14 @@ public class ActionUtils {
     }
 
     public final static String getUnitRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        String canonicalPath = virtualFile.getPath();
+        /*
+         * Language can be injected in string literals. See https://www.jetbrains.com/help/idea/using-language-injections.html.
+         * In that case the language injected code is handled in an underlying VirtualFileWindow, which returns a different a path from `getPath()`,
+         * thus we have to get the path of the file into which it is injected.
+         */
+        String canonicalPath = virtualFile instanceof VirtualFileWindow
+            ? ((VirtualFileWindow) virtualFile).getDelegate().getPath()
+            : virtualFile.getPath();
         String projectPath = project.getBasePath();
 
         String relativePath = canonicalPath.replace(projectPath, "");
