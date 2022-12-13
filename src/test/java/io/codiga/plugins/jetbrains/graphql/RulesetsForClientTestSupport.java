@@ -13,6 +13,8 @@ import java.util.Optional;
  */
 public final class RulesetsForClientTestSupport {
 
+    // Python rules
+
     private static final GetRulesetsForClientQuery.Rule PYTHON_RULE_1 = createAstRule("typename_1",
         "10",
         "python_rule_1",
@@ -38,11 +40,32 @@ public final class RulesetsForClientTestSupport {
         "python_rule_5",
         "ZnVuY3Rpb24gdmlzaXQocGF0dGVybiwgZmlsZW5hbWUsIGNvZGUpIHsKICAgIGNvbnN0IGVycm9yID0gYnVpbGRFcnJvcihtb2RlLnN0YXJ0LmxpbmUsIG1vZGUuc3RhcnQuY29sLCBtb2RlLmVuZC5saW5lLCBtb2RlLmVuZC5jb2wsICJlcnJvciBtZXNzYWdlIiwgIkNSSVRJQ0FMIiwgInNlY3VyaXR5Iik7CiAgICBhZGRFcnJvcihlcnJvcik7CiAgfQp9",
         LanguageEnumeration.PYTHON);
+
+    // Java rules
+
     private static final GetRulesetsForClientQuery.Rule JAVA_RULE_1 = createAstRule("typename_2",
         "20",
         "java_rule_1",
         "ZnVuY3Rpb24gdmlzaXQocGF0dGVybiwgZmlsZW5hbWUsIGNvZGUpIHsKICAgIGFkZEVycm9yKGJ1aWxkRXJyb3IobW9kZS5zdGFydC5saW5lLCBtb2RlLnN0YXJ0LmNvbCwgbW9kZS5lbmQubGluZSwgbW9kZS5lbmQuY29sLCAiZXJyb3IgbWVzc2FnZSIsICJDUklUSUNBTCIsICJzZWN1cml0eSIpKTsKICB9Cn0=",
         LanguageEnumeration.JAVA);
+
+    // JavaScript rules
+
+    private static final GetRulesetsForClientQuery.Rule JAVASCRIPT_RULE_1 = createAstRule("typename_1",
+        "10",
+        "javascript_rule_1",
+        "ZnVuY3Rpb24gdmlzaXQocGF0dGVybiwgZmlsZW5hbWUsIGNvZGUpIHsKfQ==",
+        LanguageEnumeration.JAVASCRIPT);
+    private static final GetRulesetsForClientQuery.Rule JAVASCRIPT_RULE_2 = createAstRule("typename_1",
+        "11",
+        "javascript_rule_2",
+        "ZnVuY3Rpb24gdmlzaXQocGF0dGVybiwgZmlsZW5hbWUsIGNvZGUpIHsKICAgIGFkZEVycm9yKGJ1aWxkRXJyb3IobW9kZS5zdGFydC5saW5lLCBtb2RlLnN0YXJ0LmNvbCwgbW9kZS5lbmQubGluZSwgbW9kZS5lbmQuY29sLCAiZXJyb3IgbWVzc2FnZSIsICJDUklUSUNBTCIsICJzZWN1cml0eSIpKTsKICB9Cn0=",
+        LanguageEnumeration.JAVASCRIPT);
+    private static final GetRulesetsForClientQuery.Rule JAVASCRIPT_RULE_3 = createAstRule("typename_1",
+        "12",
+        "javascript_rule_3",
+        "ZnVuY3Rpb24gdmlzaXQocGF0dGVybiwgZmlsZW5hbWUsIGNvZGUpIHsKICAgIGNvbnN0IGVycm9yID0gYnVpbGRFcnJvcihtb2RlLnN0YXJ0LmxpbmUsIG1vZGUuc3RhcnQuY29sLCBtb2RlLmVuZC5saW5lLCBtb2RlLmVuZC5jb2wsICJlcnJvciBtZXNzYWdlIiwgIkNSSVRJQ0FMIiwgInNlY3VyaXR5Iik7CiAgICBhZGRFcnJvcihlcnJvcik7CiAgfQp9",
+        LanguageEnumeration.JAVASCRIPT);
 
     /**
      * Returns test rulesets based on the argument ruleset names. Currently, rulesets are returned based on the first
@@ -70,6 +93,9 @@ public final class RulesetsForClientTestSupport {
             case "erroredRuleset":
                 rulesets = null;
                 break;
+            case "javascriptRuleset":
+                rulesets = javascriptRulesets();
+                break;
             default:
                 rulesets = List.of();
         }
@@ -88,6 +114,8 @@ public final class RulesetsForClientTestSupport {
                 return Optional.of(103L);
             case "multipleRulesetsMultipleLanguages":
                 return Optional.of(104L);
+            case "javascriptRuleset":
+                return Optional.of(105L);
             default:
                 return Optional.empty();
         }
@@ -139,6 +167,17 @@ public final class RulesetsForClientTestSupport {
         var ruleset2 = new GetRulesetsForClientQuery.RuleSetsForClient("typename", 6789, "python-ruleset", rules2);
 
         return List.of(ruleset, ruleset2);
+    }
+
+    /**
+     * Returns a single ruleset with JavaScript rules.
+     */
+    private static List<GetRulesetsForClientQuery.RuleSetsForClient> javascriptRulesets() {
+        var rules = List.of(JAVASCRIPT_RULE_1, JAVASCRIPT_RULE_2, JAVASCRIPT_RULE_3);
+
+        var ruleset = new GetRulesetsForClientQuery.RuleSetsForClient("typename", 1234, "javascriptRuleset", rules);
+
+        return List.of(ruleset);
     }
 
     private static GetRulesetsForClientQuery.Rule createAstRule(@NotNull String __typename,
