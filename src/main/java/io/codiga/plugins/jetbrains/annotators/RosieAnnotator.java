@@ -168,8 +168,12 @@ public class RosieAnnotator extends ExternalAnnotator<RosieAnnotatorInformation,
         @NotNull final RosieAnnotationJetBrains annotation,
         @NotNull AnnotationHolder holder) {
 
-        final String message = String.format("%s (%s)", annotation.getMessage(), ANNOTATION_PREFIX);
+        //If the annotation starts later than it ends, don't annotate
+        if (annotation.getStart() > annotation.getEnd()) {
+            return;
+        }
 
+        final String message = String.format("%s (%s)", annotation.getMessage(), ANNOTATION_PREFIX);
         final TextRange fileRange = psiFile.getTextRange();
 
         TextRange annotationRange = new TextRange(annotation.getStart(), annotation.getEnd());

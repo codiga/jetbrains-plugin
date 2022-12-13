@@ -39,7 +39,7 @@ public class DisableRosieAnalysisFix extends RosieAnnotationIntentionBase {
     }
 
     @Override
-    public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
+    public void doInvoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
         AnAction action = ActionManager.getInstance().getAction("EditorStartNewLineBefore");
         if (!(action instanceof StartNewLineBeforeAction)) {
             //This shouldn't happen since the action is available on platform-level
