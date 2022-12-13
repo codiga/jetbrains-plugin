@@ -38,6 +38,8 @@ public class RosieAnnotationFix extends RosieAnnotationIntentionBase {
 
     @Override
     public void doInvoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
+        recordRuleFix();
+
         try {
             WriteCommandAction.writeCommandAction(project).run(
                 (ThrowableRunnable<Throwable>) () -> {
