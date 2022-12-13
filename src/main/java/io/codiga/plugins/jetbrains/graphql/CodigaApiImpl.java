@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.graphql.Constants.USER_AGENT;
@@ -387,5 +388,79 @@ public final class CodigaApiImpl implements CodigaApi {
             });
 
         return apiRequest.getData();
+    }
+
+    @Override
+    public void recordRuleFix() {
+        AppSettingsState settings = AppSettingsState.getInstance();
+
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+        ApiRequest<String> apiRecordRuleFix = new ApiRequest<>();
+
+        ApolloMutationCall<RecordRuleFixMutation.Data> mutationCall =
+            apolloClient.mutate(new RecordRuleFixMutation(fingerprint))
+                .toBuilder()
+                .requestHeaders(getHeaders())
+                .build();
+        mutationCall.enqueue(
+            new ApolloCall.Callback<RecordRuleFixMutation.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<RecordRuleFixMutation.Data> response) {
+                    if (response.getData() == null) {
+                        LOGGER.info(String.format("RecordRuleFixMutation response %s", response));
+                        apiRecordRuleFix.setError();
+                    } else {
+                        LOGGER.info(String.format("RecordRuleFixMutation response data: %s ", response.getData()));
+                        LOGGER.info(String.format("RecordRuleFixMutation response data: %s ", response.getData().recordAccess()));
+                        apiRecordRuleFix.setData(response.getData().recordAccess());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    LOGGER.debug("api call to ignore failure fails");
+                    LOGGER.debug(e.getMessage());
+                    e.printStackTrace();
+                    apiRecordRuleFix.setError();
+                }
+            });
+    }
+
+    @Override
+    public void recordCreateCodigaYaml() {
+        AppSettingsState settings = AppSettingsState.getInstance();
+
+        String fingerPrintText = settings.getFingerprint();
+        Input<String> fingerprint = Input.fromNullable(fingerPrintText);
+        ApiRequest<String> apiRecordCreateCodigaYaml = new ApiRequest<>();
+
+        ApolloMutationCall<RecordCreateCodigaYamlMutation.Data> mutationCall =
+            apolloClient.mutate(new RecordCreateCodigaYamlMutation(fingerprint))
+                .toBuilder()
+                .requestHeaders(getHeaders())
+                .build();
+        mutationCall.enqueue(
+            new ApolloCall.Callback<RecordCreateCodigaYamlMutation.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<RecordCreateCodigaYamlMutation.Data> response) {
+                    if (response.getData() == null) {
+                        LOGGER.info(String.format("RecordCreateCodigaYamlMutation response %s", response));
+                        apiRecordCreateCodigaYaml.setError();
+                    } else {
+                        LOGGER.info(String.format("RecordCreateCodigaYamlMutation response data: %s ", response.getData()));
+                        LOGGER.info(String.format("RecordCreateCodigaYamlMutation response data: %s ", response.getData().recordAccess()));
+                        apiRecordCreateCodigaYaml.setData(response.getData().recordAccess());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    LOGGER.debug("api call to ignore failure fails");
+                    LOGGER.debug(e.getMessage());
+                    e.printStackTrace();
+                    apiRecordCreateCodigaYaml.setError();
+                }
+            });
     }
 }

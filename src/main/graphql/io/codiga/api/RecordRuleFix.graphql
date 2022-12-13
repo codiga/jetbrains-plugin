@@ -1,0 +1,3 @@
+mutation RecordRuleFix($fingerprint: String) {
+    recordAccess(accessType: IntelliJ, actionType: RuleFix, userFingerprint: $fingerprint)
+}
