@@ -28,6 +28,7 @@ import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCache;
+import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil;
 import io.codiga.plugins.jetbrains.rosie.CodigaConfigState;
 import io.codiga.plugins.jetbrains.rosie.CodigaRulesetConfigs;
@@ -108,6 +109,12 @@ public class RosieStartupActivity implements StartupActivity {
                     .addAction(new AnAction("Create codiga.yml") {
                         @Override
                         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                            try {
+                                CodigaApi.getInstance().recordCreateCodigaYaml();
+                            } catch (Exception e) {
+                                //Even if recording this metric fails, the creation of codiga.yml should be performed
+                            }
+
                             if (notification != null) {
                                 notification.hideBalloon();
                                 //At this point the project root dir must exist

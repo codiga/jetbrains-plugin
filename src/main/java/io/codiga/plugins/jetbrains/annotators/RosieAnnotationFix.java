@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.refactoring.util.CommonRefactoringUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ThrowableRunnable;
+import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.model.rosie.RosieViolationFix;
 import io.codiga.plugins.jetbrains.model.rosie.RosieViolationFixEdit;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,8 @@ public class RosieAnnotationFix extends RosieAnnotationIntentionBase {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
+        recordRuleFix();
+
         try {
             WriteCommandAction.writeCommandAction(project).run(
                 (ThrowableRunnable<Throwable>) () -> {
@@ -61,6 +64,14 @@ public class RosieAnnotationFix extends RosieAnnotationIntentionBase {
             //Fall through, don't have to log anything. Showing the error hint in the editor is enough.
         } catch (Throwable e) {
             LOGGER.error("Cannot apply fix in editor.", e);
+        }
+    }
+
+    private void recordRuleFix() {
+        try {
+            CodigaApi.getInstance().recordRuleFix();
+        } catch (Exception e) {
+            //Even if recording this metric fails, the application of the fix should be performed
         }
     }
 

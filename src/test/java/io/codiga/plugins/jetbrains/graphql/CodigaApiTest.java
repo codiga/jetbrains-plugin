@@ -239,4 +239,14 @@ public final class CodigaApiTest implements CodigaApi {
     public Optional<List<GetRulesetsForClientQuery.RuleSetsForClient>> getRulesetsForClient(List<String> ruleNames) {
         return RulesetsForClientTestSupport.getRulesetsForClient(ruleNames);
     }
+
+    @Override
+    public void recordRuleFix() {
+
+    }
+
+    @Override
+    public void recordCreateCodigaYaml() {
+
+    }
 }

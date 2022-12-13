@@ -46,6 +46,8 @@ public interface CodigaApi {
      */
     Optional<String> getUsername();
 
+    //Recipes
+
     List<GetRecipesForClientQuery.GetRecipesForClient> getRecipesForClient(List<String> keywords,
                                                                                   List<String> dependencies,
                                                                                   Optional<String> parameters,
@@ -74,6 +76,8 @@ public interface CodigaApi {
 
     void recordRecipeUse(Long recipeId);
 
+    // Rulesets
+
     Optional<Long> getRulesetsLastTimestamp(List<String> ruleNames);
 
     /**
@@ -83,4 +87,15 @@ public interface CodigaApi {
      * @return the list of rulesets, or empty optional if there was an error during data retrieval
      */
     Optional<List<GetRulesetsForClientQuery.RuleSetsForClient>> getRulesetsForClient(List<String> ruleNames);
+
+    /**
+     * Sends a request to Codiga that a rule fix quick fix was invoked by the user.
+     */
+    void recordRuleFix();
+
+    /**
+     * Sends a request to Codiga that the Codiga config file was created by the user with default rulesets,
+     * via the notification popup shown in {@link io.codiga.plugins.jetbrains.starter.RosieStartupActivity}.
+     */
+    void recordCreateCodigaYaml();
 }
