@@ -91,11 +91,20 @@ public class RosieApiTest implements RosieApi {
             "WARNING",
             "BEST_PRACTICE",
             Collections.emptyList());
+        //To test that a violation whose start offset is greater than its end offset, is not annotated
+        var rosieViolationWarningStartGtEnd = new RosieViolation(
+            "warning_violation_start_gt_end",
+            new RosiePosition(1, 3),
+            new RosiePosition(1, 1),
+            "WARNING",
+            "BEST_PRACTICE",
+            Collections.emptyList());
 
         return List.of(
             new RosieAnnotation("critical_rule", "ruleset_name", rosieViolationCritical),
             new RosieAnnotation("error_rule", "ruleset_name", rosieViolationError),
-            new RosieAnnotation("warning_rule", "ruleset_name", rosieViolationWarning)
+            new RosieAnnotation("warning_rule", "ruleset_name", rosieViolationWarning),
+            new RosieAnnotation("warning_rule_start_gt_end", "ruleset_name", rosieViolationWarningStartGtEnd)
         );
     }
 
