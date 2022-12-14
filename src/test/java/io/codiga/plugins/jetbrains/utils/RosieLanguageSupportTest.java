@@ -28,11 +28,6 @@ public class RosieLanguageSupportTest {
     }
 
     @Test
-    public void shouldReturnJavaScriptRosieLanguageForTypeScript() {
-        assertEquals("javascript", RosieLanguageSupport.getRosieLanguage(LanguageEnumeration.TYPESCRIPT));
-    }
-
-    @Test
     public void shouldReturnUnknownRosieLanguageForNotSupportedLanguage() {
         assertEquals("unknown", RosieLanguageSupport.getRosieLanguage(LanguageEnumeration.CSS));
     }
