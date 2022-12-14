@@ -36,47 +36,6 @@ public class RosieAnnotatorTest extends TestBase {
         doTestAnnotations("no_highlight_for_end_offset_outside.py");
     }
 
-    //Disable Rosie analysis comment quick fixes
-
-    public void testAddsCodigaDisableCommentToTopLevelElementInPython() {
-        doTestAnnotationFix("add_top_level_disable_codiga.py", "Remove error 'single_rule'",
-            "# codiga-disable\n" +
-                "class PersonWithAddress:\n" +
-                "  def __init__(self, name, age, address):\n" +
-                "    self.name = name\n" +
-                "    self.age = age\n" +
-                "    self.address = address");
-    }
-
-    public void testAddsCodigaDisableCommentToNestedElementInPython() {
-        doTestAnnotationFix("add_nested_disable_codiga.py", "Remove error 'single_rule'",
-            "class PersonWithAddress:\n" +
-                "  def __init__(self, name, age, long_address):\n" +
-                "    self.name = name\n" +
-                "    self.age = age\n" +
-                "    # codiga-disable\n" +
-                "    self.address = long_address");
-    }
-
-    public void testAddsCodigaDisableCommentToTopLevelElementInJava() {
-        doTestAnnotationFix("add_top_level_disable_codiga.java", "Remove error 'single_rule'",
-            "// codiga-disable\n" +
-                "public class SomeClass {\n" +
-                "}");
-    }
-
-    public void testAddsCodigaDisableCommentToNestedElementInJava() {
-        doTestAnnotationFix("add_nested_disable_codiga.java", "Remove error 'single_rule'",
-            "public class SomeClass {\n" +
-                "    void method() {\n" +
-                "        boolean isPassing = true;\n" +
-                "        if (isPassing)\n" +
-                "            // codiga-disable\n" +
-                "            String passing = \"passing\";\n" +
-                "    }\n" +
-                "}");
-    }
-
     //Helpers
 
     /**
@@ -93,12 +52,5 @@ public class RosieAnnotatorTest extends TestBase {
 
     private void doTestAnnotations(String filePath) {
         doTestAnnotations(filePath, true, true, true);
-    }
-
-    private void doTestAnnotationFix(String filePath, String fixName, String afterText) {
-        myFixture.configureByFile(filePath);
-        myFixture.doHighlighting();
-        myFixture.launchAction(myFixture.findSingleIntention(fixName));
-        myFixture.checkResult(afterText);
     }
 }

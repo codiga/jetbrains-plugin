@@ -1,20 +1,21 @@
 package io.codiga.plugins.jetbrains.annotators;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
-import static io.codiga.plugins.jetbrains.utils.LanguageUtils.commentPrefixFor;
 
 import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorModificationUtilEx;
 import com.intellij.openapi.editor.actions.StartNewLineBeforeAction;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,7 @@ public class DisableRosieAnalysisFix extends RosieAnnotationIntentionBase {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final String CODIGA_DISABLE = "codiga-disable";
     private final String ruleName;
+    private final RosieAnnotationJetBrains annotation;
 
     @Override
     public @IntentionName @NotNull String getText() {
@@ -47,15 +49,31 @@ public class DisableRosieAnalysisFix extends RosieAnnotationIntentionBase {
             return;
         }
 
-        //Insert a new line before the current one. It places the caret to a position with correct indentation.
+        Document document = editor.getDocument();
+        int lineAtViolationStart = document.getLineNumber(annotation.getStart());
+        int lineStartOffset = document.getLineStartOffset(lineAtViolationStart);
+        String lineText = document.getText(TextRange.create(lineStartOffset, document.getLineEndOffset(lineAtViolationStart)));
+
+        //Calculate the indentation length by counting the whitespace characters at the beginning of the violation's line.
+        var indentationLength = 0;
+        while (Character.isWhitespace(lineText.charAt(indentationLength))) {
+            indentationLength++;
+        }
+
+        //Insert a new line before the current one
         var startNewLineBeforeAction = (StartNewLineBeforeAction) action;
         startNewLineBeforeAction.actionPerformed(editor, EditorUtil.getEditorDataContext(editor));
 
-        //Create the comment with the prefix associated with one-line comments in the file's language.
-        var language = LanguageUtils.getLanguageFromFilename(psiFile.getName());
-        String codigaDisableComment = commentPrefixFor(language) + " " + CODIGA_DISABLE;
+        //Remove all whitespaces in the new line, so after adding the comment and indentation, users don't end up with extra whitespaces in the line
+        int newlineNumber = document.getLineNumber(editor.getCaretModel().getOffset());
+        int newLineStartOffset = document.getLineStartOffset(newlineNumber);
+        document.deleteString(newLineStartOffset, document.getLineEndOffset(newlineNumber));
 
-        //Insert the comment text
-        EditorModificationUtilEx.insertStringAtCaret(editor, codigaDisableComment);
+        //Get the comment sign for the current file
+        var language = LanguageUtils.getLanguageFromFilename(psiFile.getName());
+        var commentPrefix = io.codiga.plugins.jetbrains.utils.LanguageUtils.commentPrefixFor(language);
+
+        //Insert the "codiga-disable" comment at the new line's start position
+        document.insertString(newLineStartOffset, " ".repeat(indentationLength) + commentPrefix + " " + CODIGA_DISABLE);
     }
 }
