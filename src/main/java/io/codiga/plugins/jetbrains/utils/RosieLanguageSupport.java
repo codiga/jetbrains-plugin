@@ -36,8 +36,9 @@ public final class RosieLanguageSupport {
             case PYTHON:
                 return "python";
             case JAVASCRIPT:
-            case TYPESCRIPT:
                 return "javascript";
+            case TYPESCRIPT:
+                return "typescript";
             default:
                 return "unknown";
         }
