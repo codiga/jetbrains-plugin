@@ -85,21 +85,23 @@ public class RosieApiImpl implements RosieApi {
             LOGGER.debug("Rules sent in request " + requestTimestamp + ": " + rosieRules.stream().map(RosieRule::toString).collect(toList()));
             List<RosieAnnotation> annotations = List.of();
             if (response.getEntity() != null) {
-
                 String result = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
                 LOGGER.debug("Response received from request " + requestTimestamp + ": " + result);
                 RosieResponse rosieResponse = GSON.fromJson(result, RosieResponse.class);
 
-                annotations = rosieResponse.ruleResponses.stream()
-                    .flatMap(res -> res.violations.stream()
-                        //distinct()' makes sure that if multiple, completely identical, violations are returned
-                        // for the same problem from Rosie, only one instance is shown by RosieAnnotator.
-                        .distinct()
-                        .map(violation -> {
-                            var rule = RosieRulesCache.getInstance(project).getRuleWithNamesFor(fileLanguage, res.identifier);
-                            return new RosieAnnotation(rule.ruleName, rule.rulesetName, violation);
-                        }))
-                    .collect(toList());
+                //If there is no error returned, collect the violations
+                if (rosieResponse.errors == null || rosieResponse.errors.isEmpty()) {
+                    annotations = rosieResponse.ruleResponses.stream()
+                        .flatMap(res -> res.violations.stream()
+                            //distinct()' makes sure that if multiple, completely identical, violations are returned
+                            // for the same problem from Rosie, only one instance is shown by RosieAnnotator.
+                            .distinct()
+                            .map(violation -> {
+                                var rule = RosieRulesCache.getInstance(project).getRuleWithNamesFor(fileLanguage, res.identifier);
+                                return new RosieAnnotation(rule.ruleName, rule.rulesetName, violation);
+                            }))
+                        .collect(toList());
+                }
             }
             client.close();
             return annotations;
