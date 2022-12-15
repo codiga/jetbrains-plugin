@@ -120,6 +120,17 @@ public class RosieRulesCacheTest extends TestBase {
         assertTrue(javaRules.stream().allMatch(rule -> LanguageEnumeration.JAVA.rawValue().equals(rule.language)));
     }
 
+    public void testReturnsJavaScriptRulesForTypeScript() {
+        var cache = RosieRulesCache.getInstance(getProject());
+        var rulesetNames = List.of("javascriptRuleset");
+        var rulesets = CodigaApi.getInstance().getRulesetsForClient(rulesetNames);
+
+        cache.updateCacheFrom(rulesets.get());
+
+        var jsRules = cache.getRosieRulesForLanguage(LanguageEnumeration.TYPESCRIPT);
+        assertTrue(jsRules.stream().allMatch(rule -> LanguageEnumeration.JAVASCRIPT.rawValue().equals(rule.language)));
+    }
+
     //Helpers
 
     private void validateRuleCountAndRuleIds(List<RosieRule> rules, int count, String... ruleIds) {
