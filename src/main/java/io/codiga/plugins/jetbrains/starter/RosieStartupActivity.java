@@ -2,6 +2,7 @@ package io.codiga.plugins.jetbrains.starter;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.findCodigaConfigFile;
+import static io.codiga.plugins.jetbrains.rosie.CodigaRulesetConfigs.getDefaultRulesetsForProject;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -12,18 +13,14 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.project.ProjectUtil;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ModuleRootModel;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.concurrency.AppExecutorUtil;
@@ -31,15 +28,12 @@ import io.codiga.plugins.jetbrains.annotators.RosieRulesCache;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil;
 import io.codiga.plugins.jetbrains.rosie.CodigaConfigState;
-import io.codiga.plugins.jetbrains.rosie.CodigaRulesetConfigs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -55,11 +49,6 @@ import java.util.concurrent.ScheduledFuture;
 public class RosieStartupActivity implements StartupActivity {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    /**
-     * This id comes via {@code com.jetbrains.python.sdk.PythonSdkType},
-     * from {@code com.jetbrains.python.PyNames#PYTHON_SDK_ID_NAME}.
-     */
-    private static final String PYTHON_SDK_ID_NAME = "Python SDK";
 
     /**
      * Stores the Rosie cache updaters per project, so that they can be properly cancelled upon project close.
@@ -102,63 +91,53 @@ public class RosieStartupActivity implements StartupActivity {
                 return;
             }
 
-            if (isPythonSdkConfigured(project)) {
-                notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga Code Analysis")
-                    .createNotification("Check for security, code style in your Python code with Codiga", NotificationType.INFORMATION)
-                    .setSubtitle("Codiga Code Analysis")
-                    .addAction(new AnAction("Create codiga.yml") {
-                        @Override
-                        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                            try {
-                                CodigaApi.getInstance().recordCreateCodigaYaml();
-                            } catch (Exception e) {
-                                //Even if recording this metric fails, the creation of codiga.yml should be performed
-                            }
-
-                            if (notification != null) {
-                                notification.hideBalloon();
-                                //At this point the project root dir must exist
-                                var projectDir = ProjectUtil.guessProjectDir(project);
+            ReadAction.nonBlocking(() -> getDefaultRulesetsForProject(project))
+                .inSmartMode(project)
+                .finishOnUiThread(ModalityState.NON_MODAL, defaultRulesetConfig -> {
+                    if (defaultRulesetConfig.isEmpty()) {
+                        return;
+                    }
+                    notification = NotificationGroupManager.getInstance().getNotificationGroup("Codiga Code Analysis")
+                        .createNotification("Check your code for security and code style issues with Codiga", NotificationType.INFORMATION)
+                        .setSubtitle("Codiga Code Analysis")
+                        .addAction(new AnAction("Create codiga.yml") {
+                            @Override
+                            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                                 try {
-                                    WriteAction.run(() -> {
-                                        VirtualFile childData = projectDir.createChildData(this, CodigaConfigFileUtil.CODIGA_CONFIG_FILE_NAME);
-                                        childData.setBinaryContent(CodigaRulesetConfigs.DEFAULT_PYTHON_RULESET_CONFIG.getBytes(StandardCharsets.UTF_8));
-                                    });
-                                } catch (IOException e) {
-                                    LOGGER.error("Could not create codiga.yml in the project root directory.", e);
+                                    CodigaApi.getInstance().recordCreateCodigaYaml();
+                                } catch (Exception e) {
+                                    //Even if recording this metric fails, the creation of codiga.yml should be performed
+                                }
+
+                                if (notification != null) {
+                                    notification.hideBalloon();
+                                    //At this point the project root dir must exist
+                                    var projectDir = ProjectUtil.guessProjectDir(project);
+                                    try {
+                                        WriteAction.run(() -> {
+                                            VirtualFile childData = projectDir.createChildData(this, CodigaConfigFileUtil.CODIGA_CONFIG_FILE_NAME);
+                                            childData.setBinaryContent(defaultRulesetConfig.get().getBytes(StandardCharsets.UTF_8));
+                                        });
+                                    } catch (IOException e) {
+                                        LOGGER.error("Could not create codiga.yml in the project root directory.", e);
+                                    }
                                 }
                             }
-                        }
-                    })
-                    .addAction(new AnAction("Never for this project") {
-                        @Override
-                        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                            if (notification != null) {
-                                notification.hideBalloon();
-                                codigaConfig.setShouldNotifyUserToCreateCodigaConfig(false);
+                        })
+                        .addAction(new AnAction("Never for this project") {
+                            @Override
+                            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                                if (notification != null) {
+                                    notification.hideBalloon();
+                                    codigaConfig.setShouldNotifyUserToCreateCodigaConfig(false);
+                                }
                             }
-                        }
-                    });
+                        });
 
-                Notifications.Bus.notify(notification, project);
-            }
+                    Notifications.Bus.notify(notification, project);
+                })
+                .submit(AppExecutorUtil.getAppExecutorService());
         }
-    }
-
-    private boolean isPythonSdkConfigured(Project project) {
-        //First, check if a Python SDK is configured on project level
-        Sdk projectSdk = ProjectRootManager.getInstance(project).getProjectSdk();
-        boolean isPythonSdkConfigured = projectSdk != null && PYTHON_SDK_ID_NAME.equals(projectSdk.getSdkType().getName());
-        //If Python is not configured on project level, there might still be one or more modules that have Python SDK configured.
-        if (!isPythonSdkConfigured) {
-            Module[] modules = ModuleManager.getInstance(project).getModules();
-            isPythonSdkConfigured = Arrays.stream(modules)
-                .map(ModuleRootManager::getInstance)
-                .map(ModuleRootModel::getSdk)
-                .filter(Objects::nonNull)
-                .anyMatch(moduleSdk -> PYTHON_SDK_ID_NAME.equals(moduleSdk.getSdkType().getName()));
-        }
-        return isPythonSdkConfigured;
     }
 
     /**

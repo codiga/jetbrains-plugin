@@ -6,6 +6,9 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.util.Map;
 
+/**
+ * Utility for file name and file extension based language retrieval.
+ */
 public final class LanguageUtils {
 
     private final static Map<String, LanguageEnumeration> EXTENSION_TO_LANGUAGE = ImmutableMap.<String, LanguageEnumeration>builder()
@@ -63,6 +66,13 @@ public final class LanguageUtils {
         // do not instantiate
     }
 
+    /**
+     * Returns the language based on the argument file name.
+     *
+     * @param filename the file name, including its extension
+     * @return the language if supported, {@code LanguageEnumeration.DOCKER} if the file name starts with "docker",
+     * or equals to "dockerfile", or {@code LanguageEnumeration.UNKNOWN} if the file extension is not available or not supported
+     */
     public static LanguageEnumeration getLanguageFromFilename(final String filename) {
         String extension;
         try {
@@ -75,6 +85,16 @@ public final class LanguageUtils {
             return LanguageEnumeration.DOCKER;
         }
 
+        return EXTENSION_TO_LANGUAGE.getOrDefault(extension, LanguageEnumeration.UNKNOWN);
+    }
+
+    /**
+     * Returns the language for the argument file extension.
+     *
+     * @param extension The file extension. Should be specified without the leading dot, e.g. "py", "yaml".
+     * @return the language, or {@code LanguageEnumeration.UNKNOWN} if the file extension is not supported
+     */
+    public static LanguageEnumeration getLanguageFromExtension(String extension) {
         return EXTENSION_TO_LANGUAGE.getOrDefault(extension, LanguageEnumeration.UNKNOWN);
     }
 }
