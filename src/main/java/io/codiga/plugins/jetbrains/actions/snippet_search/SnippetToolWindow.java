@@ -81,7 +81,7 @@ public class SnippetToolWindow {
         radioPublicOnly.addActionListener(e -> updateSearchPreferences(false, false, true, snippetVisibility.isOnlyFavorite()));
         checkboxFavoritesOnly.addActionListener(e -> updateSearchPreferences(snippetVisibility.isAllSnippets(), snippetVisibility.isOnlyPrivate(), snippetVisibility.isOnlyPublic(), !snippetVisibility.isOnlyFavorite()));
 
-        /**
+        /*
          * The search term is triggered a new search. We wait 500 ms before doing the search
          * in order to not hammer the backend with too many requests. We only make a
          * request if no key has not been typed within 500 ms.
@@ -140,7 +140,7 @@ public class SnippetToolWindow {
         updateUser();
         updateSearchPreferences();
 
-        /**
+        /*
          * Listen to message bus if the user added their API keys. If that is the
          * case, we update the user and search preferences.
          */
@@ -178,7 +178,7 @@ public class SnippetToolWindow {
         });
 
 
-        /**
+        /*
          * Fill the content of the panel with the existing data
          * from the current editor if there is one opened.
          */
@@ -336,9 +336,7 @@ public class SnippetToolWindow {
         java.util.List<String> dependencies = DependencyManagement.getInstance().getDependencies(project, virtualFile).stream().map(v -> v.getName()).collect(Collectors.toList());
         LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(virtualFile);
 
-        /**
-         * This is used when we open a new editor, we want to reset the search term.
-         */
+        //This is used when we open a new editor, we want to reset the search term.
         if (resetSearch) {
             searchTerm.setText("");
         }

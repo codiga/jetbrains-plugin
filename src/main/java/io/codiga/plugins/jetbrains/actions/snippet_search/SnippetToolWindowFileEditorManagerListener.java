@@ -23,11 +23,10 @@ public class SnippetToolWindowFileEditorManagerListener implements FileEditorMan
      */
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-        /**
+        /*
          * Send a message with MessageBus to the snippet search that
          * we want to refresh the content.
          */
         newFileTopic.afterAction(null);
-
     }
 }

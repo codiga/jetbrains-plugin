@@ -112,7 +112,7 @@ public class SnippetPanel {
             visibilityLabel.setText("Visibility: private");
         }
 
-        /**
+        /*
          * Logic to preview or insert the snippet. When we hover the button, we preview
          * the snippet. Once clicked, we insert the snippet into the code.
          */

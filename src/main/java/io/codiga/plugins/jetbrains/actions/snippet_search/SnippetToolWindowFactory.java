@@ -14,11 +14,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SnippetToolWindowFactory implements ToolWindowFactory {
     public static final String SNIPPET_SEARCH_TOOL_WINDOW_ID = "Snippet Search";
-    private static SnippetToolWindow snippetToolWindow = null;
-
 
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        snippetToolWindow = new SnippetToolWindow(toolWindow, project);
+        SnippetToolWindow snippetToolWindow = new SnippetToolWindow(toolWindow, project);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(snippetToolWindow.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);
