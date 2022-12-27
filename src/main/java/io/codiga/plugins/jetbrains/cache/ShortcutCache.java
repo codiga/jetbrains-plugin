@@ -31,7 +31,7 @@ public final class ShortcutCache {
 
     private static ShortcutCache _INSTANCE = new ShortcutCache();
 
-    private static long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
+    private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
 
 
     private ShortcutCache() {
