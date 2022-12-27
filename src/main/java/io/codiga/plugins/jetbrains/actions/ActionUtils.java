@@ -168,9 +168,7 @@ public class ActionUtils {
             ApplicationManager.getApplication().invokeLater(() -> {
                 try {
                     WriteCommandAction.writeCommandAction(project).run(
-                        (ThrowableRunnable<Throwable>) () -> {
-                            removeAddedCodeFunction(editor, context);
-                        }
+                        (ThrowableRunnable<Throwable>) () -> removeAddedCodeFunction(editor, context)
                     );
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -364,20 +362,17 @@ public class ActionUtils {
         /**
          * Remove the code that was added before
          */
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    WriteCommandAction.writeCommandAction(project).run(
-                        (ThrowableRunnable<Throwable>) () -> {
+        ApplicationManager.getApplication().invokeAndWait(() -> {
+            try {
+                WriteCommandAction.writeCommandAction(project).run(
+                    (ThrowableRunnable<Throwable>) () -> {
 
-                            removeAddedCodeFunction(editor, codeInsertionContext);
-                            codeInsertionContext.clearAll();
-                        }
-                    );
-                }catch (Throwable e){
-                    e.printStackTrace();
-                }
+                        removeAddedCodeFunction(editor, codeInsertionContext);
+                        codeInsertionContext.clearAll();
+                    }
+                );
+            }catch (Throwable e){
+                e.printStackTrace();
             }
         });
 
@@ -385,8 +380,7 @@ public class ActionUtils {
             // add the code and update global variables to indicate code has been inserted.
             try {
                 WriteCommandAction.writeCommandAction(project).run(
-                    (ThrowableRunnable<Throwable>) () -> {
-
+                    (ThrowableRunnable<Throwable>) () ->
                         addRecipeInEditor(
                             editor,
                             recipeName,
@@ -396,8 +390,7 @@ public class ActionUtils {
                             language,
                             0,
                             false,
-                            codigaApi);
-                    }
+                            codigaApi)
                 );
             } catch (Throwable e) {
                 e.printStackTrace();

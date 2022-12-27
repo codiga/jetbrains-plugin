@@ -26,8 +26,6 @@ public final class CodeImportUtils {
      */
     public static boolean hasImport(String code, String importStatement, LanguageEnumeration languageEnumeration) {
         List<String> codeArray = Arrays.asList(code.split(LINE_SEPARATOR));
-        return codeArray.stream().anyMatch(s -> {
-            return s.equalsIgnoreCase(importStatement);
-        });
+        return codeArray.stream().anyMatch(s -> s.equalsIgnoreCase(importStatement));
     }
 }
