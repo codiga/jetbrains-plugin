@@ -45,7 +45,7 @@ import static io.codiga.plugins.jetbrains.utils.LanguageUtils.getLanguageName;
 public class SnippetToolWindow {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private static final LoginMouseListener LOGGED_IN_LABEL_MOUSE_LISTENER = new LoginMouseListener();
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
     private final JPanel noRecipePanel = new JPanel();
     private final JPanel languageNotSupportedPanel = new JPanel();
     private final CodeInsertionContext codeInsertionContext = new CodeInsertionContext();

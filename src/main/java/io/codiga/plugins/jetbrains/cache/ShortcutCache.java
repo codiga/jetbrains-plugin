@@ -1,7 +1,6 @@
 package io.codiga.plugins.jetbrains.cache;
 
 import com.google.common.collect.ImmutableList;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
@@ -28,7 +27,7 @@ public final class ShortcutCache {
     private long lastActivityTimestamp;
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
 
     private static ShortcutCache _INSTANCE = new ShortcutCache();
 
@@ -50,14 +49,11 @@ public final class ShortcutCache {
 
     /**
      * Return true if the user was active in the last ten minutes.
-     * @return
      */
     public boolean wasActiveRecently() {
         long tenMinutesAgo = System.currentTimeMillis() - TEN_MINUTES_IN_MILLISECONDS;
         return lastActivityTimestamp > tenMinutesAgo;
     }
-
-
 
     /**
      * Update values for a key by pulling the API.

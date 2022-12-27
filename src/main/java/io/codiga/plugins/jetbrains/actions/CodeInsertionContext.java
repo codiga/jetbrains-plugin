@@ -13,7 +13,7 @@ public class CodeInsertionContext {
     private Optional<Long> currentRecipeId = Optional.empty();
 
     public void clearHighlighters() {
-        highlighters.clear();;
+        highlighters.clear();
     }
 
     public void clearInsertions() {

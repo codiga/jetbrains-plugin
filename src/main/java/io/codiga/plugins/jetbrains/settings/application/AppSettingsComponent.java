@@ -118,8 +118,7 @@ public class AppSettingsComponent {
         });
 
         buttonTestConnection.addActionListener(arg0 -> {
-            final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
-            Optional<String> username = codigaApi.getUsername();
+            Optional<String> username = CodigaApi.getInstance().getUsername();
             if (username.isPresent()) {
                 new DialogApiStatus(API_STATUS_TEXT_OK).showAndGet();
             } else {

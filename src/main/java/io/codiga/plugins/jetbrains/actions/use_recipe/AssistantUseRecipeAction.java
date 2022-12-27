@@ -3,7 +3,6 @@ package io.codiga.plugins.jetbrains.actions.use_recipe;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -24,7 +23,7 @@ public class AssistantUseRecipeAction extends AnAction {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
 
 
     @Override
