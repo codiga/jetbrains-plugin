@@ -261,7 +261,7 @@ public class ActionUtils {
                         int lengthInsertedForImport = 0;
 
                         for (String importStatement : recipeImports) {
-                            if (!hasImport(currentCode, importStatement, recipeLanguage)) {
+                            if (!hasImport(currentCode, importStatement)) {
                                 String dependencyStatement = importStatement + LINE_SEPARATOR;
                                 codeInsertions.add(new CodeInsertion(
                                     dependencyStatement,

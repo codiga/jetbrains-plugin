@@ -1,7 +1,5 @@
 package io.codiga.plugins.jetbrains.utils;
 
-import io.codiga.api.type.LanguageEnumeration;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,10 +19,9 @@ public final class CodeImportUtils {
      * checking that the code contains the dependency statement.
      * @param code - the code in IntelliJ
      * @param importStatement - the name of the dependency.
-     * @param languageEnumeration - the langauge.
      * @return
      */
-    public static boolean hasImport(String code, String importStatement, LanguageEnumeration languageEnumeration) {
+    public static boolean hasImport(String code, String importStatement) {
         List<String> codeArray = Arrays.asList(code.split(LINE_SEPARATOR));
         return codeArray.stream().anyMatch(s -> s.equalsIgnoreCase(importStatement));
     }

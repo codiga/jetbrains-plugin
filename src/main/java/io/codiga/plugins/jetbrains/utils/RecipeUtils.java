@@ -100,7 +100,7 @@ public final class RecipeUtils {
                     int firstInsertion = firstPositionToInsert(currentCode, language);
 
                     for(String importStatement: imports) {
-                        if(!hasImport(currentCode, importStatement, language)) {
+                        if(!hasImport(currentCode, importStatement)) {
 
                             String dependencyStatement = importStatement + LINE_SEPARATOR;
                             document.insertString(firstInsertion, dependencyStatement);
