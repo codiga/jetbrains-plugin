@@ -30,7 +30,7 @@ import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.firstPositionT
 public final class RecipeUtils {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    private RecipeUtils() {};
+    private RecipeUtils() {}
 
 
     public static void addRecipeInEditor(@NotNull Editor editor,

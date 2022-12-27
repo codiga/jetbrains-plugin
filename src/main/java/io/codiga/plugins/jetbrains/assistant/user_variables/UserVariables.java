@@ -20,7 +20,7 @@ public final class UserVariables {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    private UserVariables() {};
+    private UserVariables() {}
 
     public static UserVariables getInstance() {return _INSTANCE;}
 

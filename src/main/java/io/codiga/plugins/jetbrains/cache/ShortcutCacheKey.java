@@ -49,9 +49,9 @@ public class ShortcutCacheKey {
     }
 
 
-    public List<String> getDependencies() { return this.dependencies; };
+    public List<String> getDependencies() { return this.dependencies; }
 
-    public LanguageEnumeration getLanguage() { return this.language; };
+    public LanguageEnumeration getLanguage() { return this.language; }
 
-    public String getFilename() { return this.filename; };
+    public String getFilename() { return this.filename; }
 }
