@@ -14,7 +14,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
-import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.utils.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotationJetBrains;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
