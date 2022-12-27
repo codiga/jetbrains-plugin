@@ -12,6 +12,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
+import com.intellij.serviceContainer.AlreadyDisposedException;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.cache.ShortcutCache;
@@ -179,19 +180,23 @@ public class AppStarter implements StartupActivity {
                 return;
             }
 
-            for (FileEditor fileEditor : FileEditorManager.getInstance(project).getAllEditors()) {
-                if (fileEditor.getFile() == null) {
-                    continue;
+            try {
+                for (FileEditor fileEditor : FileEditorManager.getInstance(project).getAllEditors()) {
+                    if (fileEditor.getFile() == null) {
+                        continue;
+                    }
+                    String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, fileEditor.getFile());
+                    List<String> dependencies = DependencyManagement.getInstance()
+                        .getDependencies(project, fileEditor.getFile())
+                        .stream()
+                        .map(Dependency::getName)
+                        .collect(toList());
+                    LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(fileEditor.getFile());
+                    ShortcutCacheKey shortcutCacheKey = new ShortcutCacheKey(languageEnumeration, filename, dependencies);
+                    ShortcutCache.getInstance().refreshCacheKey(shortcutCacheKey);
                 }
-                String filename = getUnitRelativeFilenamePathFromEditorForVirtualFile(project, fileEditor.getFile());
-                List<String> dependencies = DependencyManagement.getInstance()
-                    .getDependencies(project, fileEditor.getFile())
-                    .stream()
-                    .map(Dependency::getName)
-                    .collect(toList());
-                LanguageEnumeration languageEnumeration = getLanguageFromEditorForVirtualFile(fileEditor.getFile());
-                ShortcutCacheKey shortcutCacheKey = new ShortcutCacheKey(languageEnumeration, filename, dependencies);
-                ShortcutCache.getInstance().refreshCacheKey(shortcutCacheKey);
+            } catch (AlreadyDisposedException e) {
+                //If the project gets disposed at any point of this cache update logic, skip the cache update.
             }
 
             ShortcutCache.getInstance().garbageCollect();
