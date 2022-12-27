@@ -1,7 +1,6 @@
 package io.codiga.plugins.jetbrains.actions.shortcuts;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Processor;
 import io.codiga.api.GetRecipesForClientByShortcutQuery;
@@ -18,7 +17,7 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 public class ShortcutSearchItemProvider implements SearchPopup.SearchItemProvider {
 
     private final AnActionEvent anActionEvent;
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
 
     public ShortcutSearchItemProvider(AnActionEvent anActionEvent) {
         this.anActionEvent = anActionEvent;

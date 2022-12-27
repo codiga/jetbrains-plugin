@@ -5,7 +5,6 @@ import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.StartOnlyMatcher;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -19,7 +18,7 @@ import io.codiga.plugins.jetbrains.cache.ShortcutCache;
 import io.codiga.plugins.jetbrains.cache.ShortcutCacheKey;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
-import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.utils.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.Dependency;
 import io.codiga.plugins.jetbrains.settings.application.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +43,7 @@ import static io.codiga.plugins.jetbrains.utils.RecipeUtils.addRecipeInEditor;
 public class CodigaCompletionProvider extends CompletionProvider<CompletionParameters> {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
     private final DependencyManagement dependencyManagement = new DependencyManagement();
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
 
     CodigaCompletionProvider() {
     }

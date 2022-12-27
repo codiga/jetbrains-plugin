@@ -9,5 +9,5 @@ public interface VariableTransformer {
    * @return string with equivalent values between Codiga's recipe variables
    * and local expected result.
    */
-  public String transform(String code, CodingAssistantContext codigaTransformationContext);
+  String transform(String code, CodingAssistantContext codigaTransformationContext);
 }

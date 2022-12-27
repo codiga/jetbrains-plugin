@@ -1,6 +1,5 @@
 package io.codiga.plugins.jetbrains.settings.application;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.JBCheckBox;
@@ -43,16 +42,17 @@ public class AppSettingsComponent {
     private boolean snippetsFavoriteOnly;
     private boolean codigaEnabled;
 
+    /**
+     * Use the following code only to debug and find all supported languages
+     * <pre>
+     * Collection<Language> allLanguages = com.intellij.lang.Language.getRegisteredLanguages();
+     *     System.out.println("showing languages");
+     *     for(Language language: allLanguages){
+     *         System.out.println(language.getID());
+     *     }
+     * </pre>
+     */
     public AppSettingsComponent() {
-        /**
-         * Use the following code only to debug and find all supported languages
-         *         Collection<Language> allLanguages = com.intellij.lang.Language.getRegisteredLanguages();
-         *         System.out.println("showing langauges");
-         *         for(Language language: allLanguages){
-         *             System.out.println(language.getID());
-         *         }
-         */
-
         BorderLayoutPanel p = new BorderLayoutPanel();
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
@@ -118,8 +118,7 @@ public class AppSettingsComponent {
         });
 
         buttonTestConnection.addActionListener(arg0 -> {
-            final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
-            Optional<String> username = codigaApi.getUsername();
+            Optional<String> username = CodigaApi.getInstance().getUsername();
             if (username.isPresent()) {
                 new DialogApiStatus(API_STATUS_TEXT_OK).showAndGet();
             } else {

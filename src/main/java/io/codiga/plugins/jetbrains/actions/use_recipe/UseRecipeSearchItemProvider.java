@@ -1,7 +1,6 @@
 package io.codiga.plugins.jetbrains.actions.use_recipe;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Processor;
 import io.codiga.api.GetRecipesForClientSemanticQuery;
@@ -18,7 +17,7 @@ import static io.codiga.plugins.jetbrains.actions.ActionUtils.*;
 public class UseRecipeSearchItemProvider implements SearchPopup.SearchItemProvider {
 
     private final AnActionEvent anActionEvent;
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
 
     public UseRecipeSearchItemProvider(AnActionEvent anActionEvent) {
         this.anActionEvent = anActionEvent;

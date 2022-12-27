@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCache;
-import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.utils.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.rosie.RosieAnnotation;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRequest;
 import io.codiga.plugins.jetbrains.model.rosie.RosieResponse;

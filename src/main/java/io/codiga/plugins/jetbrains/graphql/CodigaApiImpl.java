@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
 import static io.codiga.plugins.jetbrains.graphql.Constants.USER_AGENT;
@@ -28,13 +27,12 @@ import static io.codiga.plugins.jetbrains.utils.UserAgentUtils.getUserAgent;
  * This class implements the Codiga API, which is a GraphQL API.
  * We are using apollo-android to query the API.
  * <p>
- * Apollo Android client: https://github.com/apollographql/apollo-android
+ * <a href="https://github.com/apollographql/apollo-android">Apollo Android client</a>.
  * <p>
  * This class is declared as a service to be retrieved as an application
- * service within the plugin. To retrieve it, just to
- * CodigaApi api = ApplicationManager.getApplication().getService(CodigaApi.class);
+ * service within the plugin. To retrieve it, just use {@code CodigaApi api = CodigaApi.getInstance();}.
  * <p>
- * See https://plugins.jetbrains.com/docs/intellij/plugin-services.html#declaring-a-service
+ * See <a href="https://plugins.jetbrains.com/docs/intellij/plugin-services.html#declaring-a-service">Declaring a service</a>
  */
 public final class CodigaApiImpl implements CodigaApi {
 

@@ -10,7 +10,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import io.codiga.api.type.LanguageEnumeration;
-import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.utils.LanguageUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;

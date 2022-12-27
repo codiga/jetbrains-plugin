@@ -73,13 +73,11 @@ public class CodigaErrorReporter extends ErrorReportSubmitter {
                         rollbar.error("Version: " + pluginVersion + "\n" + e.getThrowableText());
                     }
                     rollbar.close(true);
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.NEW_ISSUE));
-                    });
+                    ApplicationManager.getApplication().invokeLater(
+                        () -> consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)));
                 } catch (Exception e) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.FAILED));
-                    });
+                    ApplicationManager.getApplication().invokeLater(
+                        () -> consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.FAILED)));
                 }
             }
         }.queue(); // <-- don't miss the queue() call here!

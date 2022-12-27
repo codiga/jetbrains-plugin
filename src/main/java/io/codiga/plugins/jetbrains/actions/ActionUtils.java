@@ -23,7 +23,7 @@ import com.intellij.util.ThrowableRunnable;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.dependencies.DependencyManagement;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
-import io.codiga.plugins.jetbrains.graphql.LanguageUtils;
+import io.codiga.plugins.jetbrains.utils.LanguageUtils;
 import io.codiga.plugins.jetbrains.model.CodeInsertion;
 import io.codiga.plugins.jetbrains.model.CodingAssistantCodigaTransform;
 import io.codiga.plugins.jetbrains.model.CodingAssistantContext;
@@ -49,7 +49,7 @@ public class ActionUtils {
 
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    public final static LanguageEnumeration getLanguageFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
+    public static LanguageEnumeration getLanguageFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         VirtualFile virtualFile = anActionEvent.getDataContext().getData(LangDataKeys.VIRTUAL_FILE);
         if (virtualFile == null) {
             return LanguageEnumeration.UNKNOWN;
@@ -57,11 +57,11 @@ public class ActionUtils {
         return(LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath()));
     }
 
-    public final static LanguageEnumeration getLanguageFromEditorForVirtualFile(@NotNull VirtualFile virtualFile) {
+    public static LanguageEnumeration getLanguageFromEditorForVirtualFile(@NotNull VirtualFile virtualFile) {
         return(LanguageUtils.getLanguageFromFilename(virtualFile.getCanonicalPath()));
     }
 
-    public final static String getFilenameFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
+    public static String getFilenameFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
 
         if (psiFile == null || psiFile.getVirtualFile() == null) {
@@ -71,12 +71,12 @@ public class ActionUtils {
         return psiFile.getName();
     }
 
-    public final static String getUnixRelativeFilenamePathFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
+    public static String getUnixRelativeFilenamePathFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
         return getUnitRelativeFilenamePathFromEditorForVirtualFile(psiFile.getProject(), psiFile.getVirtualFile());
     }
 
-    public final static String getUnitRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    public static String getUnitRelativeFilenamePathFromEditorForVirtualFile(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         /*
          * Language can be injected in string literals. See https://www.jetbrains.com/help/idea/using-language-injections.html.
          * In that case the language injected code is handled in an underlying VirtualFileWindow, which returns a different a path from `getPath()`,
@@ -104,7 +104,7 @@ public class ActionUtils {
 
     }
 
-    public final static List<String> getDependenciesFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
+    public static List<String> getDependenciesFromEditorForEvent(@NotNull AnActionEvent anActionEvent) {
         PsiFile psiFile = anActionEvent.getDataContext().getData(LangDataKeys.PSI_FILE);
         DependencyManagement dependencyManagement = new DependencyManagement();
         return dependencyManagement.getDependencies(psiFile.getProject(), psiFile.getVirtualFile()).stream().map(d -> d.getName()).collect(Collectors.toList());
@@ -168,9 +168,7 @@ public class ActionUtils {
             ApplicationManager.getApplication().invokeLater(() -> {
                 try {
                     WriteCommandAction.writeCommandAction(project).run(
-                        (ThrowableRunnable<Throwable>) () -> {
-                            removeAddedCodeFunction(editor, context);
-                        }
+                        (ThrowableRunnable<Throwable>) () -> removeAddedCodeFunction(editor, context)
                     );
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -263,7 +261,7 @@ public class ActionUtils {
                         int lengthInsertedForImport = 0;
 
                         for (String importStatement : recipeImports) {
-                            if (!hasImport(currentCode, importStatement, recipeLanguage)) {
+                            if (!hasImport(currentCode, importStatement)) {
                                 String dependencyStatement = importStatement + LINE_SEPARATOR;
                                 codeInsertions.add(new CodeInsertion(
                                     dependencyStatement,
@@ -364,20 +362,17 @@ public class ActionUtils {
         /**
          * Remove the code that was added before
          */
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    WriteCommandAction.writeCommandAction(project).run(
-                        (ThrowableRunnable<Throwable>) () -> {
+        ApplicationManager.getApplication().invokeAndWait(() -> {
+            try {
+                WriteCommandAction.writeCommandAction(project).run(
+                    (ThrowableRunnable<Throwable>) () -> {
 
-                            removeAddedCodeFunction(editor, codeInsertionContext);
-                            codeInsertionContext.clearAll();
-                        }
-                    );
-                }catch (Throwable e){
-                    e.printStackTrace();
-                }
+                        removeAddedCodeFunction(editor, codeInsertionContext);
+                        codeInsertionContext.clearAll();
+                    }
+                );
+            }catch (Throwable e){
+                e.printStackTrace();
             }
         });
 
@@ -385,8 +380,7 @@ public class ActionUtils {
             // add the code and update global variables to indicate code has been inserted.
             try {
                 WriteCommandAction.writeCommandAction(project).run(
-                    (ThrowableRunnable<Throwable>) () -> {
-
+                    (ThrowableRunnable<Throwable>) () ->
                         addRecipeInEditor(
                             editor,
                             recipeName,
@@ -396,8 +390,7 @@ public class ActionUtils {
                             language,
                             0,
                             false,
-                            codigaApi);
-                    }
+                            codigaApi)
                 );
             } catch (Throwable e) {
                 e.printStackTrace();

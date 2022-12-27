@@ -1,7 +1,6 @@
 package io.codiga.plugins.jetbrains.completion.inline;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
@@ -30,7 +29,7 @@ public class SnippetPreview implements Disposable {
 
     private static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    private final CodigaApi codigaApi = ApplicationManager.getApplication().getService(CodigaApi.class);
+    private final CodigaApi codigaApi = CodigaApi.getInstance();
 
     public static Key<SnippetPreview> CODIGA_SNIPPET_PREVIEW = Key.create("CODIGA_SNIPPET_PREVIEW");
 

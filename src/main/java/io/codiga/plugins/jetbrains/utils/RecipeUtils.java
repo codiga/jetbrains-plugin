@@ -30,7 +30,7 @@ import static io.codiga.plugins.jetbrains.utils.CodePositionUtils.firstPositionT
 public final class RecipeUtils {
     public static final Logger LOGGER = Logger.getInstance(LOGGER_NAME);
 
-    private RecipeUtils() {};
+    private RecipeUtils() {}
 
 
     public static void addRecipeInEditor(@NotNull Editor editor,
@@ -100,7 +100,7 @@ public final class RecipeUtils {
                     int firstInsertion = firstPositionToInsert(currentCode, language);
 
                     for(String importStatement: imports) {
-                        if(!hasImport(currentCode, importStatement, language)) {
+                        if(!hasImport(currentCode, importStatement)) {
 
                             String dependencyStatement = importStatement + LINE_SEPARATOR;
                             document.insertString(firstInsertion, dependencyStatement);
