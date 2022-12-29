@@ -288,11 +288,12 @@ public class ActionUtils {
                 );
             } catch (Throwable e) {
                 e.printStackTrace();
-                LOGGER.error("showCurrentRecipe - impossible to update the code from the recipe");
+                LOGGER.error("addRecipeToEditor - impossible to update the code from the recipe."
+                        + " Recipe language: " + recipeLanguage.name()
+                        + " Recipe code: " + recipeCodeJetBrainsFormat);
                 LOGGER.error(e);
             }
         });
-
     }
 
     /**
