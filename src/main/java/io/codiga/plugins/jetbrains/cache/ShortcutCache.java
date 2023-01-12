@@ -156,12 +156,12 @@ public final class ShortcutCache {
         // Get the keys to remove
         for (ShortcutCacheKey key: cache.keySet()){
             ShortcutCacheValue value = cache.get(key);
-            if (value.shouldBeDeleted()) {
+            if (value != null && value.shouldBeDeleted()) {
                 keysToRemove.add(key);
             }
         }
 
-        // Remove from the mp
+        // Remove from the map
         for(ShortcutCacheKey key: keysToRemove) {
             cache.remove(key);
         }
