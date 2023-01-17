@@ -184,6 +184,40 @@ public class RosieRulesCacheGetRosieRulesTest extends TestBase {
             "python-ruleset/python_rule_3", "python-ruleset/python_rule_2", "python-ruleset/python_rule_1");
     }
 
+    public void testDoesntFilterRulesWithIgnoreConfigWithOnePrefixContainingSingleDotAsFolder() {
+        PsiFile psiFile = myFixture.configureByFile("directory/sub/python_file.py");
+        var cache = configureCache(
+            "rulesets:\n" +
+                "  - python-ruleset\n" +
+                "ignore:\n" +
+                "  - python-ruleset:\n" +
+                "    - python_rule_2:\n" +
+                "      - prefix: directory/./python_file.py");
+
+        var rosieRules = cache.getRosieRules(LanguageEnumeration.PYTHON, psiFile.getVirtualFile().getPath());
+
+        validateRuleCountAndRuleIds(rosieRules,
+            3,
+            "python-ruleset/python_rule_3", "python-ruleset/python_rule_2", "python-ruleset/python_rule_1");
+    }
+
+    public void testDoesntFilterRulesWithIgnoreConfigWithOnePrefixContainingDoubleDotsAsFolder() {
+        PsiFile psiFile = myFixture.configureByFile("directory/sub/python_file.py");
+        var cache = configureCache(
+            "rulesets:\n" +
+                "  - python-ruleset\n" +
+                "ignore:\n" +
+                "  - python-ruleset:\n" +
+                "    - python_rule_2:\n" +
+                "      - prefix: directory/../python_file.py");
+
+        var rosieRules = cache.getRosieRules(LanguageEnumeration.PYTHON, psiFile.getVirtualFile().getPath());
+
+        validateRuleCountAndRuleIds(rosieRules,
+            3,
+            "python-ruleset/python_rule_3", "python-ruleset/python_rule_2", "python-ruleset/python_rule_1");
+    }
+
     public void testFiltersRulesWithIgnoreConfigWithOneMatchingPrefixOfMultiple() {
         PsiFile psiFile = myFixture.configureByFile("python_file.py");
         var cache = configureCache(

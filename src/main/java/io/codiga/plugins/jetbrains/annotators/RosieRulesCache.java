@@ -195,8 +195,13 @@ public final class RosieRulesCache implements Disposable {
                             return ruleIgnore.get().getPrefixes().stream()
                                 //Since the leading / is optional, we remove it
                                 .map(this::removeLeadingSlash)
-                                //.. sequences are not allowed in prefixes, therefore we consider them not matching the file path
-                                .noneMatch(prefix -> !prefix.contains("..") && removeLeadingSlash(relativePathOfAnalyzedFile).startsWith(prefix));
+                                //./, /. and .. sequences are not allowed in prefixes, therefore we consider them not matching the file path.
+                                //. symbols in general are allowed to be able to target exact file paths with their file extensions.
+                                .noneMatch(prefix ->
+                                    !prefix.contains("..")
+                                        && !prefix.contains("./")
+                                        && !prefix.contains("/.")
+                                        && removeLeadingSlash(relativePathOfAnalyzedFile).startsWith(prefix));
                         }
                     ).collect(toList());
             }
