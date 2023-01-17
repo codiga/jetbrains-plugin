@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCache;
 import io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLScalar;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 import org.jetbrains.yaml.psi.YamlPsiElementVisitor;
@@ -44,7 +45,11 @@ public class CodigaRulesetContentInspection extends LocalInspectionTool {
             @Override
             public void visitScalar(@NotNull YAMLScalar scalar) {
                 var cache = RosieRulesCache.getInstance(holder.getProject());
-                if (cache.isInitialized() && scalar instanceof YAMLPlainTextImpl && scalar.getParent() instanceof YAMLSequenceItem) {
+                if (cache.isInitialized() && scalar instanceof YAMLPlainTextImpl
+                    && scalar.getParent() instanceof YAMLSequenceItem
+                    //Filters out other plain text value, such as values in ignore...prefix
+                    && scalar.getParent().getParent().getParent() instanceof YAMLKeyValue
+                    && "rulesets".equals(((YAMLKeyValue) scalar.getParent().getParent().getParent()).getKeyText())) {
                     String rulesetName = scalar.getText();
 
                     //Since ruleset names are already validated by the associated JSON schema,
