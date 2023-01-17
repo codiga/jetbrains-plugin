@@ -1,23 +1,19 @@
 package io.codiga.plugins.jetbrains.rosie;
 
-import static java.util.stream.Collectors.toList;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiManager;
+import io.codiga.plugins.jetbrains.rosie.model.codiga.CodigaYmlConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.psi.YAMLFile;
-import org.jetbrains.yaml.psi.YAMLSequence;
-import org.jetbrains.yaml.psi.YAMLSequenceItem;
-import org.jetbrains.yaml.psi.impl.YAMLBlockMappingImpl;
-import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
-import org.jetbrains.yaml.psi.impl.YAMLScalarImpl;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -57,45 +53,24 @@ public final class CodigaConfigFileUtil {
     }
 
     /**
-     * Returns the list of ruleset names configured in the codiga.yml file.
+     * Parses the argument codiga.yml file into a config object.
+     * <p>
+     * If the file is malformed, it returns an {@link CodigaYmlConfig#EMPTY} configuration.
      *
-     * @param codigaConfigFile the codiga.yml file in the current project
-     * @return the list of ruleset names, or empty list if the codiga.yml file is configured incorrectly
+     * @param codigaConfigFile the codiga.yml file as PSI
+     * @return the configuration, or empty if the file is malformed
      */
-    @NotNull
-    public static List<String> collectRulesetNames(@NotNull YAMLFile codigaConfigFile) {
+    public static CodigaYmlConfig parseCodigaYml(@NotNull YAMLFile codigaConfigFile) {
         //Since 'RosieRulesCacheUpdater' is not DumbAware, it is executed on EDT, thus needed to wrap the PSI operation in a ReadAction.
-        return ApplicationManager.getApplication().runReadAction((Computable<List<String>>) () -> readRulesetNames(codigaConfigFile));
-    }
-
-    private static List<String> readRulesetNames(@NotNull YAMLFile codigaConfigFile) {
-        var documents = codigaConfigFile.getDocuments();
-
-        if (documents.size() == 1) {
-            var topLevelValue = documents.get(0).getTopLevelValue();
-
-            if (topLevelValue instanceof YAMLBlockMappingImpl) {
-                var rulesetsKeyValue = ((YAMLBlockMappingImpl) topLevelValue).getFirstKeyValue();
-                //If the top level mapping is called "rulesets"
-                if (RULESETS.equals(rulesetsKeyValue.getName())) {
-                    var rulesetsValue = rulesetsKeyValue.getValue();
-                    if (rulesetsValue instanceof YAMLSequence) {
-                        var rulesetNames = (YAMLSequence) rulesetsValue;
-
-                        //Return the list of ruleset names.
-                        // If the list contains items other than plain text ones, they are not included.
-                        return rulesetNames.getItems()
-                            .stream()
-                            .map(YAMLSequenceItem::getValue)
-                            .filter(YAMLPlainTextImpl.class::isInstance) //this handles items as well that have an empty value
-                            .map(YAMLPlainTextImpl.class::cast)
-                            .map(YAMLScalarImpl::getTextValue)
-                            .collect(toList());
-                    }
-                }
+        return ApplicationManager.getApplication().runReadAction((Computable<CodigaYmlConfig>) () -> {
+            var mapper = new ObjectMapper(new YAMLFactory());
+            try {
+                return Optional.ofNullable(mapper.readValue(codigaConfigFile.getText(), CodigaYmlConfig.class))
+                    .orElse(CodigaYmlConfig.EMPTY);
+            } catch (JsonProcessingException e) {
+                return CodigaYmlConfig.EMPTY;
             }
-        }
-        return List.of();
+        });
     }
 
     public static boolean isRulesetNameValid(String rulesetName) {
