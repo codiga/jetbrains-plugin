@@ -1,7 +1,7 @@
 package io.codiga.plugins.jetbrains.starter;
 
-import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.collectRulesetNames;
 import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.findCodigaConfigFile;
+import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.parseCodigaYml;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import com.intellij.openapi.application.WriteAction;
@@ -13,6 +13,7 @@ import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCache;
 import io.codiga.plugins.jetbrains.graphql.CodigaApi;
 import io.codiga.plugins.jetbrains.graphql.RulesetsForClientTestSupport;
+import io.codiga.plugins.jetbrains.rosie.model.codiga.CodigaYmlConfig;
 import io.codiga.plugins.jetbrains.testutils.TestBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +39,7 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         rulesCache.updateCacheFrom(RulesetsForClientTestSupport.singleRulesetSingleLanguage());
         rulesCache.setLastUpdatedTimeStamp(101L);
 
-        assertSize(3, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(3, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
 
         new RosieRulesCacheUpdateHandler(rulesCache, getProject()).handleCacheUpdate();
 
@@ -49,9 +50,9 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         myFixture.copyFileToProject("codiga.yml");
 
         var codigaConfigFile = findCodigaConfigFile(getProject());
-        RosieRulesCache rulesCache = initializeCache(collectRulesetNames(codigaConfigFile));
+        RosieRulesCache rulesCache = initializeCache(parseCodigaYml(codigaConfigFile).getRulesets());
 
-        assertSize(3, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(3, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
 
         //Delete the config file
         WriteAction.runAndWait(() -> CommandProcessor.getInstance()
@@ -71,7 +72,7 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
     public void testClearsCacheIfTheCodigaConfigFileIsModifiedButItIsEmpty() {
         RosieRulesCache rulesCache = initializeCacheFromCodigaConfigFile();
 
-        assertSize(3, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(3, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
 
         replaceContentsOfCodigaConfigFileWith("");
         new RosieRulesCacheUpdateHandler(rulesCache, getProject()).handleCacheUpdate();
@@ -109,7 +110,7 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         replaceContentsOfCodigaConfigFileWith("rulesets:\n  - singleRulesetMultipleLanguagesDefaultTimestamp");
         new RosieRulesCacheUpdateHandler(rulesCache, getProject()).handleCacheUpdate();
 
-        assertSize(2, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(2, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
         assertEquals(100, rulesCache.getLastUpdatedTimeStamp());
     }
 
@@ -119,7 +120,7 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         replaceContentsOfCodigaConfigFileWith("rulesets:\n  - singleRulesetMultipleLanguages");
         new RosieRulesCacheUpdateHandler(rulesCache, getProject()).handleCacheUpdate();
 
-        assertSize(2, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(2, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
         assertEquals(102, rulesCache.getLastUpdatedTimeStamp());
     }
 
@@ -129,17 +130,19 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         myFixture.copyFileToProject("codiga.yml");
 
         RosieRulesCache rulesCache = RosieRulesCache.getInstance(getProject());
-        rulesCache.setRulesetNames(List.of("singleRulesetSingleLanguage"));
+        var config = new CodigaYmlConfig();
+        config.setRulesets(List.of("singleRulesetSingleLanguage"));
+        rulesCache.setCodigaYmlConfig(config);
         rulesCache.updateCacheFrom(RulesetsForClientTestSupport.singleRulesetMultipleLanguages());
         rulesCache.setLastUpdatedTimeStamp(101L);
         rulesCache.setConfigFileModificationStamp(0);
 
-        assertSize(2, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(2, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
         assertEquals(101, rulesCache.getLastUpdatedTimeStamp());
 
         new RosieRulesCacheUpdateHandler(rulesCache, getProject()).handleCacheUpdate();
 
-        assertSize(2, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(2, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
         assertEquals(101, rulesCache.getLastUpdatedTimeStamp());
     }
 
@@ -150,12 +153,12 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         rulesCache.updateCacheFrom(RulesetsForClientTestSupport.singleRulesetMultipleLanguages());
         rulesCache.setLastUpdatedTimeStamp(102L);
 
-        assertSize(2, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(2, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
         assertEquals(102, rulesCache.getLastUpdatedTimeStamp());
 
         new RosieRulesCacheUpdateHandler(rulesCache, getProject()).handleCacheUpdate();
 
-        assertSize(3, rulesCache.getRosieRulesForLanguage(LanguageEnumeration.PYTHON));
+        assertSize(3, rulesCache.getRosieRules(LanguageEnumeration.PYTHON, ""));
         assertEquals(101, rulesCache.getLastUpdatedTimeStamp());
     }
 
@@ -166,7 +169,7 @@ public class RosieRulesCacheUpdateHandlerTest extends TestBase {
         myFixture.copyFileToProject("codiga.yml");
 
         var codigaConfigFile = findCodigaConfigFile(getProject());
-        var rulesetNames = collectRulesetNames(codigaConfigFile);
+        var rulesetNames = parseCodigaYml(codigaConfigFile).getRulesets();
         return initializeCache(rulesetNames);
     }
 

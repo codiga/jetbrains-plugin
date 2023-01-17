@@ -8,6 +8,8 @@ import lombok.ToString;
  */
 @ToString
 public class RosieRule {
+    public String rulesetName;
+    public String ruleName;
     public String id;
     public String contentBase64;
     public String language;
@@ -16,6 +18,8 @@ public class RosieRule {
     public String pattern;
 
     public RosieRule(String rulesetName, GetRulesetsForClientQuery.Rule rule) {
+        this.rulesetName = rulesetName;
+        this.ruleName = rule.name();
         this.id = rulesetName + "/" + rule.name();
         this.contentBase64 = rule.content();
         this.language = rule.language().rawValue();

@@ -65,7 +65,7 @@ public class RosieApiImpl implements RosieApi {
             String codeBase64 = Base64.getEncoder().encodeToString(fileText);
 
             // Prepare the request
-            var rosieRules = RosieRulesCache.getInstance(project).getRosieRulesForLanguage(fileLanguage);
+            var rosieRules = RosieRulesCache.getInstance(project).getRosieRules(fileLanguage, psiFile.getVirtualFile().getPath());
             //If there is no rule for the target language, then Rosie is not called, and no annotation is performed
             if (rosieRules.isEmpty()) {
                 return List.of();
@@ -93,7 +93,7 @@ public class RosieApiImpl implements RosieApi {
                 if (rosieResponse.errors == null || rosieResponse.errors.isEmpty()) {
                     annotations = rosieResponse.ruleResponses.stream()
                         .flatMap(res -> res.violations.stream()
-                            //distinct()' makes sure that if multiple, completely identical, violations are returned
+                            //'distinct()' makes sure that if multiple, completely identical, violations are returned
                             // for the same problem from Rosie, only one instance is shown by RosieAnnotator.
                             .distinct()
                             .map(violation -> {
