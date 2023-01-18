@@ -104,7 +104,7 @@ public class CodigaConfigFileUtilParseConfigTest extends TestBase {
         assertEquals(codigaConfig, CodigaYmlConfig.EMPTY);
     }
 
-    public void testReturnsEmptyIgnoreConfigForNoIgnoreItem() {
+    public void testReturnsIgnoreConfigForNoIgnoreItem() {
         YAMLFile codigaFile = configureFile(
             "rulesets:\n" +
                 "  - my-python-ruleset\n" +
@@ -117,7 +117,7 @@ public class CodigaConfigFileUtilParseConfigTest extends TestBase {
         assertEquals(0, codigaConfig.getIgnore().size());
     }
 
-    public void testReturnsEmptyIgnoreConfigForBlankIgnoreItem() {
+    public void testReturnsIgnoreConfigForBlankIgnoreItem() {
         YAMLFile codigaFile = configureFile(
             "rulesets:\n" +
                 "  - my-python-ruleset\n" +
