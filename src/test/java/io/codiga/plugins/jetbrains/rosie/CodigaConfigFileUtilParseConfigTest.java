@@ -92,7 +92,7 @@ public class CodigaConfigFileUtilParseConfigTest extends TestBase {
 
     //ignore configuration
 
-    public void testReturnsNullIgnoreConfigForNonPropertyIgnore() {
+    public void testReturnsEmptyIgnoreConfigForNonPropertyIgnore() {
         YAMLFile codigaFile = configureFile(
             "rulesets:\n" +
                 "  - my-python-ruleset\n" +
