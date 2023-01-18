@@ -163,8 +163,7 @@ public final class RosieRulesCache implements Disposable {
      * Returns the list of {@code RosieRule}s for the argument language and file path,
      * that will be sent to the Rosie service for analysis.
      *
-     * @param language           the language to return the rules for, or empty list if there is no rule cached for the
-     *                           provided language
+     * @param language           the language to return the rules for
      * @param pathOfAnalyzedFile the absolute path of the file being analyzed. Required to pass in for the {@code ignore} configuration.
      */
     public List<RosieRule> getRosieRules(LanguageEnumeration language, @NotNull String pathOfAnalyzedFile) {
