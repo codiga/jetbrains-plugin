@@ -28,7 +28,14 @@ public class CodigaRulesetContentInspectionTest extends TestBase {
         doTest("rulesets:\n" +
             "  - non-existent\n" +
             "  - python-ruleset\n" +
-            "  - InvaliD_ruleset-na!me");
+            "  - InvaliD_ruleset-na!me\n" +
+            "ignore:\n" +
+            "  - ruleset:\n" +
+            "    - rule:\n" +
+            "      - prefix: somepath\n" +
+            "    - rule2:\n" +
+            "      - prefix:\n" +
+            "        - somepath");
     }
 
     public void testCodigaRulesetExistence() {
@@ -38,7 +45,14 @@ public class CodigaRulesetContentInspectionTest extends TestBase {
         doTest("rulesets:\n" +
             "  - <error descr=\"This ruleset does not exist, or you do not have access to it.\">non-existent</error>\n" +
             "  - python-ruleset\n" +
-            "  - InvaliD_ruleset-na!me");
+            "  - InvaliD_ruleset-na!me\n" +
+            "ignore:\n" +
+            "  - ruleset:\n" +
+            "    - rule:\n" +
+            "      - prefix: somepath\n" +
+            "    - rule2:\n" +
+            "      - prefix:\n" +
+            "        - somepath");
     }
 
     public void testCodigaRulesetEmptiness() {
@@ -48,7 +62,14 @@ public class CodigaRulesetContentInspectionTest extends TestBase {
         RosieRulesCache.getInstance(getProject()).updateCacheFrom(rulesets);
 
         doTest("rulesets:\n" +
-            "  - <warning descr=\"This ruleset has no rule.\">empty-ruleset</warning>");
+            "  - <warning descr=\"This ruleset has no rule.\">empty-ruleset</warning>\n" +
+            "ignore:\n" +
+            "  - ruleset:\n" +
+            "    - rule:\n" +
+            "      - prefix: somepath\n" +
+            "    - rule2:\n" +
+            "      - prefix:\n" +
+            "        - somepath");
     }
 
     private void doTest(String text) {

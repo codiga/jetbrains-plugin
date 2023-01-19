@@ -1,8 +1,8 @@
 package io.codiga.plugins.jetbrains.starter;
 
 import static io.codiga.plugins.jetbrains.Constants.LOGGER_NAME;
-import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.collectRulesetNames;
 import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.findCodigaConfigFile;
+import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.parseCodigaYml;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -29,7 +29,7 @@ public final class RosieRulesCacheUpdateHandler {
     public void initRulesets() {
         YAMLFile codigaConfigFile = findCodigaConfigFile(project);
         if (isCodigaConfigFileExist(codigaConfigFile)) {
-            rulesCache.setRulesetNames(collectRulesetNames(codigaConfigFile));
+            rulesCache.setCodigaYmlConfig(parseCodigaYml(codigaConfigFile));
             rulesCache.saveModificationStampOf(codigaConfigFile);
         }
     }
@@ -64,8 +64,8 @@ public final class RosieRulesCacheUpdateHandler {
     //There was a change in the codiga.yml file
     private void updateCacheFromModifiedCodigaConfigFile(YAMLFile codigaConfigFile) {
         rulesCache.saveModificationStampOf(codigaConfigFile);
-        var rulesetNames = collectRulesetNames(codigaConfigFile);
-        rulesCache.setRulesetNames(rulesetNames);
+        rulesCache.setCodigaYmlConfig(parseCodigaYml(codigaConfigFile));
+        var rulesetNames = rulesCache.getCodigaYmlConfig().getRulesets();
 
         //Since there was a config change locally, and there is at least one ruleset name configured,
         // query to the Codiga server must be sent.
@@ -98,7 +98,7 @@ public final class RosieRulesCacheUpdateHandler {
 
     //The codiga.yml file is unchanged
     private void updateCacheFromChangesOnServer() {
-        var rulesetNames = rulesCache.getRulesetNames();
+        var rulesetNames = rulesCache.getCodigaYmlConfig().getRulesets();
         if (!rulesetNames.isEmpty()) {
             /*
               If any of the rulesets have changed on the Codiga server, compared to what we have in the local cache,

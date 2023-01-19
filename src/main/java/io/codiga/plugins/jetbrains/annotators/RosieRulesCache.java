@@ -1,33 +1,35 @@
 package io.codiga.plugins.jetbrains.annotators;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.psi.PsiManager;
 import io.codiga.api.GetRulesetsForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCacheValue.RuleWithNames;
 import io.codiga.plugins.jetbrains.model.rosie.RosieRule;
 import io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil;
+import io.codiga.plugins.jetbrains.rosie.model.codiga.CodigaYmlConfig;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 import org.jetbrains.yaml.psi.YAMLFile;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Caches Rosie rules based on the most up-to-date version of rules and rulesets on the Codiga server.
@@ -63,14 +65,14 @@ public final class RosieRulesCache implements Disposable {
      */
     private long configFileModificationStamp = -1L;
     /**
-     * Ruleset names stored locally in the codiga.yml config file.
+     * The codiga.yml configuration in the current project.
      */
     @Getter
-    private List<String> rulesetNames;
+    private CodigaYmlConfig codigaYmlConfig;
     /**
      * [ruleset name] -> [is ruleset empty]
      * <p>
-     * The ruleset names are the ones returned from the Codiga server after sending the local {@link #rulesetNames}.
+     * The ruleset names are the ones returned from the Codiga server after sending the local {@code codigaYmlConfig#getRulesets()}.
      * <p>
      * If a locally configured ruleset name is not returned (it doesn't exist on Codiga Hub), it won't have an entry in this collection.
      */
@@ -84,7 +86,7 @@ public final class RosieRulesCache implements Disposable {
     public RosieRulesCache(Project project) {
         this.project = project;
         this.cache = new ConcurrentHashMap<>();
-        this.rulesetNames = Collections.synchronizedList(new ArrayList<>());
+        this.codigaYmlConfig = CodigaYmlConfig.EMPTY;
         this.rulesetsFromServer = new ConcurrentHashMap<>();
     }
 
@@ -96,8 +98,8 @@ public final class RosieRulesCache implements Disposable {
         this.configFileModificationStamp = codigaConfigFile.getModificationStamp();
     }
 
-    public void setRulesetNames(List<String> rulesetNames) {
-        this.rulesetNames = Collections.synchronizedList(rulesetNames);
+    public void setCodigaYmlConfig(@NotNull CodigaYmlConfig codigaYmlConfig) {
+        this.codigaYmlConfig = codigaYmlConfig;
     }
 
     public boolean isRulesetExist(String rulesetName) {
@@ -109,7 +111,7 @@ public final class RosieRulesCache implements Disposable {
     }
 
     /**
-     * Clears and repopulates this cache based on the argument rulesets' information returned
+     * Clears and repopulates this cache based on the argument 'rulesets' information returned
      * from the Codiga API.
      * <p>
      * Groups the rules by their target languages, converts them to {@code RosieRule} objects,
@@ -158,15 +160,57 @@ public final class RosieRulesCache implements Disposable {
     }
 
     /**
-     * Returns the list of {@code RosieRule}s for the argument language,
+     * Returns the list of {@code RosieRule}s for the argument language and file path,
      * that will be sent to the Rosie service for analysis.
      *
-     * @param language the language to return the rules for, or empty list if there is no rule cached for the
-     *                 provided language
+     * @param language           the language to return the rules for
+     * @param pathOfAnalyzedFile the absolute path of the file being analyzed. Required to pass in for the {@code ignore} configuration.
      */
-    public List<RosieRule> getRosieRulesForLanguage(LanguageEnumeration language) {
-        var cachedRules = cache.get(getCachedLanguageTypeOf(language));
-        return cachedRules != null ? cachedRules.getRosieRules() : List.of();
+    public List<RosieRule> getRosieRules(LanguageEnumeration language, @NotNull String pathOfAnalyzedFile) {
+        var projectDir = ProjectUtil.guessProjectDir(project);
+        if (projectDir != null) {
+            var cachedRules = cache.get(getCachedLanguageTypeOf(language));
+            var rosieRulesForLanguage = cachedRules != null ? cachedRules.getRosieRules() : List.<RosieRule>of();
+
+            if (!rosieRulesForLanguage.isEmpty()) {
+                String relativePathOfAnalyzedFile = pathOfAnalyzedFile.replace(projectDir.getPath(), "");
+                //Returns the RosieRules that either don't have an ignore rule, or their prefixes don't match the currently analyzed file's path
+                return rosieRulesForLanguage.stream()
+                    .filter(rosieRule -> {
+                            var ruleIgnore = Optional.of(codigaYmlConfig)
+                                .map(config -> config.getIgnore(rosieRule.rulesetName))
+                                .map(rulesetIgnore -> rulesetIgnore.getRuleIgnore(rosieRule.ruleName));
+
+                            //If there is no ruleset ignore or rule ignore for the current RosieRule,
+                            // then we keep it/don't ignore it.
+                            if (ruleIgnore.isEmpty())
+                                return true;
+
+                            //If there is no prefix specified for the current rule ignore config,
+                            // we don't keep the rule/ignore it.
+                            if (ruleIgnore.get().getPrefixes().isEmpty())
+                                return false;
+
+                            return ruleIgnore.get().getPrefixes().stream()
+                                //Since the leading / is optional, we remove it
+                                .map(this::removeLeadingSlash)
+                                //./, /. and .. sequences are not allowed in prefixes, therefore we consider them not matching the file path.
+                                //. symbols in general are allowed to be able to target exact file paths with their file extensions.
+                                .noneMatch(prefix ->
+                                    !prefix.contains("..")
+                                        && !prefix.contains("./")
+                                        && !prefix.contains("/.")
+                                        && removeLeadingSlash(relativePathOfAnalyzedFile).startsWith(prefix));
+                        }
+                    ).collect(toList());
+            }
+        }
+
+        return List.of();
+    }
+
+    private String removeLeadingSlash(String path) {
+        return path.startsWith("/") ? path.replaceFirst("/", "") : path;
     }
 
     /**
@@ -182,7 +226,7 @@ public final class RosieRulesCache implements Disposable {
     /**
      * Returns the cached rules for the provided language and rule id.
      * <p>
-     * Null value for non-existent mapping for a language is already handled in {@link #getRosieRulesForLanguage(LanguageEnumeration)}.
+     * Null value for non-existent mapping for a language is already handled in {@link #getRosieRules(LanguageEnumeration, String)}.
      * <p>
      * It should not return null when retrieving the rule for the rule id, since in {@code RosieImpl#getAnnotations()}
      * the {@link io.codiga.plugins.jetbrains.model.rosie.RosieRuleResponse}s and their ids are based on the values
@@ -199,12 +243,10 @@ public final class RosieRulesCache implements Disposable {
         if (!cache.isEmpty()) {
             cache.clear();
         }
-        if (!rulesetNames.isEmpty()) {
-            rulesetNames.clear();
-        }
         if (!rulesetsFromServer.isEmpty()) {
             rulesetsFromServer.clear();
         }
+        codigaYmlConfig = CodigaYmlConfig.EMPTY;
         lastUpdatedTimeStamp = -1L;
     }
 

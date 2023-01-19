@@ -12,7 +12,16 @@ properties:
       # Can't start with dash.
       pattern: ^[a-z0-9][a-z0-9-]*$
       minLength: 5
+      maxLength: 31
       example: a-ruleset-name
+  ignore:
+    type: array
+    description: Specifies rulesets and rules to ignore code analysis for
+    minItems: 1
+    # This is not key- but object-based uniqueness
+    uniqueItems: true
+    items:
+      type: object
 required:
   - rulesets
 additionalProperties: false

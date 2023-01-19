@@ -96,6 +96,9 @@ public final class RulesetsForClientTestSupport {
             case "javascriptRuleset":
                 rulesets = javascriptRulesets();
                 break;
+            case "python-ruleset":
+                rulesets = pythonRuleset();
+                break;
             default:
                 rulesets = List.of();
         }
@@ -119,6 +122,17 @@ public final class RulesetsForClientTestSupport {
             default:
                 return Optional.empty();
         }
+    }
+
+    /**
+     * Returns a single ruleset with a few rules, all configured for the same language.
+     */
+    public static List<GetRulesetsForClientQuery.RuleSetsForClient> pythonRuleset() {
+        var rules = List.of(PYTHON_RULE_1, PYTHON_RULE_2, PYTHON_RULE_3);
+
+        var ruleset = new GetRulesetsForClientQuery.RuleSetsForClient("typename", 1234, "python-ruleset", rules);
+
+        return List.of(ruleset);
     }
 
     /**

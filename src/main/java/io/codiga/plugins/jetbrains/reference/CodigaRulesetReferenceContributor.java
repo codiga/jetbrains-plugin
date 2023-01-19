@@ -5,6 +5,7 @@ import static com.intellij.patterns.PlatformPatterns.psiFile;
 import static io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil.isRulesetNameValid;
 
 import com.intellij.openapi.paths.WebReference;
+import com.intellij.patterns.PatternCondition;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -15,6 +16,7 @@ import com.intellij.util.ProcessingContext;
 import io.codiga.plugins.jetbrains.rosie.CodigaConfigFileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLFile;
+import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
@@ -26,7 +28,14 @@ public class CodigaRulesetReferenceContributor extends PsiReferenceContributor {
 
     private static final PsiElementPattern.Capture<YAMLPlainTextImpl> CODIGA_RULESET_NAME =
         psiElement(YAMLPlainTextImpl.class)
-            .withParent((psiElement(YAMLSequenceItem.class)))
+            .withParent(psiElement(YAMLSequenceItem.class)
+                .withSuperParent(2, psiElement(YAMLKeyValue.class)
+                    .with(new PatternCondition<>("") {
+                        @Override
+                        public boolean accepts(@NotNull YAMLKeyValue element, ProcessingContext context) {
+                            return "rulesets".equals(element.getKeyText());
+                        }
+                    })))
             .inFile(psiFile(YAMLFile.class)
                 .withName(CodigaConfigFileUtil.CODIGA_CONFIG_FILE_NAME));
 

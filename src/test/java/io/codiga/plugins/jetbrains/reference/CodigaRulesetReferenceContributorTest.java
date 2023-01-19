@@ -35,4 +35,20 @@ public class CodigaRulesetReferenceContributorTest extends TestBase {
 
         assertEmpty(references);
     }
+
+    public void testDoesntAddReferenceForIgnorePrefixPath() {
+        myFixture.configureByText("codiga.yml",
+            "rulesets:\n" +
+                "  - valid-ruleset\n" +
+                "ignore:" +
+                "  - valid-ruleset:" +
+                "    - rule:" +
+                "      - prefix:" +
+                "        - some<caret>path");
+
+        PsiElement element = myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent();
+        PsiReference[] references = element.getReferences();
+
+        assertEmpty(references);
+    }
 }
