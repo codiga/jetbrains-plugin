@@ -6,20 +6,12 @@
 
 # Codiga for Jetbrains
 
-- Code Analysis: analyze your code directly within your IDE using public Codiga rulesets from
-  the [Codiga Hub](https://app.codiga.io/hub/rulesets) or from your private rulesets.
-- Code Snippets: search, create and
-  share [smart code snippets](https://www.codiga.io/code-snippets/smart-code-snippets/) from your IDE. It is integrated
-  with all JetBrains products as well
-  as [VS Code](https://marketplace.visualstudio.com/items?itemName=codiga.vscode-plugin)
-  and [Google Chrome](https://chrome.google.com/webstore/detail/codiga/dbkhkhonmelajjempmoadocgneoadjge).
+Codiga is a static code analyzer on steroids.
 
 Codiga is compatible with all JetBrains products: IntelliJ, AppCode, PHPStorm, DataDrip, GoLand, RubyMine, PyCharm,
 CLion (and many more).
 
-With Codiga, you can create your own code snippets and find and import them easily.
-
-![Inline Completion](images/inline.gif "Using an inline snippet")
+![Code Analysis](images/code-analysis.gif "Static Code Analysis with Codiga")
 
 ## Installation
 
@@ -39,11 +31,21 @@ With Codiga, you can:
 
 ### Getting Started
 
+
+### Automatically
+
+At the root of your project, invoke the following command
+
+```bash
+npx @codiga/cli@latest ruleset-add
+```
+
+**Note**: you must have `npx` installed (available with `npm`)
+
+### Manually
 Visit the [Codiga Hub](https://app.codiga.io/hub/rulesets) and select the rulesets to use for your project.
 
-Then, create a `codiga.yml` at the root of your project with the list of rulesets you want to use.
-
-### Configuration example
+Then, create a `codiga.yml` **at the root of your project** with the list of rulesets you want to use.
 
 Example of `codiga.yml` for Python:
 

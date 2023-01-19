@@ -19,8 +19,24 @@
                 your private rules (requires API token to be specified).
             </p>
             <h3>Quick Start</h3>
+            <h4>Automatic (recommended)</h4>
+            <p>
+            At the root of your project, invoke the command below. It will create a codiga.yml file at the root of your project
+            with the necessary rulesets for you to use.
+            </p>
+
+            <pre>
+npx @codiga/cli@latest ruleset-add
+            </pre>
+
+            <p>
+            You can later add more rulesets to your codiga.yml file by visiting the <a href="https://app.codiga.io/hub/rulesets">Codiga Hub</a>
+            and finding more rulesets for you.
+            </p>
+
+            <h4>Manual</h4>
             <ul>
-                <li>Select rulesets from the <a href="https://app.codiga.io/hub/rulesets">Codiga Hub</a> to check your Python code</li>
+                <li>Select rulesets from the <a href="https://app.codiga.io/hub/rulesets">Codiga Hub</a> to check your code</li>
                 <li>Create a codiga.yml file at the root of your project with the list of rulesets you want to use (example below)</li>
                 <li>Get feedback on your code in real-time!</li>
             </ul>
