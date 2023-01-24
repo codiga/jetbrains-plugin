@@ -43,6 +43,10 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.11.0")
 
+    //codiga.yml parsing
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1")
+
     implementation("com.google.code.gson:gson:2.10")
 
     // markdown support
