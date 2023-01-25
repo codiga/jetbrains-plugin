@@ -18,6 +18,8 @@ final class RosieRuleAstTypes {
     private final static String ENTITY_CHECKED_HTML_ELEMENT = "htmlelement";
     private final static String ENTITY_CHECKED_CLASS_DEFINITION = "classdefinition";
     private final static String ENTITY_CHECKED_FUNCTION_EXPRESSION = "functionexpression";
+    private final static String ENTITY_CHECKED_VARIABLE_DECLARATION = "variabledeclaration";
+    private final static String ENTITY_CHECKED_ANY = "any";
 
     /**
      * Maps the argument element checked to its Rosie counterpart value.
@@ -51,6 +53,10 @@ final class RosieRuleAstTypes {
                 return ENTITY_CHECKED_CLASS_DEFINITION;
             case FUNCTIONEXPRESSION:
                 return ENTITY_CHECKED_FUNCTION_EXPRESSION;
+            case VARIABLEDECLARATION:
+                return ENTITY_CHECKED_VARIABLE_DECLARATION;
+            case ANY:
+                return ENTITY_CHECKED_ANY;
             default:
                 return null;
         }
