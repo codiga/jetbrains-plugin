@@ -21,6 +21,17 @@ import java.util.Optional;
  */
 public final class CodigaConfigFileUtil {
 
+    /**
+     * Combines the following validations for the ruleset name:
+     * <ul>
+     *     <li>it must be at least 5 characters long</li>
+     *     <li>it must be at most 32 character long</li>
+     *     <li>it must start with a lowercase letter or number, but not a dash</li>
+     *     <li>it must consist of lowercase alphanumerical characters and dash</li>
+     * </ul>
+     *
+     * @see <a href="https://regexr.com/730qs">Test cases on regexr</a>
+     */
     private static final String CODIGA_RULESET_NAME_PATTERN = "^[a-z0-9][a-z0-9-]{4,31}$";
     public static final String CODIGA_CONFIG_FILE_NAME = "codiga.yml";
 
