@@ -10,6 +10,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.serviceContainer.AlreadyDisposedException;
@@ -110,23 +111,35 @@ public class AppStarter implements StartupActivity {
                 .addAction(new AnAction("Snippets") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                        ActionManager.getInstance().getAction("com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction")
-                            .actionPerformed(new AnActionEvent(null,
-                                DataManager.getInstance().getDataContext(FileEditorManager.getInstance(project).getSelectedEditor().getComponent()),
-                                ActionPlaces.UNKNOWN,
-                                new Presentation(),
-                                ActionManager.getInstance(), 0));
+                        //The selected editor is null when the user has no open editor by default, or closed all of them before invoking this action.
+                        var selectedEditor = FileEditorManager.getInstance(project).getSelectedEditor();
+                        if (selectedEditor != null) {
+                            ActionManager.getInstance().getAction("com.code_inspector.plugins.intellij.actions.AssistantUseRecipeAction")
+                                .actionPerformed(new AnActionEvent(null,
+                                    DataManager.getInstance().getDataContext(selectedEditor.getComponent()),
+                                    ActionPlaces.UNKNOWN,
+                                    new Presentation(),
+                                    ActionManager.getInstance(), 0));
+                        } else {
+                            DumbService.getInstance(project).showDumbModeNotification("There is no active editor to invoke the selected action in.");
+                        }
                     }
                 })
                 .addAction(new AnAction("Shortcuts") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                        ActionManager.getInstance().getAction("com.code_inspector.plugins.intellij.actions.AssistantListShortcuts")
-                            .actionPerformed(new AnActionEvent(null,
-                                DataManager.getInstance().getDataContext(FileEditorManager.getInstance(project).getSelectedEditor().getComponent()),
-                                ActionPlaces.UNKNOWN,
-                                new Presentation(),
-                                ActionManager.getInstance(), 0));
+                        //The selected editor is null when the user has no open editor by default, or closed all of them before invoking this action.
+                        var selectedEditor = FileEditorManager.getInstance(project).getSelectedEditor();
+                        if (selectedEditor != null) {
+                            ActionManager.getInstance().getAction("com.code_inspector.plugins.intellij.actions.AssistantListShortcuts")
+                                .actionPerformed(new AnActionEvent(null,
+                                    DataManager.getInstance().getDataContext(selectedEditor.getComponent()),
+                                    ActionPlaces.UNKNOWN,
+                                    new Presentation(),
+                                    ActionManager.getInstance(), 0));
+                        } else {
+                            DumbService.getInstance(project).showDumbModeNotification("There is no active editor to invoke the selected action in.");
+                        }
                     }
                 })
                 .addAction(new AnAction("Doc") {
