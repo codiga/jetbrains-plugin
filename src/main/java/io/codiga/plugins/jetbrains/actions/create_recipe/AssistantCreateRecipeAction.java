@@ -1,5 +1,6 @@
 package io.codiga.plugins.jetbrains.actions.create_recipe;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -16,9 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -102,8 +100,8 @@ public class AssistantCreateRecipeAction extends AnAction {
         // URL to go once the user clicked.
         String urlString = String.format("%s/assistant/recipe/create?code=%s&language=%s", FRONTEND_URL, encodedContent, language.rawValue());
         try {
-            Desktop.getDesktop().browse(new URL(urlString).toURI());
-        } catch (IOException | URISyntaxException e) {
+            BrowserUtil.browse(urlString);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
