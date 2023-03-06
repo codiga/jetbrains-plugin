@@ -12,6 +12,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.psi.PsiManager;
+import com.intellij.serviceContainer.AlreadyDisposedException;
 import io.codiga.api.GetRulesetsForClientQuery;
 import io.codiga.api.type.LanguageEnumeration;
 import io.codiga.plugins.jetbrains.annotators.RosieRulesCacheValue.RuleWithNames;
@@ -151,12 +152,16 @@ public final class RosieRulesCache implements Disposable {
      * always reflects the current state of the cache.
      */
     private void reAnalyzeConfigFile() {
-        Arrays.stream(FileEditorManager.getInstance(project).getOpenFiles())
-            .filter(file -> CodigaConfigFileUtil.CODIGA_CONFIG_FILE_NAME.equals(file.getName()))
-            .map(file -> ReadAction.compute(() -> PsiManager.getInstance(project).findFile(file)))
-            .filter(Objects::nonNull)
-            .findFirst()
-            .ifPresent(file -> DaemonCodeAnalyzer.getInstance(project).restart(file));
+        try {
+            Arrays.stream(FileEditorManager.getInstance(project).getOpenFiles())
+                .filter(file -> CodigaConfigFileUtil.CODIGA_CONFIG_FILE_NAME.equals(file.getName()))
+                .map(file -> ReadAction.compute(() -> PsiManager.getInstance(project).findFile(file)))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(file -> DaemonCodeAnalyzer.getInstance(project).restart(file));
+        } catch (AlreadyDisposedException e) {
+            //If the project gets disposed at any point, skip the re-analysis of codiga.yml
+        }
     }
 
     /**
