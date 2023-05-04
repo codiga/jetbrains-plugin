@@ -1,5 +1,6 @@
-[![Code Grade](https://api.codiga.io/project/29692/status/svg)](https://app.codiga.io/public/project/29692/jetbrains-plugin/dashboard)
-[![Code Quality](https://api.codiga.io/project/29692/score/svg)](https://app.codiga.io/public/project/29692/jetbrains-plugin/dashboard)
+[Datadog acquired Codiga](https://www.codiga.io/blog/codiga-joins-datadog/). This repository is no longer active.
+
+
 ![JetBrains Plugins Download](https://img.shields.io/jetbrains/plugin/d/17969)
 ![JetBrains Plugins Ratings](https://img.shields.io/jetbrains/plugin/r/rating/17969)
 ![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/v/17969)
